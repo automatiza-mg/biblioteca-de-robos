@@ -1,0 +1,8 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\Andre\\Downloads\\Base de dados - Curso.xlsx''' Visible: True ReadOnly: False Instance=> planilha
+Excel.GetFirstFreeColumnRow Instance: planilha FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.ReadFromExcel.ReadCells Instance: planilha StartColumn: $'''A''' StartRow: 1 EndColumn: coluna_livre - 1 EndRow: linha_livre - 1 ReadAsText: False FirstLineIsHeader: True RangeValue=> tabela
+SET linha_excel TO 2
+LOOP FOREACH linha IN tabela
+    Excel.WriteToExcel.WriteCell Instance: planilha Value: $'''ok''' Column: $'''G''' Row: linha_excel
+    Variables.IncreaseVariable Value: linha_excel IncrementValue: 1
+END

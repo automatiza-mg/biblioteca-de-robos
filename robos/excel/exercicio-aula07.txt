@@ -1,0 +1,9 @@
+Excel.LaunchExcel.LaunchUnderExistingProcess Visible: True Instance=> exercicio_aula_07
+WAIT 5
+UIAutomation.CloseWindow.CloseByTitleClass Title: $'''Assistente para ativação do Microsoft Office''' Class: $''''''
+SET numero TO 1
+LOOP WHILE (numero) < (11)
+    Excel.GetFirstFreeRowOnColumn Instance: exercicio_aula_07 Column: $'''A''' FirstFreeRowOnColumn=> linha_livre
+    Excel.WriteToExcel.WriteCell Instance: exercicio_aula_07 Value: numero Column: $'''A''' Row: linha_livre
+    Variables.IncreaseVariable Value: numero IncrementValue: 1
+END
