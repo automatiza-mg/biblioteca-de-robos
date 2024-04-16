@@ -1,0 +1,38 @@
+/# Este fluxo descompacta arquivos utilizando o aplicativo 7z. 
+Ele obtem, de uma pasta, os arquivos com extensão ".rar" e ".7z" e os descompacta no aplicativo 7z#/
+Folder.GetFiles Folder: caminho_pasta FileFilter: $'''*.7z''' IncludeSubfolders: True FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> arquivos
+/# Ele obtem todos os arquivos da pasta e das subpastas dentro dela
+#/
+LOOP FOREACH item_7z IN arquivos
+    System.RunApplication.RunApplication ApplicationPath: item_7z WindowStyle: System.ProcessWindowStyle.Maximized
+    WAIT 3
+    MouseAndKeyboard.MoveMouseToImage.ClickImage Images: [imgrepo['Extrair 7zip']] SearchForImageOn: MouseAndKeyboard.SearchTarget.EntireScreen MousePositionOnImage: MouseAndKeyboard.PositionOnImage.MiddleCenter OffsetX: 0 OffsetY: 0 Tolerance: 10 MovementStyle: MouseAndKeyboard.MovementStyle.Instant Occurence: 1 Timeout: 5 ClickType: MouseAndKeyboard.ClickType.LeftClick SecondsBeforeClick: 0 SearchAlgorithm: MouseAndKeyboard.ImageFinderAlgorithm.Legacy X=> X3 Y=> Y3
+    Text.CropText.CropTextBeforeFlag Text: item_7z ToFlag: $'''.7z''' IgnoreCase: False CroppedText=> nome_pasta_7z
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%nome_pasta_7z%{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({F4})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    File.Delete Files: item_7z
+END
+Folder.GetFiles Folder: caminho_pasta FileFilter: $'''*.rar''' IncludeSubfolders: True FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> arquivos
+LOOP FOREACH item_rar IN arquivos
+    System.RunApplication.RunApplication ApplicationPath: item_rar WindowStyle: System.ProcessWindowStyle.Maximized
+    WAIT 3
+    MouseAndKeyboard.MoveMouseToImage.ClickImage Images: [imgrepo['Extrair 7zip']] SearchForImageOn: MouseAndKeyboard.SearchTarget.EntireScreen MousePositionOnImage: MouseAndKeyboard.PositionOnImage.MiddleCenter OffsetX: 0 OffsetY: 0 Tolerance: 10 MovementStyle: MouseAndKeyboard.MovementStyle.Instant Occurence: 1 Timeout: 5 ClickType: MouseAndKeyboard.ClickType.LeftClick SecondsBeforeClick: 0 SearchAlgorithm: MouseAndKeyboard.ImageFinderAlgorithm.Legacy X=> X3 Y=> Y3
+    Text.CropText.CropTextBeforeFlag Text: item_rar ToFlag: $'''.rar''' IgnoreCase: False CroppedText=> nome_pasta_7z
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%nome_pasta_7z%{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({F4})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    File.Delete Files: item_rar
+END
+
+# [ControlRepository][PowerAutomateDesktop]
+
+{
+  "ControlRepositorySymbols": [],
+  "ImageRepositorySymbol": {
+    "Repository": "{\r\n  \"Folders\": [],\r\n  \"Images\": [\r\n    {\r\n      \"Id\": \"ccd7f153-c1e7-4b73-b190-2dc7ce798a05\",\r\n      \"Name\": \"Extrair 7zip\",\r\n      \"Screenshot\": \"iVBORw0KGgoAAAANSUhEUgAAADQAAAAuCAYAAABnNToWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFKSURBVGhD7ZZdDoIwDIB7KeE4EE7CCzEexcRwEhPjKXzSYOJ73UBwm12EbNE6+/DFMdp1n/sJcL7eMCVEiDsixB0R4o4IcUeEfABAFKixlxBZCAMBrOuaHH8uIuRDhEhE6IXIQuGwEdLoycSAGnsuUYU4IELcESHuiBB3RIg7IsSdfxZqsXC+jIsdFRfIYYMryLE5EO9msFBoSaGl8XEQIXuCR2wywNX6ODzvKoRsg/s+1tieZTvlF2Wu+ircqvht6ca4dV5znrVpAs7QWED36/b4a8abf8CQP8lbmLFu25dDE2fL6ZVRhe1Lwo0n8h95Az4hT00P3xPqb7NxRfXWpSS+IqT7524543k6b6ptXdVmnDvGewLOkN7brXUp7Nfq8I6TVEyH3rgUnpMbLpT+fVZh8fkV+g1EiDvpCZ0uN0wJ6LoOUyIxoQ7vsMiLL6hEig0AAAAASUVORK5CYII=\",\r\n      \"ScreenshotPath\": \"imageRepo-screenshots\\\\89e984a7-ffb4-4d1b-a7c8-460b82429c05.png\"\r\n    }\r\n  ],\r\n  \"Version\": 1\r\n}",
+    "ImportMetadata": {},
+    "Name": "imgrepo"
+  },
+  "ConnectionReferences": []
+}
