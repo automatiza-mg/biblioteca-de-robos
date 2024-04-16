@@ -1,0 +1,14 @@
+/# abaixo de 16 anos: não-habilitado para votar
+entre 16 e 17 anos: optativo
+entre 18 e 64 anos: obrigatório
+65 anos ou mais: optativo
+#/
+IF idade >= 65 THEN
+    Display.ShowMessageDialog.ShowMessage Title: $'''Análsie de sua idade''' Message: $'''Você tem %idade% anos, portanto seu voto é facultativo''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+ELSE IF idade >= 18 THEN
+    Display.ShowMessageDialog.ShowMessage Title: $'''Análsie de sua idade''' Message: $'''Você tem %idade% anos, portanto seu voto é obrigatório''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+ELSE IF idade >= 16 THEN
+    Display.ShowMessageDialog.ShowMessage Title: $'''Análsie de sua idade''' Message: $'''Você tem %idade% anos, portanto seu voto é facultativo''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+ELSE IF idade < 16 THEN
+    Display.ShowMessageDialog.ShowMessage Title: $'''Análsie de sua idade''' Message: $'''Você tem %idade% anos, portanto você ainda não está habilitado para votar''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+END
