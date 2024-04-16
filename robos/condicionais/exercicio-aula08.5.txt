@@ -1,0 +1,8 @@
+Variables.CreateNewDatatable InputTable: { ^['numero'], [1], [2], [5], [209], [200] } DataTable=> numeros
+LOOP FOREACH linha IN numeros
+    IF (linha['numero'] mod 2) = 0 THEN
+        Display.ShowMessageDialog.ShowMessage Title: $'''Par ou ímpar''' Message: $'''O número %linha['numero']% é par''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+    ELSE
+        Display.ShowMessageDialog.ShowMessage Title: $'''Par ou ímpar''' Message: $'''O número %linha['numero']% é ímpar''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+    END
+END
