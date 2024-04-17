@@ -1,0 +1,100 @@
+# Executa sublfuxo de login no SEI.
+CALL login_sei
+# Executa sublfuxo de troca de unidade no SEI.
+CALL troca_unidade_sei
+# Usa função Javascript para buscar o número de páginas (de processos) da unidde.
+WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { 
+var pages = document.getElementById(\"selRecebidosPaginacaoSuperior\")
+
+return pages.length - 1
+}''' Result=> pagination
+Text.ToNumber Text: pagination Number=> pagination_number
+# Cria tabela onde serão incluídos os processos a serem distribuídos.
+Variables.CreateNewDatatable InputTable: { ^['Processo', 'atribuicoes', 'atribuir'], [$'''''', $'''''', $''''''] } DataTable=> tabela
+SET processos_adicionados TO 1
+# Cria loop para buscar todos os processos por página. Neste processo a busca deveria ocorrer dos processos da última página até a primeira (ordem inversa). Por isso a variável é reduzida em -1 a cada rodada do loop.
+LOOP page FROM pagination_number TO 0 STEP -1
+    # Executa função Javascript para ir para a página desejada. Como dito, o trabalho se inicia da última página até a primeira.
+    WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { infraAcaoPaginar(\'=\',%page%,\'Recebidos\', null) }'''
+    WAIT 2
+    # Função Javascript para buscar informações de todos os processo da página.
+    WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { 
+
+var processos = \'\'
+var listaProcessos = document.getElementById(\"tblProcessosRecebidos\")
+var corpoProcessos = listaProcessos.children[1]
+var linhas = corpoProcessos.children
+
+for (let indexLinha = 1; indexLinha < linhas.length; indexLinha++)  {
+marcadorTodos = \'\'
+marcadores = linhas[indexLinha].children[1].children
+
+if (marcadores.length > 0) {
+
+for (let indexMarca = 0; indexMarca < marcadores.length; indexMarca++){
+
+if (marcadores[indexMarca].children[0].src.includes(\'marcador\')) {
+
+marcador = marcadores[indexMarca].onmouseover.toString().split(\"\',\'\")[1].split(\"\');\\n}\")[0]
+
+marcadorTodos = marcadorTodos.concat(marcador,\'///\')
+
+}
+
+}
+
+marcadorTodos = marcadorTodos.concat(\'///\')
+
+}
+
+
+processos = processos.concat(linhas[indexLinha].children[2].textContent,\'$$$\',marcadorTodos,\'###\')
+
+
+}
+
+return processos
+}''' Result=> processos
+    # Quebra a busca das informações dos processos em colunas e linhas a serem adicionadas na tabela. Os caracteres "$$$" são responsáveis pela divisão das colunas e os caracteres ",###" são responsáveis pela divisão das linhas. Essa construção foi exigida porque o Power Automate não aceita como resultado de uma ação que executa Javascript (return) uma lista. O retorno da função executada tem que ser, necessariamente, um texto. Esta divisão é responsável pela quebra das linhas ("###")
+    Text.SplitText.SplitWithDelimiter Text: processos CustomDelimiter: $'''###''' IsRegEx: False Result=> lista_processos
+    # Quebra variável de entrada "nome_marcadores" em lista. Necessário para saber quantos servidores irão realizar a atividade.
+    Text.SplitText.SplitWithDelimiter Text: nomes_marcadores CustomDelimiter: $''';''' IsRegEx: False Result=> nomes_marcadores_lista
+    # Cria loop para buscar todas as informações por processos.
+    LOOP FOREACH item IN lista_processos
+        # Quebra a busca das informações dos processos em colunas e linhas a serem adicionadas na tabela. Os caracteres "$$$" são responsáveis pela divisão das colunas e os caracteres ",###" são responsáveis pela divisão das linhas. Essa construção foi exigida porque o Power Automate não aceita como resultado de uma ação que executa Javascript (return) uma lista. O retorno da função executada tem que ser, necessariamente, um texto. Esta divisão é responsável pela quebra das colunas ("$$$")
+        Text.SplitText.SplitWithDelimiter Text: item CustomDelimiter: $'''$$$''' IsRegEx: False Result=> lista_processos_marcadores
+        # Confere se a quebra de colunas retornou duas colunas, pois algumas vezes ela pode vir em branco.
+        IF lista_processos_marcadores.Count = 2 THEN
+            # Se processo não tem nenhum marcador ele poderá ser distribuído, caso contrário não. Tendo em vista o alto volume de processos não distribuídos e a dificuldade de acessar todos os processos para saber o que é referente a INSS, resolvemos simplificar a análise e distribuir simplesmente se não houver marcador no processo.
+            IF (lista_processos_marcadores[1].Length > 0) = $'''True''' THEN
+                Variables.AddItemToList Item: $'''Não''' List: lista_processos_marcadores
+            ELSE
+                Variables.AddItemToList Item: $'''Sim''' List: lista_processos_marcadores
+            END
+        END
+        # Confere se linha agora possui 3 colunas (após adição da análise "Sim" ou "Não"), pois algumas vezes ela pode vir em branco.
+        IF lista_processos_marcadores.Count = 3 THEN
+            # Se processo foi marcado como "Sim" (ou sem nenhum marcador) ele é adicionado na tabela de dados.
+            IF Contains(lista_processos_marcadores[2], $'''Sim''', False) THEN
+                Variables.AddRowToDataTable.AppendRowToDataTable DataTable: tabela RowToAdd: lista_processos_marcadores
+                # Verifica se a tabela de dados contruída tem a quantidade de trabalho desejado (servidores * número de processos por servidor).
+                IF processos_adicionados >= (nomes_marcadores_lista.Count * processos_por_marcador) THEN
+                    GOTO fim_busca_processos
+                END
+                Variables.IncreaseVariable Value: processos_adicionados IncrementValue: 1
+            END
+        END
+    END
+END
+# Finaliza busca de processos quando tabela tem a quantidade de trabalho desejado (servidores * número de processos por servidor).
+LABEL fim_busca_processos
+Variables.DeleteRowFromDataTable DataTable: tabela RowIndex: 0
+# Verifica se a quantidade de trabalho desejado (servidores * número de processos por servidor) é maior que o número de processos disponíveis.
+IF (nomes_marcadores_lista.Count * processos_por_marcador) > processos_adicionados THEN
+    Display.ShowMessageDialog.ShowMessage Title: $'''Atenção''' Message: $'''Existem %processos_adicionados% processo(s) para ser(em) distribuído(s). Isso é menos do que os %processos_por_marcador% processos por funcionários disponíveis atualmente para realizar a atividade (%nomes_marcadores_lista.Count% servidores disponíveis). Uma sugestão é redefinir as variáveis de entrada \"processos_por_marcador\" ou \"nomes_marcadores\"  para que cada servidor fique com a quantidade proporcional aos %processos_adicionados% processo(s) disponíveis.''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+    EXIT Code: 0 ErrorMessage: $'''Fluxo finalizado para ajuste das variáveis de entrada \"processos_por_marcador\" e ou \"nomes_marcadores\".'''
+ELSE
+    # Executa sublfuxo de para inclusão de marcadores nos processos selecionados.
+    CALL incluindo_marcadores
+END
+Display.ShowMessageDialog.ShowMessage Title: $'''Sucesso''' Message: $'''Fluxo executado com sucesso''' Icon: Display.Icon.Information Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
