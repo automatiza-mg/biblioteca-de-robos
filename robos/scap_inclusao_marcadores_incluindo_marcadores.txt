@@ -1,0 +1,72 @@
+SET contador TO 0
+# Cria loop na lista de servidores disponíveis para realizar o trabalho ("nomes_marcadores").
+LOOP FOREACH nome_marcador_processo IN nomes_marcadores_lista
+    SET index_inicio TO contador
+    # Cria loop para marcar o número de processos desejados por servidor ("processos_por_marcador").
+    LOOP marcador_processo_index FROM 1 TO processos_por_marcador STEP 1
+        IF Contains(tabela[contador]['atribuir'], $'''Sim''', False) THEN
+            # Executa Javascript para filtrar processo na barra de pesquisa do canto superior direito do sistema.
+            WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { 
+
+//Pesquisa número do processo
+document.getElementById(\'txtPesquisaRapida\').value = \"%tabela[contador]['Processo']%\"
+
+document.getElementById(\'frmProtocoloPesquisaRapida\').submit();
+
+}''' Result=> processos
+            # Aguarda próxima página ser carregada. Aguarda 5 segundos, pois a próxima função Javascript estava sendo executada muito rápido.
+            WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sei Text: $'''Consultar Andamento''')
+            WAIT 5
+            # Executa função javascript para clicar na opção de adição de marcadores.
+            WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { 
+
+//Clica no botão marcadores dentro do processo
+doc = window.top.document.querySelectorAll(\'iframe\')[1]
+doc.contentDocument.getElementById(\'divArvoreAcoes\').children[22].click()
+
+}''' Result=> processos
+            # Aguarda próxima página ser carregada. Caso o processo pare aqui é porque os 5 segundos aguardados anteriormente não foram suficientes, basta clicar manualmente na opção de adicionar marcador.
+            WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sei Text: $'''Adicionar Marcador''')
+            # Executa função Javascript para adicionar marcador.
+            WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { 
+
+doc = window.top.document.querySelectorAll(\'iframe\')[1]
+elemento_selecao = doc.contentDocument.getElementsByClassName(\'dd-select\')[0]
+input_marcador = elemento_selecao.children[0]
+elemento_selecao.removeChild(input_marcador)
+marcador = elemento_selecao.children[0]
+
+options = doc.contentDocument.getElementsByClassName(\'dd-option\')
+
+for (let index = 1; index < options.length; index++){
+    option = options[index]
+    if (option.children[2].textContent == \'%nome_marcador_processo%\') {
+    	
+    	doc.contentDocument.getElementById(\'hdnIdMarcador\').value = option.children[0].value
+
+    	option_input = option.children[0].cloneNode(true)
+    	option_input.className = \'dd-selected-value\'
+    	
+    	option_image = option.children[1].cloneNode(true)
+       option_image.className = \'dd-selected-image\'
+    	
+    	option_text = option.children[2].cloneNode(true)
+    	option_text.className = \'dd-selected-text\'
+       
+       elemento_selecao.insertBefore(option_input, marcador)
+       marcador.appendChild(option_image)
+       marcador.appendChild(option_text)
+       option.classList.add(\'dd-option-selected\')
+    }
+}
+
+ doc.contentDocument.getElementById(\'sbmSalvar\').click()
+
+
+}''' Result=> processos
+            # Aguarda próxima página ser carregada, antes de reiniciar o loop.
+            WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sei Text: $'''Marcadores do Processo''')
+        END
+        Variables.IncreaseVariable Value: contador IncrementValue: 1
+    END
+END
