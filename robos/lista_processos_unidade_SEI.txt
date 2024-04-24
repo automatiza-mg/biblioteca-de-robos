@@ -1,0 +1,41 @@
+**REGION início_lista_processos
+/# *Subfluxo para listar todos processos SEI de uma determinada unidade.*
+Deve-se rodar anteriormente os fluxos: login_sei > troca_unidade
+Ao final, a variável de fluxo "lista_final" conterá todos números de processos da unidade SEI selecionada.#/
+WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { 
+var pages = document.getElementById(\"selRecebidosPaginacaoSuperior\")
+
+return pages.length - 1
+}''' Result=> pagination
+Text.ToNumber Text: pagination Number=> pagination_number
+Variables.CreateNewDatatable InputTable: { ^['Processos'], [$''''''] } DataTable=> tabela
+LOOP page FROM pagination_number TO 0 STEP -1
+    WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { infraAcaoPaginar(\'=\',%page%,\'Recebidos\', null) }'''
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() {
+   
+	const processos = [];
+	var marcadores = \'\';
+	//Seleciona linhas from table \"processos recebidos\"
+
+	var listaProcessos = document.getElementById(\"tblProcessosRecebidos\");
+	var corpoProcessos = listaProcessos.children[2];
+	var linhas = corpoProcessos.children;
+    
+	//Loop para verificar cada linha da tabela
+	for (let indexLinha = 0; indexLinha < linhas.length; indexLinha++) {
+		
+		marcadores = linhas[indexLinha].children[2].textContent;
+		processos[indexLinha] = marcadores;
+        }
+
+    return processos.toString();
+}
+''' Result=> processos_vetor
+    Text.SplitText.SplitWithDelimiter Text: processos_vetor CustomDelimiter: $''',''' IsRegEx: False Result=> lista
+    Variables.MergeLists FirstList: lista_final SecondList: lista OutputList=> lista_final
+END
+Excel.LaunchExcel.LaunchUnderExistingProcess Visible: False Instance=> ExcelInstance
+Excel.WriteToExcel.Write Instance: ExcelInstance Value: lista_final
+Excel.CloseExcel.CloseAndSaveAs Instance: ExcelInstance DocumentFormat: Excel.ExcelFormat.FromExtension DocumentPath: $'''C:\\Users\\santo\\Desktop\\processos'''
+**ENDREGION
