@@ -1,0 +1,20 @@
+# Constroi o link para chamada da API, onde é necessário passar token e código de rastreio.
+SET url_api_correios TO $'''https://api.linketrack.com/track/json?user=%usuario_api_correios%&token=%chave_acesso_api_correios%&codigo=%codigo_rastreio%'''
+# Chama API.
+Web.InvokeWebService.InvokeWebServiceUseAuth Url: url_api_correios Method: Web.Method.Get Accept: $'''application/json''' ContentType: $'''application/json''' ConnectionTimeout: 30 FollowRedirection: True ClearCookies: True FailOnErrorStatus: False EncodeRequestBody: True UserAgent: $'''Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6''' Encoding: Web.Encoding.utf_8 AcceptUntrustedCertificates: True Username: $'''m7522667''' Password: $'''110715_Dias5''' Response=> response StatusCode=> status_code
+# Verifica se status da resposta da chamada da API foi bem sucedida (status_code = 200).
+IF status_code = 200 THEN
+    # Caso status da resposta da chamada da API tenha sido bem sucedida (status_code = 200), busca informações necessárias no json recebido.
+    # Converte json recebido em objeto para facilitar busca das informações necessárias.
+    Variables.ConvertJsonToCustomObject Json: response CustomObject=> json_object
+    # Busca das informações necessárias.
+    SET data_postagem TO json_object['eventos'][json_object['quantidade'] - 1]['data']
+    SET hora_postagem TO json_object['eventos'][json_object['quantidade'] - 1]['hora']
+    SET local_postagem TO json_object['eventos'][json_object['quantidade'] - 1]['local']
+    SET local_postagem TO json_object['eventos'][json_object['quantidade'] - 1]['status']
+ELSE
+    # Caso status da resposta da chamada da API tenha sido diferente de 200 chama atenção do usuário com uma mensagem. Poderá ser retirada caso seja incluída dentro de um loop. Neste caso, respostas mal sucedidas poderão ser gravadas em uma coluna de planilha excel, por exemplo.
+    Display.ShowMessageDialog.ShowMessage Title: $'''Atenção''' Message: $'''Status code da consulta não foi 200, foi %status_code%). O que siginifica que algo deu errado. Pode ser apenas um problema temporário de conexão. Tente novamente em alguns minutos. Status code 401 também pode indicar código de rastreio errado. Se for o caso, uso o endereço https://linketrack.com/ para testes.''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+END
+# Aguarda 1 segundo para, caso seja necessário reiniciar o fluxo. Muito importante este ponto pois, só pedemos fazer uma chamada por segundo. Caso contrário o serviço poderá bloquear nosso usuário.
+WAIT 1
