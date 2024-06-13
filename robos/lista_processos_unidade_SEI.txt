@@ -1,4 +1,3 @@
-
 FUNCTION lista_processos GLOBAL
     **REGION início_lista_processos
     /# *Subfluxo para listar todos processos SEI de uma determinada unidade.*
