@@ -1,0 +1,11 @@
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> hora_inicio
+SET caminho_arquivo TO $'''C:\\Users\\m7522667\\Downloads\\teste_pythomate.xlsx'''
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_arquivo Visible: True ReadOnly: False Instance=> excel
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: excel Name: $'''sem-variavel'''
+Excel.GetFirstFreeRowOnColumn Instance: excel Column: $'''C''' FirstFreeRowOnColumn=> linha_livre
+Excel.WriteToExcel.WriteCell Instance: excel Value: hora_inicio Column: $'''a''' Row: linha_livre
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> hora_fim
+DateTime.Subtract FromDate: hora_fim SubstractDate: hora_inicio TimeUnit: DateTime.DifferenceTimeUnit.Seconds TimeDifference=> temp_execucao
+Excel.WriteToExcel.WriteCell Instance: excel Value: temp_execucao Column: $'''b''' Row: linha_livre
+Excel.WriteToExcel.WriteCell Instance: excel Value: $'''Pythomate executado com sucesso''' Column: $'''c''' Row: linha_livre
+Excel.CloseExcel.CloseAndSave Instance: excel
