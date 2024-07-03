@@ -1,0 +1,66 @@
+# Este subfluxo reúne em uma só aba todos aqueles professores que devem ser taxados por meio da formação de uma lista única de INSS (junção das abas de "Inss Externos" e "Inss internos")
+Excel.GetAllWorksheets Instance: taxacao Worksheets=> SheetNames
+IF NotContains(SheetNames, $'''Inss geral''', False) THEN
+    Excel.AddWorksheet Instance: taxacao Name: $'''Inss geral''' WorksheetPosition: Excel.WorksheetPosition.Last
+    Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: taxacao Name: $'''Inss internos'''
+    Excel.ActivateCellInExcel.ActivateCell Instance: taxacao Column: $'''a''' Row: 1
+    SET linha_inss TO 1
+    LOOP LoopIndex FROM 1 TO 50000 STEP 1
+        Excel.ReadFromExcel.ReadCell Instance: taxacao StartColumn: $'''a''' StartRow: linha_inss ReadAsText: False CellValue=> ExcelData
+        IF IsEmpty(ExcelData) THEN
+        ELSE
+            EXIT LOOP
+        END
+        Variables.IncreaseVariable Value: linha_inss IncrementValue: 1
+    END
+    Excel.ActivateCellInExcel.ActivateCell Instance: taxacao Column: $'''a''' Row: linha_inss + 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{LControlKey}({LShiftKey}{Right}{Down})''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{LShiftKey}({Up})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 2
+    Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: taxacao Name: $'''Inss geral'''
+    Excel.WriteToExcel.WriteCell Instance: taxacao Value: $'''Nome''' Column: $'''a''' Row: 1
+    Excel.WriteToExcel.WriteCell Instance: taxacao Value: $'''Valor total recebido''' Column: $'''b''' Row: 1
+    Excel.WriteToExcel.WriteCell Instance: taxacao Value: $'''INSS''' Column: $'''c''' Row: 1
+    Excel.ActivateCellInExcel.ActivateCell Instance: taxacao Column: $'''a''' Row: 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{LControlKey}({V})''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+    WAIT 2
+    Excel.GetFirstFreeRowOnColumn Instance: taxacao Column: $'''a''' FirstFreeRowOnColumn=> linha_livre_internos
+    Excel.SelectCellsFromExcel.SelectCells Instance: taxacao StartColumn: $'''a''' StartRow: linha_livre_internos - 1 EndColumn: $'''a''' EndRow: linha_livre_internos - 1
+    Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: taxacao Name: $'''Inss Externos'''
+    Excel.ActivateCellInExcel.ActivateCell Instance: taxacao Column: $'''a''' Row: 1
+    SET linha_inss TO 1
+    LOOP LoopIndex FROM 1 TO 50000 STEP 1
+        Excel.ReadFromExcel.ReadCell Instance: taxacao StartColumn: $'''a''' StartRow: linha_inss ReadAsText: False CellValue=> ExcelData
+        IF IsEmpty(ExcelData) THEN
+        ELSE
+            EXIT LOOP
+        END
+        Variables.IncreaseVariable Value: linha_inss IncrementValue: 1
+    END
+    Excel.ActivateCellInExcel.ActivateCell Instance: taxacao Column: $'''a''' Row: linha_inss + 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{LControlKey}({LShiftKey}{Right}{Down})''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{LShiftKey}({Up})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: taxacao Name: $'''Inss geral'''
+    WAIT 2
+    Excel.ActivateCellInExcel.ActivateCell Instance: taxacao Column: $'''a''' Row: linha_livre_internos
+    WAIT 2
+    Excel.SelectCellsFromExcel.SelectCells Instance: taxacao StartColumn: $'''a''' StartRow: linha_livre_internos EndColumn: $'''a''' EndRow: linha_livre_internos
+    WAIT 3
+    Excel.SelectCellsFromExcel.SelectCells Instance: taxacao StartColumn: $'''a''' StartRow: linha_livre_internos EndColumn: $'''a''' EndRow: linha_livre_internos
+    WAIT 3
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{LControlKey}({V})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+    Excel.ActivateCellInExcel.ActivateCell Instance: taxacao Column: $'''a''' Row: 1
+    # ou {Alt}{C}{LC}{F}
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{Alt}{C}{S}{F}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{Alt}({Down})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{Tab}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{LControlKey}({T})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    # ou {Alt}{C}{KF}{T}
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{Alt}{C}{O}{T}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+    WAIT 1
+END
+Excel.SelectCellsFromExcel.SelectCells Instance: taxacao StartColumn: $'''a''' StartRow: 1 EndColumn: $'''a''' EndRow: 1
+Excel.GetFirstFreeRowOnColumn Instance: taxacao Column: $'''a''' FirstFreeRowOnColumn=> FirstFreeRowOnColumn2
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: taxacao Name: $'''taxacao'''
