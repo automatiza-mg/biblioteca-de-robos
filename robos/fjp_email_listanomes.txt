@@ -1,0 +1,30 @@
+/# Caminho do arquivo das informações dos professores (variável de entrada 'caminho_planilhabase):
+[caminho da pasta]\\sisap_[mês]_[ano].xlsx#/
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_planilhabase Visible: True ReadOnly: False Instance=> base_infos
+Excel.GetAllWorksheets Instance: base_infos Worksheets=> SheetNames2
+IF NotContains(SheetNames2, $'''Lista nomes''', False) THEN
+    WAIT 2
+    Excel.ActivateCellInExcel.ActivateCell Instance: base_infos Column: $'''a''' Row: 1
+    # ou {Alt}({C}{LC}{F})
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: base_infos TextToSend: $'''{Alt}({C}{S}{F})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+    WAIT 2
+    Excel.GetFirstFreeRowOnColumn Instance: taxacao Column: $'''B''' FirstFreeRowOnColumn=> FirstFreeRowOnColumn
+    Excel.CopyCellsFromExcel.CopyCells Instance: taxacao StartColumn: $'''B''' StartRow: 2 EndColumn: $'''C''' EndRow: FirstFreeRowOnColumn - 1
+    WAIT 3
+    Excel.AddWorksheet Instance: base_infos Name: $'''Lista nomes''' WorksheetPosition: Excel.WorksheetPosition.Last
+    Excel.ActivateCellInExcel.ActivateCell Instance: base_infos Column: $'''a''' Row: 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: base_infos TextToSend: $'''{Alt}{C}{V}{E}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    # ou {Alt}({C}{KF}{T})
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}{C}{O}{T}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+    # ou {Alt}{S}{RE}
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: base_infos TextToSend: $'''{Alt}{S}{M}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: base_infos TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: base_infos TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    # ou {Alt}({C}{LC}{F})
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: base_infos TextToSend: $'''{Alt}({C}{S}{F})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+END
+WAIT 1
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: base_infos Name: $'''Lista nomes'''
+Excel.GetFirstFreeColumnRow Instance: base_infos FirstFreeColumn=> coluna_vazia FirstFreeRow=> linha_vazia
+Excel.ReadFromExcel.ReadCells Instance: base_infos StartColumn: $'''a''' StartRow: 2 EndColumn: $'''a''' EndRow: linha_vazia - 1 ReadAsText: False FirstLineIsHeader: False RangeValue=> lista_cpf
+Excel.ReadFromExcel.ReadCells Instance: base_infos StartColumn: $'''b''' StartRow: 2 EndColumn: $'''b''' EndRow: linha_vazia - 1 ReadAsText: False FirstLineIsHeader: False RangeValue=> lista_nomes
