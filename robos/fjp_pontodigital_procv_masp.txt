@@ -1,0 +1,24 @@
+Excel.AddWorksheet Instance: excel_internos Name: $'''masp_procv''' WorksheetPosition: Excel.WorksheetPosition.Last
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: sisap_caminho_arquivo Visible: True ReadOnly: False Instance=> tb_procv
+/# O arquivo a ser aberto está salvo como uma variável de entrada denominada "sisap_caminho_arquivo". Na máquina que irá rodar o robô, este caminho é: 
+G:\\DEPARTAMENTOS\\DPGF\\GRH\\RCA\\Folha Pagamento\\2024\\Pgto. docentes EG - 2024\\Maio 2024\\sisap_maio_2024.xlsx
+
+Caso o robô seja executado em outra máquina, a variável de entrada "caminho_arquivo" deve ter seu 'valor padrão' alterado, utilizando o mesmo modelo atual.#/
+Excel.GetFirstFreeColumnRow Instance: tb_procv FirstFreeColumn=> coluna_livre_tb_procv FirstFreeRow=> linha_livre_tb_procv
+Excel.ReadFromExcel.ReadCells Instance: tb_procv StartColumn: 1 StartRow: 1 EndColumn: coluna_livre_tb_procv - 1 EndRow: linha_livre_tb_procv - 1 ReadAsText: False FirstLineIsHeader: False RangeValue=> conjunto_tb_procv
+Excel.WriteToExcel.WriteCell Instance: excel_internos Value: conjunto_tb_procv Column: 1 Row: 1
+Excel.CopyCellsFromExcel.CopyCells Instance: excel_internos StartColumn: $'''b''' StartRow: 1 EndColumn: $'''b''' EndRow: linha_livre_tb_procv - 1
+Excel.PasteCellsToExcel.PasteAt Instance: excel_internos Column: $'''e''' Row: 1
+# As ações 1 a 8 são referentes à abertura do arquivo excel advindo do Sisap, leitura e cópia dos dados desta tabela e colagem e tratamento no arquivo excel da taxação, de modo a evitar erros no Procv.
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: excel_internos Name: $'''Internos'''
+Excel.InsertColumn Instance: excel_internos Column: $'''P'''
+WAIT 2
+Excel.WriteToExcel.WriteCell Instance: excel_internos Value: $'''Masp''' Column: $'''P''' Row: 1
+Excel.ActivateCellInExcel.ActivateCell Instance: excel_internos Column: $'''P''' Row: 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel_internos TextToSend: $'''=SEERRO(PROCV(B2;masp_procv!C:E;3;FALSO);\"Servidor ainda não possui masp\")
+{Return}''' DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: False
+/# As linhas que deram erro na fórmula e retornaram como "Servidor ainda não possui masp" são de novos servidores que ainda não foram cadastrados no Sisap. Nesses casos, o taxador irá realizar a taxação manualmente no mês em questão. 
+Portanto, os casos em que a fórmula retornou "Servidor ainda não possui masp" deverão constar como "necessário cadastrar o servidor no Sisap" na coluna "automate" ao fim da automação.#/
+Excel.SelectCellsFromExcel.SelectCells Instance: excel_internos StartColumn: $'''P''' StartRow: 2 EndColumn: $'''P''' EndRow: linha_livre_internos - 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel_internos TextToSend: $'''{Control}({D})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+# As ações 10 a 18 são referentes à criação da coluna "Masp" na aba 'Internos', criação da fórmula SEERRO + PROCV e expansão desse conteúdo para todas as linhas da coluna.
