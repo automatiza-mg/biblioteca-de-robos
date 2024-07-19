@@ -1,0 +1,6 @@
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateOnly CurrentDateTime=> CurrentDateTime
+Text.CropText.CropTextBetweenFlags Text: CurrentDateTime FromFlag: $'''/''' ToFlag: $'''/''' IgnoreCase: False CroppedText=> mes IsFlagFound=> IsFlagFound
+Text.CropText.CropTextBeforeFlag Text: CurrentDateTime ToFlag: $'''/%mes%''' IgnoreCase: False CroppedText=> dia IsFlagFound=> IsFlagFound
+Text.CropText.CropTextAfterFlag Text: CurrentDateTime FromFlag: $'''%mes%/''' IgnoreCase: False CroppedText=> ano_hora IsFlagFound=> IsFlagFound
+Text.GetSubtext.GetSubtextFromStartTo Text: ano_hora NumberOfChars: 4 Subtext=> ano
+SET data TO $'''%dia%%mes%%ano%'''
