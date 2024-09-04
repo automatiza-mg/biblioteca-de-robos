@@ -1,23 +1,4 @@
-DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\Andre\\Documents\\SIGES-SEPLAG\\SEE_FGTS\\teste-email-30_08\\CHAVE DE MOVIMENTAÇÃO - EMAILS.xlsx''' Visible: True ReadOnly: False Instance=> ExcelInstance
-WAIT 20
-Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: ExcelInstance Name: $'''Planilha1'''
-LABEL início
-Excel.GetFirstFreeRowOnColumn Instance: ExcelInstance Column: $'''O''' FirstFreeRowOnColumn=> robô
-Excel.ReadFromExcel.ReadCell Instance: ExcelInstance StartColumn: $'''A''' StartRow: robô ReadAsText: False CellValue=> email
-Excel.ReadFromExcel.ReadCell Instance: ExcelInstance StartColumn: $'''B''' StartRow: robô ReadAsText: False CellValue=> NOME
-Folder.GetFiles Folder: $'''C:\\Users\\Andre\\Documents\\SIGES-SEPLAG\\SEE_FGTS\\teste-email-30_08''' FileFilter: $'''%NOME%*pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> chaves
-Clipboard.Clear _
-@@copilotGeneratedAction: 'False'
-Scripting.RunPowershellScript.RunPowershellScript Script: $'''Add-Type -AssemblyName System.Windows.Forms
-
-# Define the path to the file you want to copy
-$filePath = \"C:\\Users\\Andre\\Documents\\SIGES-SEPLAG\\SEE_FGTS\\teste-email-30_08\\%NOME%.pdf\"
-
-# Create a StringCollection to hold the file path(s)
-$files = New-Object System.Collections.Specialized.StringCollection
-$files.Add($filePath)
-
+dd($filePath)
 # Set the files in the clipboard
 [System.Windows.Forms.Clipboard]::SetFileDropList($files)''' ScriptOutput=> PowershellOutput
 WAIT 4
@@ -61,12 +42,7 @@ ELSE
     END
 END
 Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''e-mail com chave em pdf enviado''' Column: $'''O''' Row: robô
-Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: CurrentDateTime Column: $'''P''' Row: robô
-GOTO início
-
-# [ControlRepository][PowerAutomateDesktop]
-
-{
+Excel.WriteToExcel.Writ{
   "ControlRepositorySymbols": [
     {
       "IgnoreImagesOnSerialization": false,
