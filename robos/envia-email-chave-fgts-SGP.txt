@@ -1,17 +1,18 @@
 Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_excel_emails Visible: True ReadOnly: False Instance=> ExcelInstance
-WAIT 20
+DISABLE WAIT 20
 Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: ExcelInstance Name: $'''Planilha1'''
 LABEL início
-DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-Text.ConvertDateTimeToText.FromDateTime DateTime: CurrentDateTime StandardFormat: Text.WellKnownDateTimeFormat.GeneralDateTimeShortTime Result=> FormattedDateTime
 Excel.GetFirstFreeRowOnColumn Instance: ExcelInstance Column: $'''O''' FirstFreeRowOnColumn=> robô
 Excel.ReadFromExcel.ReadCell Instance: ExcelInstance StartColumn: $'''A''' StartRow: robô ReadAsText: False CellValue=> email
 Excel.ReadFromExcel.ReadCell Instance: ExcelInstance StartColumn: $'''B''' StartRow: robô ReadAsText: False CellValue=> NOME
 Excel.ReadFromExcel.ReadCell Instance: ExcelInstance StartColumn: $'''M''' StartRow: robô ReadAsText: False CellValue=> resultado
-IF Contains(resultado, $'''Chave gerada''', False) THEN
-    Folder.GetFiles Folder: caminho_pasta_chaves FileFilter: $'''%NOME%*pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> chaves
-    Clipboard.Clear _
-    @@copilotGeneratedAction: 'False'
+LOOP WHILE (robô) < (email)
+    DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+    Text.ConvertDateTimeToText.FromDateTime DateTime: CurrentDateTime StandardFormat: Text.WellKnownDateTimeFormat.GeneralDateTimeShortTime Result=> FormattedDateTime
+    IF Contains(resultado, $'''Chave gerada''', False) THEN
+        Folder.GetFiles Folder: caminho_pasta_chaves FileFilter: $'''%NOME%*pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> chaves
+        Clipboard.Clear _
+        @@copilotGeneratedAction: 'False'
 Scripting.RunPowershellScript.RunPowershellScript Script: $'''Add-Type -AssemblyName System.Windows.Forms
 
 # Define o diretório onde os arquivos estão localizados
@@ -33,53 +34,125 @@ foreach ($filePath in $filePaths) {
 
 # Define os arquivos na área de transferência
 [System.Windows.Forms.Clipboard]::SetFileDropList($files)''' ScriptOutput=> PowershellOutput
-    WAIT 4
-    WebAutomation.LaunchChrome.LaunchChromeCloseDialog Url: $'''https://mail.google.com/mail/u/0/?ogbl#inbox''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> sgp
-    DISABLE WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Pesquisar e-mail''')
-    WebAutomation.Click.Click BrowserInstance: sgp Control: appmask['Web Page \'https://mail.google.com/mail/u/1/#starred/p42\'']['Div \'Escrever\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
-    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Nova Mensagem''')
-    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%email%{Return}{Tab}
+        WAIT 4
+        WebAutomation.LaunchChrome.LaunchChromeCloseDialog Url: $'''https://mail.google.com/mail/u/0/?ogbl#inbox''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> sgp
+        WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Pesquisar e-mail''')
+        WebAutomation.Click.Click BrowserInstance: sgp Control: appmask['Web Page \'https://mail.google.com/mail/u/1/#starred/p42\'']['Div \'Escrever\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
+        WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Nova Mensagem''')
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%email%{Return}{Tab}
 
 
 
 ''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: False
-    WAIT 3
-    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''FGTS - Chave de Movimentacao{Tab}
+        WAIT 3
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''FGTS - Chave de Movimentacao{Tab}
 
 ''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
-    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''Prezado(a),
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''Prezado(a),
 
 Segue anexo chave de movimentação para saque de FGTS Acordo.
 
 Informamos que esta chave tem validade de 20 dias.''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
-    WAIT 3
-    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}(v)''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
-    WAIT 3
-    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
-    WAIT 4
-    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sgp Text: $'''Mensagem enviada''') THEN
-        WebAutomation.CloseWebBrowser BrowserInstance: sgp
-    ELSE
-        IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sgp Text: $'''É possível que as alterações feitas não sejam salvas.''') THEN
-            UIAutomation.Click.Click Element: appmask['Pane \'FGTS - Chave  ... mg.gov.br)\'']['Button \'Cancelar\''] ClickType: UIAutomation.ClickType.LeftClick MousePositionRelativeToElement: UIAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
-            WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Mensagem enviada''')
+        WAIT 3
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}(v)''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
+        WAIT 3
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
+        WAIT 4
+        IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sgp Text: $'''Mensagem enviada''') THEN
             WebAutomation.CloseWebBrowser BrowserInstance: sgp
         ELSE
-            IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sgp Text: $'''Erro''') THEN
-                Display.ShowMessageDialog.ShowMessage Title: $'''Erro em anexar''' Message: $'''Anexe o arquivo manualmente e clique em Enviar email na caixa de edição da mensagem no Gmail''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: True ButtonPressed=> ButtonPressed
-                WAIT 6
+            IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sgp Text: $'''É possível que as alterações feitas não sejam salvas.''') THEN
+                UIAutomation.Click.Click Element: appmask['Pane \'FGTS - Chave  ... mg.gov.br)\'']['Button \'Cancelar\''] ClickType: UIAutomation.ClickType.LeftClick MousePositionRelativeToElement: UIAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
                 WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Mensagem enviada''')
                 WebAutomation.CloseWebBrowser BrowserInstance: sgp
+            ELSE
+                IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sgp Text: $'''Erro''') THEN
+                    Display.ShowMessageDialog.ShowMessage Title: $'''Erro em anexar''' Message: $'''Anexe o arquivo manualmente e clique em Enviar email na caixa de edição da mensagem no Gmail''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: True ButtonPressed=> ButtonPressed
+                    WAIT 6
+                    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Mensagem enviada''')
+                    WebAutomation.CloseWebBrowser BrowserInstance: sgp
+                END
             END
         END
+        Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''e-mail com chave em pdf enviado''' Column: $'''O''' Row: robô
+        Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: FormattedDateTime Column: $'''P''' Row: robô
+        Variables.IncreaseVariable Value: robô IncrementValue: 1
+        GOTO início
+    ELSE IF resultado = $'''Chaves geradas - 2 vínculos''' THEN
+        Folder.GetFiles Folder: caminho_pasta_chaves FileFilter: $'''%NOME%*pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> chaves
+        Clipboard.Clear _
+        @@copilotGeneratedAction: 'False'
+Scripting.RunPowershellScript.RunPowershellScript Script: $'''Add-Type -AssemblyName System.Windows.Forms
+
+# Define o diretório onde os arquivos estão localizados
+$directoryPath = \"%caminho_pasta_chaves%\"
+
+# Define o padrão do nome dos arquivos (sem os números)
+$fileNamePattern = \"%NOME%\"
+
+# Busca os arquivos que contêm o padrão do nome
+$filePaths = Get-ChildItem -Path $directoryPath -Filter \"$fileNamePattern*.pdf\" | Select-Object -ExpandProperty FullName
+
+# Cria uma StringCollection para armazenar os caminhos dos arquivos
+$files = New-Object System.Collections.Specialized.StringCollection
+
+# Adiciona cada caminho de arquivo à coleção
+foreach ($filePath in $filePaths) {
+    $files.Add($filePath)
+}
+
+# Define os arquivos na área de transferência
+[System.Windows.Forms.Clipboard]::SetFileDropList($files)''' ScriptOutput=> PowershellOutput
+        WAIT 4
+        WebAutomation.LaunchChrome.LaunchChromeCloseDialog Url: $'''https://mail.google.com/mail/u/0/?ogbl#inbox''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> sgp
+        WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Pesquisar e-mail''')
+        WebAutomation.Click.Click BrowserInstance: sgp Control: appmask['Web Page \'https://mail.google.com/mail/u/1/#starred/p42\'']['Div \'Escrever\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
+        WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Nova Mensagem''')
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%email%{Return}{Tab}
+
+
+
+''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: False
+        WAIT 3
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''FGTS - Chave de Movimentacao{Tab}
+
+''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''Prezado(a),
+
+Segue anexo chave de movimentação para saque de FGTS Acordo.
+
+Informamos que esta chave tem validade de 20 dias.''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+        WAIT 3
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}(v)''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
+        WAIT 3
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
+        WAIT 4
+        IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sgp Text: $'''Mensagem enviada''') THEN
+            WebAutomation.CloseWebBrowser BrowserInstance: sgp
+        ELSE
+            IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sgp Text: $'''É possível que as alterações feitas não sejam salvas.''') THEN
+                UIAutomation.Click.Click Element: appmask['Pane \'FGTS - Chave  ... mg.gov.br)\'']['Button \'Cancelar\''] ClickType: UIAutomation.ClickType.LeftClick MousePositionRelativeToElement: UIAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
+                WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Mensagem enviada''')
+                WebAutomation.CloseWebBrowser BrowserInstance: sgp
+            ELSE
+                IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sgp Text: $'''Erro''') THEN
+                    Display.ShowMessageDialog.ShowMessage Title: $'''Erro em anexar''' Message: $'''Anexe o arquivo manualmente e clique em Enviar email na caixa de edição da mensagem no Gmail''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: True ButtonPressed=> ButtonPressed
+                    WAIT 6
+                    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Mensagem enviada''')
+                    WebAutomation.CloseWebBrowser BrowserInstance: sgp
+                END
+            END
+        END
+        Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''e-mail com chave em pdf enviado''' Column: $'''O''' Row: robô
+        Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: FormattedDateTime Column: $'''P''' Row: robô
+        Variables.IncreaseVariable Value: robô IncrementValue: 1
+        GOTO início
+    ELSE
+        Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Verificar motivo Resultado site CEF''' Column: $'''O''' Row: robô
+        Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: FormattedDateTime Column: $'''P''' Row: robô
+        Variables.IncreaseVariable Value: robô IncrementValue: 1
+        GOTO início
     END
-    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''e-mail com chave em pdf enviado''' Column: $'''O''' Row: robô
-    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: FormattedDateTime Column: $'''P''' Row: robô
-    GOTO início
-ELSE
-    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Verificar motivo Resultado site CEF''' Column: $'''O''' Row: robô
-    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: FormattedDateTime Column: $'''P''' Row: robô
-    GOTO início
 END
 
 # [ControlRepository][PowerAutomateDesktop]
