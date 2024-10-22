@@ -1,0 +1,59 @@
+# Cria variável processo formatado para receber o número do processo para o qual os documentos serão baixados. Esta variável poderá ser substituída no fluxo a ser construído com, por exemplo, números de processos vindos de uma planilha de Excel.
+SET processo_formatado TO $'''Insira aqui seu processo'''
+/# Chamada API SEI. 
+
+Necessário ter serviço configurado pelo administrador SEI.
+Envelope da mensagem achado via Python (print(response.last_sent())).
+
+Necessário passar:
+
+Url da api.
+Token para autenticação (IdentificacaoServico).
+Id da unidade onde processo se encontra (Se não souber inspecione a página de troca de unidade).
+Número do processo a ser procurado.#/
+@@wsdl: 'http://sei.mg.gov.br/sei/controlador_ws.php?servico=sei'
+Web.InvokeSoapService.InvokeSoapService Endpoint: $'''https://www.sei.mg.gov.br/sei/ws/SeiWS.php''' CustomHeaders: $'''SOAPAction: SeiAction''' RequestBody: $'''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:ns0=\"Sei\" xmlns:ns1=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:ns2=\"http://www.w3.org/2001/XMLSchema\" xmlns:ns3=\"http://schemas.xmlsoap.org/soap/envelope/\" SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">
+   <SOAP-ENV:Header/>
+   <ns3:Body>
+      <ns0:consultarProcedimento>
+         <SiglaSistema xsi:type=\"ns2:string\">%api_sei_sistema%</SiglaSistema>
+         <IdentificacaoServico xsi:type=\"ns2:string\">%api_sei_token%</IdentificacaoServico>
+         <IdUnidade xsi:type=\"ns2:string\">%api_sei_unidade%</IdUnidade>
+         <ProtocoloProcedimento xsi:type=\"ns2:string\">%processo_formatado%</ProtocoloProcedimento>
+         <SinRetornarAssuntos xsi:type=\"ns2:string\">N</SinRetornarAssuntos>
+         <SinRetornarInteressados xsi:type=\"ns2:string\">N</SinRetornarInteressados>
+         <SinRetornarObservacoes xsi:type=\"ns2:string\">N</SinRetornarObservacoes>
+         <SinRetornarAndamentoGeracao xsi:type=\"ns2:string\">N</SinRetornarAndamentoGeracao>
+         <SinRetornarAndamentoConclusao xsi:type=\"ns2:string\">N</SinRetornarAndamentoConclusao>
+         <SinRetornarUltimoAndamento xsi:type=\"ns2:string\">N</SinRetornarUltimoAndamento>
+         <SinRetornarUnidadesProcedimentoAberto xsi:type=\"ns2:string\">N</SinRetornarUnidadesProcedimentoAberto>
+         <SinRetornarProcedimentosRelacionados xsi:type=\"ns2:string\">N</SinRetornarProcedimentosRelacionados>
+         <SinRetornarProcedimentosAnexados xsi:type=\"ns2:string\">N</SinRetornarProcedimentosAnexados>
+      </ns0:consultarProcedimento>
+   </ns3:Body>
+</SOAP-ENV:Envelope>''' ConnectionTimeout: 30 FollowRedirection: True ClearCookies: False FailOnErrorStatus: False UserAgent: $'''Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6''' Encoding: Web.Encoding.AutoDetect AcceptUntrustedCertificates: False TrimRequestBody: True ResponseHeaders=> SoapServiceResponseHeaders Response=> SoapServiceResponse StatusCode=> StatusCode
+IF StatusCode = 200 THEN
+    /# Busca somente url da resposta da chamada da API.
+
+Trata texto uma vez que url recebida contém problemas de encoding.#/
+    Text.CropText.CropTextBetweenFlags Text: SoapServiceResponse FromFlag: $'''<LinkAcesso xsi:type=\"xsd:string\">''' ToFlag: $'''</LinkAcesso>''' IgnoreCase: False CroppedText=> link_externo_processo
+    Text.Replace Text: link_externo_processo TextToFind: $'''&amp;''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''&''' ActivateEscapeSequences: False Result=> link_externo_processo
+    WebAutomation.LaunchChrome.LaunchChrome Url: link_externo_processo WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile BrowserInstance=> sei_baixar_processo
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sei_baixar_processo Text: processo_formatado)
+    WebAutomation.ExecuteJavascript BrowserInstance: sei_baixar_processo Javascript: $'''function ExecuteScript() {
+
+// Seleciona para baixar todos os documentos
+documentos = document.getElementById(\'lnkInfraCheck\')
+documentos.click()
+
+// Chama função do botão Gerar PDF
+gerarPdf()
+
+}'''
+    WAIT 5
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sei_baixar_processo Text: processo_formatado)
+    UIAutomation.CloseWindow.CloseByInstanceOrHandle WindowInstance: sei_baixar_processo
+ELSE
+    # Caso retorno da API seja diferente de 200 significa que algo deu errado. Nesta situação é aconselhável incluir o registro disso em uma planilha de controle.
+END
