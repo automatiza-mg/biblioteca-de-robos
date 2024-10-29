@@ -1,0 +1,31 @@
+**REGION Início
+CALL login_sei
+CALL troca_unidade_sei
+SET linha TO 2
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: Caminho_excel Visible: True ReadOnly: False Instance=> ExcelInstance
+DISABLE CALL lista_processos
+Excel.GetFirstFreeColumnRow Instance: ExcelInstance FirstFreeRow=> FirstFreeRow
+Excel.ReadFromExcel.ReadCells Instance: ExcelInstance StartColumn: $'''A''' StartRow: linha EndColumn: $'''A''' EndRow: FirstFreeRow - 1 ReadAsText: False FirstLineIsHeader: False RangeValue=> processos
+LOOP FOREACH processo IN processos
+    SET controle TO 0
+    CALL login_siaut
+    CALL Intempestivo
+    IF controle = 0 THEN
+        CALL extrai_numero_defesa
+        Excel.ReadFromExcel.ReadCell Instance: ExcelInstance StartColumn: $'''B''' StartRow: linha ReadAsText: False CellValue=> status_numero
+        IF status_numero <> $'''Não encontrado''' THEN
+            WAIT 5
+            CALL pesquisa_siaut
+            Variables.IncreaseVariable Value: linha IncrementValue: 1
+        ELSE
+            Variables.IncreaseVariable Value: linha IncrementValue: 1
+        END
+    ELSE
+        Variables.IncreaseVariable Value: linha IncrementValue: 1
+    END
+    WebAutomation.CloseWebBrowser BrowserInstance: siaut
+END
+Excel.CloseExcel.CloseAndSave Instance: ExcelInstance
+WebAutomation.CloseWebBrowser BrowserInstance: sei
+Display.ShowMessageDialog.ShowMessage Title: $'''Atenção''' Message: $'''Fluxo finalizado com sucesso''' Icon: Display.Icon.Information Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+**ENDREGION
