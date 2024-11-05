@@ -1,42 +1,38 @@
-
-FUNCTION Main_copy GLOBAL
-    CALL Login_SEI
-    CALL login_Siaut
-    WebAutomation.Click.Click BrowserInstance: siaut Control: appmask['Web Page \'http://www.siaut.mg.gov.br/pyaa0999.asp\'']['Anchor \'Recepção\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
-    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainElement BrowserInstance: siaut Control: appmask['Web Page \'http://www.siaut.mg.gov.br/pyaa0999.asp\'']['Bold \'Defesa da Autuação\''])
-    WebAutomation.Click.Click BrowserInstance: siaut Control: appmask['Web Page \'http://www.siaut.mg.gov.br/pyaa0999.asp\'']['Bold \'Defesa da Autuação\' 3'] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
-    WebAutomation.Click.Click BrowserInstance: siaut Control: appmask['Web Page \'http://www.siaut.mg.gov.br/pyaa0999.asp\'']['Bold \'Inclusão Defesa Protocolo Digital\' 2'] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
-    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainElement BrowserInstance: siaut Control: appmask['Web Page \'http://www.siaut.mg.gov.br/pyaa0999.asp\'']['Bold \'RECEPÇÃO DEFESA\''])
-    Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\m7522667\\Desktop\\Documentos - Raiane\\erro_protocolo.xlsx''' Visible: True ReadOnly: False Instance=> dados
-    Excel.GetFirstFreeColumnRow Instance: dados FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
-    Excel.ReadFromExcel.ReadCells Instance: dados StartColumn: $'''A''' StartRow: 1 EndColumn: coluna_livre - 1 EndRow: linha_livre - 1 ReadAsText: False FirstLineIsHeader: True RangeValue=> historico
-    WebAutomation.ExtractData.ExtractHtmlTable BrowserInstance: siaut Control: $'''html > frameset > frameset > frame:eq(1) > html > body > center:eq(1) > table''' ExtractionParameters: {[$'''Value #1''', $'''Value #2''', $'''Value #3''', $'''Value #4'''], [$'''''', $'''''', $'''''', $''''''] } PostProcessData: False TimeoutInSeconds: 60 ExtractedData=> protocolo_dia
-    SET cont TO 2
-    LOOP WHILE (i) < (protocolo_dia.RowsCount)
-        SET cont TO 0
-        SET j TO 1
-        LOOP WHILE (j) < (historico.RowsCount)
-            IF protocolo_dia[i][0] = historico[j][0] THEN
-                Variables.IncreaseVariable Value: cont IncrementValue: 1
-                EXIT LOOP
-            END
-            Variables.IncreaseVariable Value: j IncrementValue: 1
+CALL Login_SEI
+CALL login_Siaut
+WebAutomation.Click.Click BrowserInstance: siaut Control: appmask['Web Page \'http://www.siaut.mg.gov.br/pyaa0999.asp\'']['Anchor \'Recepção\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainElement BrowserInstance: siaut Control: appmask['Web Page \'http://www.siaut.mg.gov.br/pyaa0999.asp\'']['Bold \'Defesa da Autuação\''])
+WebAutomation.Click.Click BrowserInstance: siaut Control: appmask['Web Page \'http://www.siaut.mg.gov.br/pyaa0999.asp\'']['Bold \'Defesa da Autuação\' 3'] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
+WebAutomation.Click.Click BrowserInstance: siaut Control: appmask['Web Page \'http://www.siaut.mg.gov.br/pyaa0999.asp\'']['Bold \'Inclusão Defesa Protocolo Digital\' 2'] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainElement BrowserInstance: siaut Control: appmask['Web Page \'http://www.siaut.mg.gov.br/pyaa0999.asp\'']['Bold \'RECEPÇÃO DEFESA\''])
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\m7522667\\Desktop\\Documentos - Raiane\\erro_protocolo.xlsx''' Visible: True ReadOnly: False Instance=> erro_protocolo
+Excel.GetFirstFreeColumnRow Instance: erro_protocolo FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.ReadFromExcel.ReadCells Instance: erro_protocolo StartColumn: $'''A''' StartRow: 1 EndColumn: coluna_livre - 1 EndRow: linha_livre - 1 ReadAsText: False FirstLineIsHeader: True RangeValue=> historico_erro
+WebAutomation.ExtractData.ExtractHtmlTable BrowserInstance: siaut Control: $'''html > frameset > frameset > frame:eq(1) > html > body > center:eq(1) > table''' ExtractionParameters: {[$'''Value #1''', $'''Value #2''', $'''Value #3''', $'''Value #4'''], [$'''''', $'''''', $'''''', $''''''] } PostProcessData: False TimeoutInSeconds: 60 ExtractedData=> protocolo_dia
+SET cont TO 2
+LOOP WHILE (i) < (protocolo_dia.RowsCount)
+    SET cont TO 0
+    SET j TO 0
+    LOOP WHILE (j) < (historico_erro.RowsCount)
+        IF protocolo_dia[i][0] = historico_erro[j][0] THEN
+            Variables.IncreaseVariable Value: cont IncrementValue: 1
+            EXIT LOOP
         END
-        IF cont = 0 THEN
-            DISABLE Display.ShowMessageDialog.ShowMessage Title: $'''Não existe''' Message: $'''Não existe o %protocolo_dia[i][0]% no histórico.''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
-            CALL Novos_Protocolos
-            DISABLE CALL Mont_Siaut_Anexos
-            DISABLE CALL Mont_Siaut_AIT
-            DISABLE CALL Login_SEI
-            DISABLE CALL Mont_Sei
-            DISABLE WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: siaut Url: $'''http://www.siaut.mg.gov.br/pyaa0104.asp?id=%protocolo_dia[i][0]%''' WaitForPageToLoadTimeout: 60
-        ELSE
-            DISABLE Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''Existe''' Message: $'''Existe %protocolo_dia[i][0]% no historico.''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 5
-        END
-        Variables.IncreaseVariable Value: i IncrementValue: 1
+        Variables.IncreaseVariable Value: j IncrementValue: 1
     END
-    EXIT Code: 0
-END FUNCTION
+    IF cont = 0 THEN
+        DISABLE Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''Não existe''' Message: $'''Não existe o %protocolo_dia[i][0]% no histórico.''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 6
+        CALL Novos_Protocolos
+        DISABLE CALL Mont_Siaut_Anexos
+        DISABLE CALL Mont_Siaut_AIT
+        DISABLE CALL Login_SEI
+        DISABLE CALL Mont_Sei
+    ELSE
+        DISABLE Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''Existe''' Message: $'''Existe %protocolo_dia[i][0]% no historico.''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 6
+    END
+    Variables.IncreaseVariable Value: i IncrementValue: 1
+END
+EXIT Code: 0
 
 # [ControlRepository][PowerAutomateDesktop]
 
