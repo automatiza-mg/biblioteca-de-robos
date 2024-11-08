@@ -20,8 +20,12 @@ LOOP WHILE (linhaatual) < (qtde_a_conferir)
         CALL Justiça_Trabalho
         IF estado = $'''MG''' THEN
             CALL SIARE_SEF_MG
+        ELSE
+            Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Pesquisar CND no estado da sede da empresa''' Column: $'''I''' Row: linhaatual
             IF município = $'''BH''' THEN
                 CALL CND_PBH
+            ELSE
+                Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Pesquisar CND no município da sede da empresa''' Column: $'''J''' Row: linhaatual
             END
         END
     END
