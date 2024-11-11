@@ -1,3 +1,6 @@
+/# Para a variável %pasta%, é importante verificar se:
+1. o nome da pasta contém caracteres especiais e se eles serão reconhecidos pelo robô ao salvar as certidões;
+2. existe algum arquivo com o mesmo nome da pasta, isso pode gerar um 'autocompletar' em vez da ação de salvar a certidão no computador#/
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_hora
 Workstation.SetDefaultPrinter PrinterName: $'''Microsoft Print to PDF'''
 Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: planilha Visible: True ReadOnly: False Instance=> fornecedores
