@@ -1,4 +1,4 @@
-WebAutomation.LaunchChrome.LaunchChromeCloseDialog Url: siteCND_PBH WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"}}''' BrowserInstance=> cnd_pbh
+WebAutomation.LaunchChrome.LaunchChromeCloseDialog Url: site_cnd_pbh WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"}}''' BrowserInstance=> cnd_pbh
 WebAutomation.ExecuteJavascript BrowserInstance: cnd_pbh Javascript: $'''function ExecuteScript() {
     const label = document.querySelector(\'label[for=\"meuForm:TIPO1\"]\');
     if (label) {
