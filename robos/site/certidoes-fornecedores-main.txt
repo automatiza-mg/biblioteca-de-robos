@@ -4,7 +4,6 @@
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_hora
 Workstation.SetDefaultPrinter PrinterName: $'''Microsoft Print to PDF'''
 Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: planilha Visible: True ReadOnly: False Instance=> fornecedores
-Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: fornecedores Name: $'''CNPJ'''
 # Definição da linha atual para que possa ser acrescida à variavel uma unidade para o fluxo rodar
 Excel.GetFirstFreeRowOnColumn Instance: fornecedores Column: $'''M''' FirstFreeRowOnColumn=> linhaatual
 Excel.GetFirstFreeColumnRow Instance: fornecedores FirstFreeRow=> qtde_a_conferir
