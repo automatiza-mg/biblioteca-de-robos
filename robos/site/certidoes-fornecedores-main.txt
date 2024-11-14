@@ -15,7 +15,8 @@ LOOP WHILE (linhaatual) < (qtde_a_conferir)
     Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''E''' StartRow: linhaatual ReadAsText: True CellValue=> estado
     CALL CRC_Cagef_MG
     Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''F''' StartRow: linhaatual ReadAsText: True CellValue=> cagef
-    IF cagef <> $'''ativo''' THEN
+    # condicional alterada provisoriamente para conseguirmos testar todos os subfluxos em sequência
+    IF cagef = $'''ativo''' THEN
         CALL CNPJ
         CALL CND_Federal
         CALL FGTS
