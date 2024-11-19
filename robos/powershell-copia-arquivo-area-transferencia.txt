@@ -1,0 +1,24 @@
+Folder.GetFiles Folder: caminho_pasta_chaves FileFilter: $'''%NOME%*pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> chaves
+Clipboard.Clear _
+@@copilotGeneratedAction: 'False'
+Scripting.RunPowershellScript.RunPowershellScript Script: $'''Add-Type -AssemblyName System.Windows.Forms
+
+# Define o diretório onde os arquivos estão localizados
+$directoryPath = \"%caminho_pasta_chaves%\"
+
+# Define o padrão do nome dos arquivos (sem os números)
+$fileNamePattern = \"%NOME%\"
+
+# Busca os arquivos que contêm o padrão do nome
+$filePaths = Get-ChildItem -Path $directoryPath -Filter \"$fileNamePattern*.pdf\" | Select-Object -ExpandProperty FullName
+
+# Cria uma StringCollection para armazenar os caminhos dos arquivos
+$files = New-Object System.Collections.Specialized.StringCollection
+
+# Adiciona cada caminho de arquivo à coleção
+foreach ($filePath in $filePaths) {
+    $files.Add($filePath)
+}
+
+# Define os arquivos na área de transferência
+[System.Windows.Forms.Clipboard]::SetFileDropList($files)''' ScriptOutput=> PowershellOutput
