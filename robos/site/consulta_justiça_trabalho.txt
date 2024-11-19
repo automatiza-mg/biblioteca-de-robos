@@ -19,7 +19,7 @@ if (button) {
 
 }''' Result=> Result
 WAIT 2
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_jus_trab TextToSend: $'''02421421000111{Tab}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_jus_trab TextToSend: $'''%cnpjatual%{Tab}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
 Display.ShowMessageDialog.ShowMessage Title: $'''Validar o Captcha''' Message: $'''Prezado,
 Favor solucionar o Captcha e clicar no botão de emissão da certidão''' Icon: Display.Icon.Warning Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed
 DISABLE MouseAndKeyboard.WaitForShortcutKey.WaitForShortcutKey InputKeys: ['Ctrl+A'] IndexOfShortcutKeyPressed=> IndexOfShortcutKeyPressed
@@ -28,7 +28,7 @@ DISABLE WebAutomation.Click.Click BrowserInstance: site_jus_trab Control: appmas
 IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_jus_trab Text: $'''O CNPJ / CPF informado é inválido.''') THEN
     WebAutomation.Click.Click BrowserInstance: site_jus_trab Control: appmask['Web Page \'https://www.tst.jus.br/certidao1\'']['Input submit \'Emitir Nova Certidão\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
     WAIT 2
-    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_jus_trab TextToSend: $'''06981180000116{Tab}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_jus_trab TextToSend: $'''%cnpjatual%{Tab}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
     DISABLE WebAutomation.ExecuteJavascript BrowserInstance: site_jus_trab Javascript: $'''function ExecuteScript() { 
 const recaptchaCheckbox = document.querySelector(\'.recaptcha-checkbox-border\');
 
@@ -54,8 +54,8 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({l})%pasta%
 # prezado usuário, por favor verifique a melhor forma de salvar o documento: tabs (pode depender da versão do Windows, ou da forma de exibição da caixa de 'Salvar como') ou clicar na interface de usuário
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 120 SendTextAsHardwareKeys: True
 DISABLE UIAutomation.Click.Click Element: appmask['Pane \'Outlook –  ...  Leidi (Pessoa 2)\'']['Button \'Salvar\''] ClickType: UIAutomation.ClickType.LeftClick MousePositionRelativeToElement: UIAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
-WAIT (File.WaitForFile.Created File: $'''%pasta%\\_Justica_Trabalho.pdf''')
-Pdf.ExtractTextFromPDF.ExtractTextFromPage PDFFile: $'''%pasta%\\_Justica_Trabalho.pdf''' PageNumber: 1 DetectLayout: False ExtractedText=> ExtractedPDFText
+WAIT (File.WaitForFile.Created File: $'''%pasta%\\%empresa%_Justica_Trabalho.pdf''')
+Pdf.ExtractTextFromPDF.ExtractTextFromPage PDFFile: $'''%pasta%\\%empresa%_Justica_Trabalho.pdf''' PageNumber: 1 DetectLayout: False ExtractedText=> ExtractedPDFText
 Text.CropText.CropTextBeforeFlag Text: ExtractedPDFText ToFlag: $'''NOME''' IgnoreCase: True CroppedText=> certidão_justiça_trabalho IsFlagFound=> IsFlagFound
 IF Contains(certidão_justiça_trabalho, $'''EFEITO DE NEGATIVA''', False) THEN
     Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Positiva com efeitos de negativa''' Column: $'''L''' Row: linhaatual
