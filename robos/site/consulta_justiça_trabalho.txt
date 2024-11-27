@@ -48,7 +48,7 @@ Assim que concluir pressione no teclado CTRL+A''' Icon: Display.Icon.Warning But
     WebAutomation.Click.Click BrowserInstance: site_jus_trab Control: appmask['Web Page \'https://www.tst.jus.br/certidao1\'']['Input button \'Emitir Certidão\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
 END
 WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''Salvar como''' Class: $'''#32770''' FocusWindow: True)
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''_Justica_Trabalho''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%empresa%_Justica_Trabalho''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
 WAIT 2
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({l})%pasta%{Return}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
 # prezado usuário, por favor verifique a melhor forma de salvar o documento: tabs (pode depender da versão do Windows, ou da forma de exibição da caixa de 'Salvar como') ou clicar na interface de usuário
