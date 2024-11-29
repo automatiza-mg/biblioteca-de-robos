@@ -1,0 +1,3 @@
+CALL entrada_variaveis
+CALL chat_gpt
+CALL sei

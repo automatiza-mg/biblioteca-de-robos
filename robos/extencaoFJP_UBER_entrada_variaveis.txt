@@ -1,0 +1,7 @@
+# Inicialmente, pede-se o Nome, CPF e o MASP do Usuário para o registro no SEI, caminho da pasta onde está salvo os pdf's comprovantes de viagens
+Display.InputDialog Title: $'''Preencher nome completo''' Message: $'''Favor preencher seu nome completo abaixo:''' InputType: Display.InputType.SingleLine IsTopMost: False UserInput=> nome
+Display.InputDialog Title: $'''Preencher CPF completo''' Message: $'''Favor preencher seu CPF completo abaixo. Insira sem pontos e hífens. Apenas números.''' InputType: Display.InputType.SingleLine IsTopMost: False UserInput=> cpf
+Display.InputDialog Title: $'''Preencher senha SEI''' Message: $'''Favor preencher sua senha utilizada no SEI abaixo. ''' InputType: Display.InputType.SingleLine IsTopMost: False UserInput=> senha
+Display.InputDialog Title: $'''Preencher orgao SEI''' Message: $'''Favor preencher seu orgao que acessa no SEI abaixo. Ele precisa ser digitado todo maiúsculo e sem espaço no final.''' InputType: Display.InputType.SingleLine IsTopMost: False UserInput=> orgao
+Display.InputDialog Title: $'''Preencher MASP completo''' Message: $'''Favor preencher seu MASP completo abaixo:''' InputType: Display.InputType.SingleLine IsTopMost: False UserInput=> masp
+Display.InputDialog Title: $'''Preencher MASP completo''' Message: $'''Favor preencher o caminho completo do diretório (pasta) onde estão salvos os arquivos pdf\'s comprovantes de viagens:''' InputType: Display.InputType.SingleLine IsTopMost: False UserInput=> diretorio
