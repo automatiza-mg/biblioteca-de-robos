@@ -1,36 +1,31 @@
-WebAutomation.LaunchChrome.LaunchChromeCloseDialog Url: $'''https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"}}''' BrowserInstance=> Browser
+WebAutomation.LaunchChrome.LaunchChromeCloseDialog Url: $'''https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"}}''' BrowserInstance=> site_fgts
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}%cnpjatual%''' DelayBetweenKeystrokes: 25 SendTextAsHardwareKeys: True
 WAIT 5
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
 Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''Inserir Captcha''' Message: $'''FAVOR DIGITAR AS LETRAS E NUMEROS PRESENTES NA IMAGEM, AO FINALIZAR PRESSIONE \"Consultar\"''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 5 ButtonPressed=> ButtonPressed
-DISABLE MouseAndKeyboard.WaitForShortcutKey.WaitForShortcutKey InputKeys: ['Ctrl+S'] IndexOfShortcutKeyPressed=> playfluxo
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
 WAIT 4
 LABEL 'ERRO CAPTCHA'
-IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: Browser Text: $'''Código Captcha Inválido''') THEN
+IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_fgts Text: $'''Código Captcha Inválido''') THEN
     MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 25 SendTextAsHardwareKeys: True
     MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}''' DelayBetweenKeystrokes: 25 SendTextAsHardwareKeys: True
     Display.ShowMessageDialog.ShowMessage Title: $'''ERRO''' Message: $'''Houve um erro com a escrita do captcha tente novamente. Ao finalizar clique em CONSULTAR para retomada automatica do fluxo''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed2
-    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: Browser Text: $'''Código Captcha Inválido''') THEN
+    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_fgts Text: $'''Código Captcha Inválido''') THEN
         GOTO 'ERRO CAPTCHA'
     END
 END
-WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: Browser Text: $'''Resultado da consulta''') FOR 60
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_fgts Text: $'''Resultado da consulta''') FOR 60
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({C})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
-MouseAndKeyboard.SendMouseClick.ClickAt ClickType: MouseAndKeyboard.MouseClickType.LeftClick MillisecondsDelay: 4 X: 1373 Y: 606 RelativeTo: MouseAndKeyboard.PositionRelativeTo.Screen MovementStyle: MouseAndKeyboard.MovementStyle.Instant
 Clipboard.GetText Text=> situacap_fgts
 Text.CropText.CropTextBetweenFlags Text: situacap_fgts FromFlag: $'''A EMPRESA abaixo identificada está''' ToFlag: $''':''' IgnoreCase: True CroppedText=> CroppedText IsFlagFound=> IsFlagFound
-DISABLE Display.ShowMessageDialog.ShowMessage Title: $'''resultado''' Message: CroppedText Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed4
 Excel.WriteToExcel.WriteCell Instance: fornecedores Value: CroppedText Column: $'''k''' Row: linhaatual
-WAIT 4
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
-WAIT 4
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
-WAIT 4
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_fgts Text: $'''Visualizar''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_fgts Text: $'''Imprimir''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
 WAIT 2
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
 WAIT (UIAutomation.WaitForWindow.ToBecomeFocusedByTitleClass Title: $'''Salvar Saída de Impressão como''' Class: $'''''')
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%empresa%_FGTS''' DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: True
 WAIT 2
@@ -39,7 +34,7 @@ WAIT 2
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: pasta DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: True
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: True
 DISABLE UIAutomation.Click.Click Element: appmask['Pane \'Outlook –  ...  Leidi (Pessoa 2)\'']['Button \'Salvar\' 2'] ClickType: UIAutomation.ClickType.LeftClick MousePositionRelativeToElement: UIAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
-UIAutomation.CloseWindow.CloseByInstanceOrHandle WindowInstance: Browser
+UIAutomation.CloseWindow.CloseByInstanceOrHandle WindowInstance: site_fgts
 EXIT FUNCTION
 
 # [ControlRepository][PowerAutomateDesktop]
