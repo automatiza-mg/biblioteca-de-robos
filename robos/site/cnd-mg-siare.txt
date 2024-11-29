@@ -30,9 +30,11 @@ IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_si
     WAIT 3
     MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''SIARE - Secretaria de Estado de Fazenda MG - Google Chrome''' Class: $'''''' TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: True
     WAIT 3
-    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%cnpjatual%_CDT_MG''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%empresa%_CDT_MG''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: True
     WAIT 3
-    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({l})%pasta%{Return}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({l})%pasta%{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT 3
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
 ELSE
     CALL endereço_SIARE_SEF_MG
     Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Empresa sem endereço no SIARE, protocolo de cadastro efetudado''' Column: $'''I''' Row: linhaatual
