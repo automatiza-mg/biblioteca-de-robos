@@ -1,0 +1,24 @@
+# Este subfluxo adiciona a coluna de controle "E-mail enviado?" ao final da planilha de taxação para que, caso o robô pare no meio, seja necessário apenas rodá-lo novamente e o mesmo professor não receberá dois e-mails.
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: taxacao Name: $'''taxacao'''
+Excel.SelectCellsFromExcel.SelectCells Instance: taxacao StartColumn: $'''a''' StartRow: 1 EndColumn: $'''a''' EndRow: 1
+SET linha_taxacao TO 1
+LOOP LoopIndex FROM 1 TO 50000 STEP 1
+    Excel.ReadFromExcel.ReadCell Instance: taxacao StartColumn: $'''a''' StartRow: linha_taxacao ReadAsText: False CellValue=> ExcelData
+    IF IsEmpty(ExcelData) THEN
+    ELSE
+        EXIT LOOP
+    END
+    Variables.IncreaseVariable Value: linha_taxacao IncrementValue: 1
+END
+Excel.ActivateCellInExcel.ActivateCell Instance: taxacao Column: $'''a''' Row: linha_taxacao
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{Right}{Right}{Right}{Right}{Right}{Right}{Right}{Right}{Right}{Right}{Right}{Right}{Right}{Right}{Right}{Right}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+Excel.ReadFromExcel.Read Instance: taxacao ReadAsText: False FirstLineIsHeader: False RangeValue=> ExcelData2
+WAIT 1
+IF IsBlank(ExcelData2[0][0]) THEN
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''E-mail enviado?{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    /# Conferir atalho na máquina de destino.
+Pode ser [Alt}{C}{LC}{F}#/
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{Alt}{C}{S}{F}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: taxacao TextToSend: $'''{Alt}{C}{S}{F}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+END
