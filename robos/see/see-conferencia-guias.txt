@@ -1,13 +1,26 @@
 Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_FGTS Visible: True ReadOnly: False Instance=> planilha_FGTS
 Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_formulario Name: $'''Respostas ao formulário 1'''
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AH''' Row: 2
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''=SEERRO(PROCV(E2;\'C:\\Users\\m669550\\Documents\\conferencias\\[10parcelasFGTS_SEM_DUPLICATAS.xlsx]Planilha1\'!$A$2:$B$71219;1;FALSO);\"Não encontrado\")
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''=SEERRO(PROCV(E2;\'C:\\Users\\m669550\\Documents\\conferencias\\[10parcelasFGTS_SEM_DUPLICATAS.xlsx]Planilha1\'!$A$2:$B$71219;1;FALSO);\"Não encontrado\")
+{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+Clipboard.SetText Text: $'''=SEERRO(PROCV(E2;\'C:\\Users\\m669550\\Documents\\conferencias\\[10parcelasFGTS_SEM_DUPLICATAS.xlsx]Planilha1\'!$A$2:$B$71219;1;FALSO);\"Não encontrado\")
+{Return}'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 WAIT 1
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 WAIT 1
+Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AI''' Row: 2
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''=SEERRO(PROCV(AA2;\'C:\\Users\\m669550\\Documents\\conferencias\\[10parcelasFGTS_SEM_DUPLICATAS.xlsx]Planilha1\'!$B$2:$B$71219;1;FALSO);\"Não encontrado\")
+{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+Clipboard.SetText Text: $'''=SEERRO(PROCV(AA2;\'C:\\Users\\m669550\\Documents\\conferencias\\[10parcelasFGTS_SEM_DUPLICATAS.xlsx]Planilha1\'!$B$2:$B$71219;1;FALSO);\"Não encontrado\")
+{Return}'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
+{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 Excel.CloseExcel.CloseAndSave Instance: planilha_FGTS
