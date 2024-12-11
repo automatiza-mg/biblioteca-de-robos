@@ -1,0 +1,21 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_processos Visible: True ReadOnly: False Instance=> planilha_processos
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_AGE Visible: True ReadOnly: False Instance=> planilha_AGE
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_formulario Name: $'''Respostas ao formulário 1'''
+Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AB''' Row: 2
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''=SE(OU(NÃO(ÉERROS(PROCV(AA2;\'[EXCLUSÃO AGE.xlsx]AGE\'!$B$5:$B$2577;1;FALSO)));NÃO(ÉERROS(PROCV(AA2;\'[RELATÓRIO SEFIP POR PROCESSOS.xlsx]Planilha1\'!$B$4:$B$7575;1;FALSO)))); \"Encontrado\"; \"Não encontrado\")
+{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+Clipboard.SetText Text: $'''=SE(OU(NÃO(ÉERROS(PROCV(AA2;\'[EXCLUSÃO AGE.xlsx]AGE\'!$B$5:$B$2577;1;FALSO)));NÃO(ÉERROS(PROCV(AA2;\'[RELATÓRIO SEFIP POR PROCESSOS.xlsx]Planilha1\'!$B$4:$B$7575;1;FALSO)))); \"Encontrado\"; \"Não encontrado\")
+{Return}'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
+{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''V''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''V''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+Excel.CloseExcel.CloseAndSave Instance: planilha_processos
+Excel.CloseExcel.CloseAndSave Instance: planilha_AGE
