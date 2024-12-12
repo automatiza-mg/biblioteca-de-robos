@@ -58,6 +58,7 @@ ELSE IF Contains(certidão_justiça_trabalho, $'''CERTIDÃO NEGATIVA''', False) 
 ELSE IF NotContains(certidão_justiça_trabalho, $'''NEGATIVA''', False) THEN
     Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Positiva''' Column: $'''L''' Row: linhaatual
 END
+WebAutomation.CloseWebBrowser BrowserInstance: site_jus_trab
 EXIT FUNCTION
 
 # [ControlRepository][PowerAutomateDesktop]
