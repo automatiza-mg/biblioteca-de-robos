@@ -1,0 +1,11 @@
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''i640{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''%receber%{Return}{F5}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Down}{Down}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''i5816''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''%data_inicio%%data_fim%{Return}%data_inicio%{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''%inss%{Return}{F5}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+WAIT 3
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''s{Return}s{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Down}{Down}{Down}{Down}pgto. gratificacao encargo curso concurso %data_extenso%''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Return}{F5}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True

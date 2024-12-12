@@ -1,0 +1,65 @@
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: excel_pagamento Name: $'''lanca_pagamento'''
+Excel.GetFirstFreeColumnRow Instance: excel_pagamento FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.ReadFromExcel.ReadCells Instance: excel_pagamento StartColumn: $'''a''' StartRow: 2 EndColumn: coluna_livre - 1 EndRow: linha_livre - 1 ReadAsText: False FirstLineIsHeader: True RangeValue=> consolidado
+System.RunApplication.RunApplicationAndWaitToLoad ApplicationPath: $'''C:\\Program Files (x86)\\pw3270\\pw3270.exe''' WindowStyle: System.ProcessWindowStyle.Normal Timeout: 0 ProcessId=> sistema WindowHandle=> WindowHandle
+WAIT 4
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''sisap{Tab}%login%%senha%{Return}''' DelayBetweenKeystrokes: 80 SendTextAsHardwareKeys: True
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> texto_inicio_terminal
+IF NotContains(texto_inicio_terminal, $'''Logon executado com sucesso''', True) THEN
+    Display.ShowMessageDialog.ShowMessage Title: $'''Login não executado''' Message: $'''Favor conferir se as variáveis de login e senha do robô correspondem ao login e senha do SISAP. 
+
+Essa situação pode ocorrer quando o usuário altera a senha do SISAP e não atualiza a senha do robô.
+
+Favor executar o robô novamente. Confira de ter fechado todos os arquivos que o robô abriu sem salvá-los.
+
+Proceder com a atualização das variáveis login e/ou senha do robô e executar novamente o robô. ''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+    EXIT Code: 0 ErrorMessage: $'''Favor executar o robô novamente. Confira de ter fechado todos os arquivos que o robô abriu sem salvá-los.'''
+ELSE
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Tab}siap{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+END
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> texto_inicio_terminal
+LOOP WHILE (NotContains(texto_inicio_terminal, '2061-00000099 FJP', True)) = ($'''True''')
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Escape}{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> texto_inicio_terminal
+END
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Tab}x{Return}{F3}''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: True
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''liberacao *{Return}{Tab}X{Return}''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''01{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
+SET index_linha TO 0
+LOOP FOREACH linha IN consolidado
+    IF (linha[3] = Blank() AND NotContains(linha[0], 'professor não encontrado', True)) = $'''True''' THEN
+        Text.Pad Text: linha[0] PadPosition: Text.PadPosition.Left PaddingText: 0 TotalLength: 8 PaddedText=> masp
+        Text.FromNumber Number: linha[1] DecimalPlaces: 2 UseThousandsSeparator: True FormattedNumber=> receber
+        Text.FromNumber Number: linha[2] DecimalPlaces: 2 UseThousandsSeparator: True FormattedNumber=> inss
+        WAIT 2
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''%masp%{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+        WAIT 2
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 500 SendTextAsHardwareKeys: True
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Escape}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        Clipboard.GetText Text=> texto_terminal
+        IF Contains(texto_terminal, $'''SELECIONAR NUMERO DE ADMISSAO''', True) THEN
+            CALL '3_busca_posicao_admisao'
+            LOOP pressionar FROM 1 TO count_tab STEP 1
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+                IF pressionar = count_tab THEN
+                    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+                    EXIT LOOP
+                END
+            END
+            CALL '4_liberacao_financeiro'
+        ELSE
+            MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: classe_terminal Class: $'''''' TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+            WAIT 2
+            CALL '4_liberacao_financeiro'
+        END
+        Excel.WriteToExcel.WriteCell Instance: excel_pagamento Value: $'''lancamento ok''' Column: $'''d''' Row: index_linha + 3
+    END
+    Variables.IncreaseVariable Value: index_linha IncrementValue: 1
+END

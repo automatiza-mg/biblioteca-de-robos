@@ -1,8 +1,0 @@
-/# As variaveis data_extenso, data_inicio e data_fim precisam ser alteradas mensalmente pelo taxador, conforme mês vigente da taxação.
-A variável data_extenso é digitada na ocorrência SISAP.#/
-/# Alterar mensalmente o conteúdo da variável caminho_documento_taxacao com o nome da pasta e arquivo da planilha taxação atual.
-#/
-# Alterar mensalmente o conteúdo da variável caminho_documento_sisapmasp com o nome do arquivo da planilha atual.
-# As linhas que deram erro na fórmula e retornaram como "Professor não encontrado - cpf" são os professores que estão na planilha taxação, mas não está na planilha baixada do BO mensalmente. Neste caso, é preciso cadastrá-los.
-CALL '1_preparar_planilha'
-CALL '2_taxacao'

@@ -1,0 +1,27 @@
+Excel.AddWorksheet Instance: excel_pagamento Name: $'''masp_procv2''' WorksheetPosition: Excel.WorksheetPosition.Last
+WAIT 1
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_documento_sisapmasp Visible: True ReadOnly: False Instance=> tb_procv
+WAIT (UIAutomation.WaitForWindow.ToOpenByInstanceOrHandle WindowInstance: tb_procv FocusWindow: True)
+Excel.GetFirstFreeColumnRow Instance: tb_procv FirstFreeColumn=> coluna_livre_tb_procv FirstFreeRow=> linha_livre_tb_procv
+Excel.ActivateCellInExcel.ActivateCell Instance: tb_procv Column: $'''B''' Row: 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({C}){Control}({Shift}({Down})){Alt}CVFF{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}COLS/{Tab}{Tab}{Tab}{Return}{Escape}{Escape}{Escape}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+Excel.ReadFromExcel.ReadCells Instance: tb_procv StartColumn: 1 StartRow: 1 EndColumn: coluna_livre_tb_procv - 1 EndRow: linha_livre_tb_procv - 1 ReadAsText: False FirstLineIsHeader: False RangeValue=> conjunto_tb_procv
+WAIT 2
+Excel.WriteToExcel.WriteCell Instance: excel_pagamento Value: conjunto_tb_procv Column: 1 Row: 1
+Excel.CloseExcel.Close Instance: tb_procv
+Excel.CopyCellsFromExcel.CopyCells Instance: excel_pagamento StartColumn: $'''b''' StartRow: 1 EndColumn: $'''b''' EndRow: linha_livre_tb_procv - 1
+Excel.PasteCellsToExcel.PasteAt Instance: excel_pagamento Column: $'''e''' Row: 1
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: excel_pagamento Name: $'''taxacao'''
+Excel.InsertColumn Instance: excel_pagamento Column: $'''P'''
+Excel.WriteToExcel.WriteCell Instance: excel_pagamento Value: $'''Masp''' Column: $'''P''' Row: 2
+Excel.ActivateCellInExcel.ActivateCell Instance: excel_pagamento Column: $'''p''' Row: 3
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''=senãodisp(PROCV(B3;masp_procv2!C:E;3;0);\"Professor não encontrado - \"&B3){Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+Excel.SelectCellsFromExcel.SelectCells Instance: excel_pagamento StartColumn: $'''p''' StartRow: 3 EndColumn: $'''p''' EndRow: linha_livre_taxacao - 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({D})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: False
+Excel.SelectCellsFromExcel.SelectCells Instance: excel_pagamento StartColumn: $'''p''' StartRow: 3 EndColumn: $'''p''' EndRow: linha_livre_taxacao - 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel_pagamento TextToSend: $'''{Control}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}cvv''' DelayBetweenKeystrokes: 1000 SendTextAsHardwareKeys: False
+Excel.DeleteWorksheet.DeleteWorksheetByName Instance: excel_pagamento Name: $'''masp_procv2'''
