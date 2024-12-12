@@ -1,6 +1,7 @@
 WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://solucoes.receita.fazenda.gov.br/Servicos/cnpjreva/Cnpjreva_Solicitacao.asp''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"}}''' BrowserInstance=> site_cnpj
 WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cnpj Text: $'''Emissão de Comprovante de Inscrição e de Situação Cadastral''') FOR 12
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}%cnpjatual%{Tab}{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: False
+WAIT 2
 # atenção para o recaptcha! as próximas estão desabilitadas, mas podem ser utilizadas como alternativas ao javascript em eventuais falhas
 DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 80 SendTextAsHardwareKeys: False
 DISABLE WebAutomation.Click.Click BrowserInstance: site_cnpj Control: appmask['Web Page \'h ... itacao.asp\'']['Button \'Consultar\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
@@ -15,13 +16,13 @@ if (button) {
 
 }''' Result=> Result3
 IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_cnpj Text: $'''Erro na Consulta - Esclarecimentos adicionais''') THEN
-    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cnpj Text: $'''Confira os dados de Identificação da Pessoa Jurídica''') FOR 12
+    DISABLE WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cnpj Text: $'''Confira os dados de Identificação da Pessoa Jurídica''') FOR 12
     Display.ShowMessageDialog.ShowMessage Title: $'''Validar o hCaptcha''' Message: $'''Prezado,
 Favor marcar o botão à esquerda do texto \'Sou humano\' e  pressione o botão \'CONSULTAR\' para avançar com o processo de emissão do comprovante de inscrição no CNPJ.
 ''' Icon: Display.Icon.Warning Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed
 END
 WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cnpj Text: $'''Confira os dados de Identificação da Pessoa Jurídica''')
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Next}''' DelayBetweenKeystrokes: 80 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Next}''' DelayBetweenKeystrokes: 80 SendTextAsHardwareKeys: True
 IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_cnpj Text: $'''ATIVA''') THEN
     Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Ativo''' Column: $'''G''' Row: linhaatual
 ELSE
@@ -44,6 +45,56 @@ if (printIcon) {
 
 }''' Result=> Result3
 WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''about:blank - Google Chrome''' Class: $'''''' FocusWindow: True)
+@@copilotGeneratedAction: 'False'
+DISABLE Scripting.RunPowershellScript.RunPowershellScript Script: $'''# Definir variáveis de pasta e empresa
+$pasta = \"%pasta%\"  # No Power Automate, a variável \'pasta\' será definida dinamicamente
+$empresa = \"%empresa%\"  # Para cada linha, a empresa será definida dinamicamente no fluxo do Power Automate
+
+# Adicionar biblioteca para simular teclas
+Add-Type -AssemblyName System.Windows.Forms
+
+# Simular Ctrl+P para abrir a janela de impressão
+Write-Host \"Simulando Ctrl+P para abrir a janela de impressão...\"
+[System.Windows.Forms.SendKeys]::SendWait(\"^p\")
+Start-Sleep -Seconds 2
+
+# Simular o clique no botão \"Imprimir\" (Enter na janela de impressão)
+Write-Host \"Simulando clique no botão \'Imprimir\'...\"
+[System.Windows.Forms.SendKeys]::SendWait(\"{ENTER}\")
+Start-Sleep -Seconds 2
+
+# Inserir o nome do arquivo
+Write-Host \"Inserindo o nome do arquivo...\"
+$nomeArquivo = \"${empresa}_CNPJ\"
+foreach ($char in $nomeArquivo.ToCharArray()) {
+    [System.Windows.Forms.SendKeys]::SendWait($char)
+    Start-Sleep -Milliseconds 50  # Pausa entre caracteres para evitar erros
+}
+
+# Simular Ctrl+L para selecionar a barra de caminho
+Write-Host \"Simulando Ctrl+L para selecionar a barra de caminho...\"
+[System.Windows.Forms.SendKeys]::SendWait(\"^l\")
+Start-Sleep -Milliseconds 500  # Pausa para garantir a seleção da barra de caminho
+
+# Inserir o caminho da pasta
+Write-Host \"Inserindo o caminho da pasta: $pasta\"
+foreach ($char in $pasta.ToCharArray()) {
+    [System.Windows.Forms.SendKeys]::SendWait($char)
+    Start-Sleep -Milliseconds 50  # Pausa entre caracteres para evitar problemas
+}
+
+# Confirmar o salvamento
+Write-Host \"Simulando clique no botão \'Salvar\'...\"
+Start-Sleep -Milliseconds 500
+for ($i = 0; $i -lt 10; $i++) {
+    [System.Windows.Forms.SendKeys]::SendWait(\"{TAB}\")
+    Start-Sleep -Milliseconds 100
+}
+[System.Windows.Forms.SendKeys]::SendWait(\"{ENTER}\")
+Start-Sleep -Seconds 2
+
+
+''' ScriptOutput=> PowershellOutput
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''about:blank - Google Chrome''' Class: $'''''' TextToSend: $'''{Control}({p})''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''about:blank - Google Chrome''' Class: $'''''' TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''Salvar Saída de Impressão como''' Class: $'''''' TextToSend: $'''%empresa%_CNPJ''' DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: True
@@ -52,6 +103,7 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''Salvar Saída 
 # prezado usuário, por favor verifique a melhor forma de salvar o documento: tabs (pode depender da versão do Windows, ou da forma de exibição da caixa de 'Salvar como') ou clicar na interface de usuário
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''Salvar Saída de Impressão como''' Class: $'''''' TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 120 SendTextAsHardwareKeys: True
 DISABLE UIAutomation.Click.Click Element: appmask['Pane \'Outlook –  ...  Leidi (Pessoa 2)\'']['Button \'Salvar\''] ClickType: UIAutomation.ClickType.LeftClick MousePositionRelativeToElement: UIAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
+UIAutomation.CloseWindow.CloseByTitleClass Title: $'''about:blank - Google Chrome''' Class: $''''''
 WebAutomation.CloseWebBrowser BrowserInstance: site_cnpj
 EXIT FUNCTION
 
