@@ -2,10 +2,7 @@ Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_processos Visi
 Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_AGE Visible: True ReadOnly: False Instance=> planilha_AGE
 Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_formulario Name: $'''Respostas ao formulário 1'''
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AB''' Row: 2
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''=SE(OU(NÃO(ÉERROS(PROCV(AA2;\'[EXCLUSÃO AGE.xlsx]AGE\'!$B$5:$B$2577;1;FALSO)));NÃO(ÉERROS(PROCV(AA2;\'[RELATÓRIO SEFIP POR PROCESSOS.xlsx]Planilha1\'!$B$4:$B$7575;1;FALSO)))); \"Encontrado\"; \"Não encontrado\")
-{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
-Clipboard.SetText Text: $'''=SE(OU(NÃO(ÉERROS(PROCV(AA2;\'[EXCLUSÃO AGE.xlsx]AGE\'!$B$5:$B$2577;1;FALSO)));NÃO(ÉERROS(PROCV(AA2;\'[RELATÓRIO SEFIP POR PROCESSOS.xlsx]Planilha1\'!$B$4:$B$7575;1;FALSO)))); \"Encontrado\"; \"Não encontrado\")
-{Return}'''
+Clipboard.SetText Text: $'''=SE(OU(NÃO(ÉERROS(PROCV(AA2;\'[EXCLUSÃO AGE.xlsx]AGE\'!$B$5:$B$2577;1;FALSO)));NÃO(ÉERROS(PROCV(AA2;\'[RELATÓRIO SEFIP POR PROCESSOS.xlsx]Planilha1\'!$B$4:$B$7575;1;FALSO)))); \"Encontrado\"; \"Não encontrado\")'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
