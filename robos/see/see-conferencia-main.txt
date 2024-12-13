@@ -1,0 +1,6 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_formulario Visible: True ReadOnly: False Instance=> planilha_formulario
+CALL 'Ajustes planilha'
+CALL 'Conferência de Processos'
+CALL 'Conferência Sisap'
+CALL 'Conferência Guias'
+CALL 'Campos Robô'
