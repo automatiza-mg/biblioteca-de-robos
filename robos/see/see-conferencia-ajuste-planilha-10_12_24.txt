@@ -16,6 +16,7 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: pla
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LShiftKey}({Tab}).{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 WAIT 1
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{LShiftKey}({Tab}{Tab}{Tab})-{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 WAIT 1
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''G''' Row: 2
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
@@ -28,68 +29,41 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{LShiftKey}({
 WAIT 1
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''Z''' Row: 1
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Down}){Down}{Right}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Down}){Down}{Right}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AA''' Row: 1
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''nome_arrumado
-{Tab}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-Clipboard.SetText Text: $'''nome_arrumado
-{Tab}'''
+Clipboard.SetText Text: $'''nome_arrumado'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AB''' Row: 1
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''conferencia_processos
-{Tab}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-Clipboard.SetText Text: $'''conferencia_processos
-{Tab}'''
+Clipboard.SetText Text: $'''conferencia_processos'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AC''' Row: 1
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''conferencia_nome_sisap
-{Tab}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-Clipboard.SetText Text: $'''conferencia_nome_sisap
-{Tab}'''
+Clipboard.SetText Text: $'''conferencia_nome_sisap'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AD''' Row: 1
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''conferencia_masp_sisap
-{Tab}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-Clipboard.SetText Text: $'''conferencia_masp_sisap
-{Tab}'''
+Clipboard.SetText Text: $'''conferencia_masp_sisap'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AE''' Row: 1
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''conferencia_pis_sisap
-{Tab}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-Clipboard.SetText Text: $'''conferencia_pis_sisap
-{Tab}'''
+Clipboard.SetText Text: $'''conferencia_pis_sisap'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AF''' Row: 1
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''conferencia_email_sisap
-{Tab}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-Clipboard.SetText Text: $'''conferencia_email_sisap
-{Tab}'''
+Clipboard.SetText Text: $'''conferencia_email_sisap'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AG''' Row: 1
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''conferencia_cpf_sisap
-{Tab}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-Clipboard.SetText Text: $'''conferencia_cpf_sisap
-{Tab}'''
+Clipboard.SetText Text: $'''conferencia_cpf_sisap'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AH''' Row: 1
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''conferencia_guias_masp
-{Tab}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-Clipboard.SetText Text: $'''conferencia_guias_masp
-{Tab}'''
+Clipboard.SetText Text: $'''conferencia_guias_masp'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AI''' Row: 1
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''conferencia_guias_nome
-{Tab}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-Clipboard.SetText Text: $'''conferencia_guias_nome
-{Tab}'''
+Clipboard.SetText Text: $'''conferencia_guias_nome'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AA''' Row: 2
