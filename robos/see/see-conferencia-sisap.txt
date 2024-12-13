@@ -6,44 +6,44 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: pla
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AD''' Row: 2
 Clipboard.SetText Text: $'''=SEERRO(PROCV(E2;\'[Lista_LC-100.xlsx]Lista LC 100\'!$D$6:$J$99469;7;FALSO);\"Não encontrado\")'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AE''' Row: 2
 Clipboard.SetText Text: $'''=SEERRO(PROCV(G2;\'[Lista_LC-100.xlsx]Lista LC 100\'!$E$6:$J$99469;6;FALSO);\"Não encontrado\")'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AF''' Row: 2
 Clipboard.SetText Text: $'''=SEERRO(PROCV(B2;\'[Lista_LC-100.xlsx]Lista LC 100\'!$G$6:$J$99469;4;FALSO);\"Não encontrado\")'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AG''' Row: 2
 Clipboard.SetText Text: $'''=SEERRO(PROCV(F2;\'[Lista_LC-100.xlsx]Lista LC 100\'!$F$6:$J$99469;5;FALSO);\"Não encontrado\")'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
 WAIT 4
 Excel.CloseExcel.CloseAndSave Instance: planilha_sisap
