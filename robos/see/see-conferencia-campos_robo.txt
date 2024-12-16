@@ -24,7 +24,7 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: pla
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 WAIT 2
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AJ''' Row: 2
-Clipboard.SetText Text: $'''=SES(AB2=\"Encontrado\";\"processo\";AH2=\"Não encontrado\";\"conferir\";AI2=\"Não encontrado\";\"conferir\";AG2=\"Não encontrado\";\"conferir\";VERDADEIRO;\"31/12/2015\")'''
+Clipboard.SetText Text: $'''=SE(AB2=\"Encontrado\"; \"processo\"; SE(AH2=\"Não encontrado\"; \"conferir\"; SE(AI2=\"Não encontrado\"; \"conferir\"; SE(AG2=\"Não encontrado\"; \"conferir\"; \"31/12/2015\"))))'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V}){Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
@@ -34,7 +34,7 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: pla
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
 WAIT 1
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AK''' Row: 2
-Clipboard.SetText Text: $'''=SES(AB2=\"Encontrado\";\"processo\";AH2=\"Não encontrado\";\"conferir\";AI2=\"Não encontrado\";\"conferir\";AG2=\"Não encontrado\";\"conferir\";VERDADEIRO;\"SIM\")'''
+Clipboard.SetText Text: $'''=SE(AB2=\"Encontrado\"; \"processo\"; SE(AH2=\"Não encontrado\"; \"conferir\"; SE(AI2=\"Não encontrado\"; \"conferir\"; SE(AG2=\"Não encontrado\"; \"conferir\"; \"SIM\"))))'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V}){Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
