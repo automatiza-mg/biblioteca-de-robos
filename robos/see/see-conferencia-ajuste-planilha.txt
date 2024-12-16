@@ -1,3 +1,11 @@
+WAIT 2
+Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''Z''' Row: 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Down})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Down})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Right}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LShiftKey}({LControlKey}({Right}{Up}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Delete}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Up}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 Excel.GetFirstFreeColumnRow Instance: planilha_formulario FirstFreeColumn=> coluna_livre_formulario FirstFreeRow=> linha_livre_formulario
 WAIT 2
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''E''' Row: 2
