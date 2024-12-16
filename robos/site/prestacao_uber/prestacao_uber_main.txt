@@ -1,0 +1,7 @@
+CALL entrada_variaveis
+CALL chat_gpt
+CALL login_sei
+CALL cria_processo
+CALL insere_prestacao
+CALL insere_PDFs
+CALL insere_ateste
