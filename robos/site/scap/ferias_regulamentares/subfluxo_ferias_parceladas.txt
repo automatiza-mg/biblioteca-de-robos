@@ -1,0 +1,97 @@
+IF Contains(ferias_parceladas, $'''s''', True) THEN
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%numero_de_dias%%mes_de_ferias%%ferias_exerc_anterior%%dia_inicio_ferias%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({a}){Control}({c})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0227 - Ferias posterior existente . Exclua para cadastrar periodo anterior .''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Ferias posterior existente . Exclua para cadastrar periodo anterior .''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0190 - Servidor afastado neste periodo.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Servidor afastado neste periodo.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0166 - Informe: 10,11,12,13,14 ou 15  dias para Ferias Parceladas .''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Informe: 10,11,12,13,14 ou 15  dias para Ferias Parceladas .''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0212 - Periodo a cadastrar coincide com periodo de ferias ja incluidas.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Periodo a cadastrar coincide com periodo de ferias ja incluidas.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0104 - Ano aquisitivo nao pode ser maior que ''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Ano aquisitivo nao pode ser maior que ao subsequente.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0237 - Para ferias anos anteriores, utilize Rotina de Historico .''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $''' Para ferias anos anteriores, utilize Rotina de Historico .''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0125 - Servidor com direito a ferias a partir ''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Servidor com direito a ferias após 11 meses.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0222 - Servidor com ferias premio no periodo .''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Servidor com ferias premio no periodo .''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0190 - Servidor afastado neste periodo.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Servidor afastado neste periodo.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''SERVIDOR COM O SALDO DE FERIAS DO ANO ANTERIOR.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Servidor com saldo de ferias do ano anterior.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0222 - Servidor nao possui saldo ferias do ano anterior''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Servidor não possui saldo de ferias do ano anterior.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0189 - Mes invalido(a).''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Mês invalido.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $''' 0327 - Atencao! Servidor ja possui parcelamento.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Atencao! Servidor ja possui parcelamento. Verificar os dias restantes''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0327 - Atencao! Servidor nao possui saldo de ferias''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Atencao! Servidor ja possui parcelamento. Verificar os dias restantes''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''MORE''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Provavel interrupção de programa devido a data inválida. Verificar inclusão manual.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''*** Comando invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Comando inválido. Verificar inclusão manual''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}%inicio_2_periodo%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({a}){Control}({c})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0011 - Data invalida.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Data do segundo periodo invalida.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0327 - Atencao! 2º PERIODO DEVE COMECAR NO MESMO ANO DO 1º''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Atenção! Segundo Periodo deve ser no mesmo ano do primeiro periodo''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''MORE''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Provavel interrupção de programa devido a data inválida. Verificar inclusão manual.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''*** Comando invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Comando inválido. Verificar inclusão manual''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''0008 - Tecle <PF5> para confirmar.''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Registro incluído com sucesso.''' Column: $'''L''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    LABEL 'Proximo Masp'
+END
