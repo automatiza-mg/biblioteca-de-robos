@@ -1,0 +1,155 @@
+# Para não sobrecarregar o Sisap, sugerimos rodar o robô antes das 09:00 e depois das 16:00
+# Primeiro, criar as variáveis de Entrada usuario e senha, citadas na linha 6, com os dados de acesso ao Sisap (masp e senha do Sisap)
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_e_hora_inicio
+System.RunApplication.RunApplication ApplicationPath: $'''C:\\Program Files (x86)\\pw3270\\pw3270.exe''' WindowStyle: System.ProcessWindowStyle.Maximized ProcessId=> terminal
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''bhmvsb.prodemge.gov.br''' Class: $'''''' TextToSend: $'''sisap{Tab}%usuario%{Tab}%senha%{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> TELA_SISAP
+WAIT 2
+IF Contains(TELA_SISAP, $'''Senha incorreta. Digite novamente''', True) THEN
+    EXIT Code: 0 ErrorMessage: $'''Senha incorreta na Variavel de Entrada \"Senha\". Verificar'''
+END
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''siap{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+/# Deverá ser inserido mais quantidades de TAB no envio de teclas na linha 15 quando o usuário possuir mais de uma opção para seleção na lista de restrição no Sisap:
+
+ VISHC000                                                              PRODEMGE
+ NISHC000        SISAP-MG - ADMINISTRACAO DE PESSOAL DO ESTADO       17/12/2024
+ M753077                                                               13:15:39
+                            Lista de RESTRICOES para selecao
+            *** Fim da Lista de RESTRICAO
+            _  1981-00000099 SUP.CENTRAL DE GESTAO DE RECURSOS HUMANOS
+            X  1501-00000099 SECRETARIA DE PLANEJAMENTO E GESTAO 
+
+Caso o usuario não tenha lista de restrições. desabilitar a linha 13 clicando com o botão direito do mouse em cima da respectiva linha e selecionar "Desablitar Ação"#/
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}X{Return}{F3}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''EVOLUCAO NA.CARREIRA{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''01{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+# Inserir a planilha com o leiaute na linha 19 e 139
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: `` Visible: True ReadOnly: False Instance=> Progressao
+Excel.GetFirstFreeRowOnColumn Instance: Progressao Column: $'''A''' FirstFreeRowOnColumn=> Linhalivre
+Excel.GetFirstFreeRowOnColumn Instance: Progressao Column: $'''H''' FirstFreeRowOnColumn=> Linha
+LOOP WHILE (linha) < (Linhalivre)
+    Excel.ReadFromExcel.ReadCell Instance: Progressao StartColumn: $'''B''' StartRow: linha ReadAsText: True CellValue=> Masp1
+    Excel.ReadFromExcel.ReadCell Instance: Progressao StartColumn: $'''C''' StartRow: linha ReadAsText: True CellValue=> digito_verificador
+    Excel.ReadFromExcel.ReadCell Instance: Progressao StartColumn: $'''D''' StartRow: linha ReadAsText: True CellValue=> ADMISSAO
+    Excel.ReadFromExcel.ReadCell Instance: Progressao StartColumn: $'''E''' StartRow: linha ReadAsText: True CellValue=> NAT
+    Excel.ReadFromExcel.ReadCell Instance: Progressao StartColumn: $'''F''' StartRow: linha ReadAsText: True CellValue=> DATAPUBLICACAO
+    Excel.ReadFromExcel.ReadCell Instance: Progressao StartColumn: $'''G''' StartRow: linha ReadAsText: True CellValue=> DTINICIO
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''''' Class: $'''gdkWindowToplevel''' TextToSend: $'''%Masp1%%digito_verificador%%ADMISSAO%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0222 - Servidor inativo na Instituicao''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Servidor inativo na Instituicao''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0154 - Operador nao autorizado para incluir''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Operador nao autorizado para incluir''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0034 - MASP invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''MASP invalido''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0113 - Numero Admissao inexistente/invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Numero Admissao inexistente/invalido''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0041 - Digito Verificador invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Digito Verificador invalido''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0222 - Servidor sem direito a Progressao''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Servidor sem direito a Progressao''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%NAT%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''Natureza incompativel''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Natureza incompativel''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0152 - Natureza incompativel com Carreira Nova''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Natureza incompativel com Carreira Nova''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0152 - Natureza incompativel com Progressao''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Natureza incompativel com Progressao''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0344 - Natureza inexistente para Grupo Natureza''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Natureza inexistente para Grupo Natureza''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: DATAPUBLICACAO DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%DTINICIO%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0188 - Data inicio maior que Data Publicacao''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Data inicio maior que Data Publicação''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0012 - Data informada maior que data corrente''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Data Publicação informada maior que data corrente''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0214 - Data inicio Progressao menor que Data inicio Progressao anterior''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Data inicio Progressao menor que Data inicio Progressao anterior''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0012 - Data informada maior que data corrente''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Data Inicio Progressão informada maior que data corrente''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0222 - Servidor com Nivel/Simbolo/Grau existente''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Servidor com Nivel/Simbolo/Grau existente''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0222 - Servidor com Grau Superior/Igual existente''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Servidor com Grau Superior/Igual existente''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0222 - Servidor sem direito a Progressao''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Servidor sem direito a Progressao''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''*** Comando invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Comando inválido. Verificar inclusão manual''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0008 - Tecle <PF5> para confirmar''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    END
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0123 - Registro incluido com sucesso''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: Progressao Value: $'''Registro incluido com sucesso''' Column: $'''H''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    LABEL 'Proximo Masp'
+    Variables.IncreaseVariable Value: linha IncrementValue: 1
+END
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+Excel.SaveExcel.Save Instance: Progressao
+Excel.CloseExcel.Close Instance: Progressao
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F12}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_e_hora_final
+DateTime.Subtract FromDate: data_e_hora_final SubstractDate: data_e_hora_inicio TimeUnit: DateTime.DifferenceTimeUnit.Minutes TimeDifference=> tempogasto
+WAIT 2
+Display.ShowMessageDialog.ShowMessage Message: $'''REGISTROS INCLUÍDOS EM %tempogasto% MINUTOS. VERIFICAR COLUNA DE STATUS.
+
+
+
+
+Desenvolvido por: Erik Morais
+E-mail: erik.morais@planejamento.mg.gov.br''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({Q})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: `` Visible: True ReadOnly: False Instance=> ExcelInstance
