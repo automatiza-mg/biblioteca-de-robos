@@ -1,0 +1,144 @@
+# Para n„o sobrecarregar o Sisap, sugerimos rodar o robÙ antes das 09:00 e depois das 16:00
+# Primeiro, criar as vari·veis de Entrada usuario e senha, citadas na linha 5, com os dados de acesso ao Sisap (masp e senha do Sisap)
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_e_hora_inicio
+System.RunApplication.RunApplication ApplicationPath: $'''C:\\Program Files (x86)\\pw3270\\pw3270.exe''' WindowStyle: System.ProcessWindowStyle.Maximized ProcessId=> terminal
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''bhmvsb.prodemge.gov.br''' Class: $'''''' TextToSend: $'''sisap{Tab}%usuario%{Tab}%senha%{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> TELA_SISAP
+IF Contains(TELA_SISAP, $'''Senha incorreta. Digite novamente''', True) THEN
+    EXIT Code: 0 ErrorMessage: $'''Senha incorreta na Variavel de Entrada \"Senha\". Verificar'''
+END
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''siap{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+/# Dever· ser inserido mais quantidades de TAB no envio de teclas na linha 13 quando o usu·rio possuir mais de uma opÁ„o para seleÁ„o na lista de restriÁ„o no Sisap:
+
+ VISHC000                                                              PRODEMGE
+ NISHC000        SISAP-MG - ADMINISTRACAO DE PESSOAL DO ESTADO       17/12/2024
+ M753077                                                               13:15:39
+                            Lista de RESTRICOES para selecao
+            *** Fim da Lista de RESTRICAO
+            _  1981-00000099 SUP.CENTRAL DE GESTAO DE RECURSOS HUMANOS
+            X  1501-00000099 SECRETARIA DE PLANEJAMENTO E GESTAO 
+
+Caso o usuario n„o tenha lista de restriÁıes. desabilitar a linha 13 clicando com o bot„o direito do mouse em cima da respectiva linha e selecionar "Desablitar AÁ„o"#/
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}X{Return}{F3}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''FALTAS CONSOLIDADAS PAGAMENTO{Return}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+WAIT 2
+# Inserir a planilha com o leiaute na linha 17 e 130
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\m753077\\Desktop\\Power Automate 12_11_2024\\Faltas - rotina Normal - OK\\Layout inclus„o Faltas - ROTINA NORMAL - Copia - Copia.xlsx''' Visible: True ReadOnly: False Instance=> planilha_faltas_rotina_normal
+Excel.GetFirstFreeRowOnColumn Instance: planilha_faltas_rotina_normal Column: $'''A''' FirstFreeRowOnColumn=> linha_coluna_masp
+Excel.GetFirstFreeRowOnColumn Instance: planilha_faltas_rotina_normal Column: $'''K''' FirstFreeRowOnColumn=> linha_coluna_status
+LOOP WHILE (linha_coluna_status) < (linha_coluna_masp)
+    Excel.ReadFromExcel.ReadCell Instance: planilha_faltas_rotina_normal StartColumn: $'''B''' StartRow: linha_coluna_status ReadAsText: True CellValue=> Masp1
+    Excel.ReadFromExcel.ReadCell Instance: planilha_faltas_rotina_normal StartColumn: $'''C''' StartRow: linha_coluna_status ReadAsText: True CellValue=> digito_verificador
+    Excel.ReadFromExcel.ReadCell Instance: planilha_faltas_rotina_normal StartColumn: $'''D''' StartRow: linha_coluna_status ReadAsText: True CellValue=> ADMISSAO
+    Excel.ReadFromExcel.ReadCell Instance: planilha_faltas_rotina_normal StartColumn: $'''E''' StartRow: linha_coluna_status ReadAsText: True CellValue=> mes_ano_apuracao
+    Excel.ReadFromExcel.ReadCell Instance: planilha_faltas_rotina_normal StartColumn: $'''F''' StartRow: linha_coluna_status ReadAsText: True CellValue=> tipo_de_falta
+    Excel.ReadFromExcel.ReadCell Instance: planilha_faltas_rotina_normal StartColumn: $'''G''' StartRow: linha_coluna_status ReadAsText: True CellValue=> quantidade_de_faltas
+    Excel.ReadFromExcel.ReadCell Instance: planilha_faltas_rotina_normal StartColumn: $'''H''' StartRow: linha_coluna_status ReadAsText: True CellValue=> natureza_falta
+    Excel.ReadFromExcel.ReadCell Instance: planilha_faltas_rotina_normal StartColumn: $'''I''' StartRow: linha_coluna_status ReadAsText: True CellValue=> horas_a_descontar
+    Excel.ReadFromExcel.ReadCell Instance: planilha_faltas_rotina_normal StartColumn: $'''J''' StartRow: linha_coluna_status ReadAsText: True CellValue=> natureza_falta_horas
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''''' Class: $'''gdkWindowToplevel''' TextToSend: $'''%Masp1%%digito_verificador%%ADMISSAO%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0222 - Servidor inativo na Instituicao''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''Servidor inativo na Instituicao''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''0154 - Operador nao autorizado para incluir''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''Operador nao autorizado para incluir''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''0034 - MASP invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''MASP invalido''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''0113 - Numero Admissao inexistente/invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''Numero Admissao inexistente/invalido''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''0041 - Digito Verificador invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''Digito Verificador invalido''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''NISHC714''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''X{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''''' Class: $'''gdkWindowToplevel''' TextToSend: mes_ano_apuracao DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''''' Class: $'''gdkWindowToplevel''' TextToSend: $'''%tipo_de_falta%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0343 - Utilize ROTINA DE HISTORICO''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''Verifique o MÍs/Ano apuraÁ„o - Utilize ROTINA DE HISTORICO''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''0039 - Opcao invalida''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''CÛdigo de falta invalido''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''0222 - Servidor com faltas cadastradas. Acesse alteracao''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''Servidor com faltas cadastradas. Verificar/Alterar''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''*** Comando invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''Comando inv·lido''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: quantidade_de_faltas DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0063 - Quantidade de faltas e eventos maior que dias do mes.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''Quantidade de faltas e eventos maior que dias do mes.''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''*** Comando invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''Comando inv·lido''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''''' Class: $'''gdkWindowToplevel''' TextToSend: $'''%natureza_falta%{Tab}{Tab}{Tab}{Tab}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''''' Class: $'''gdkWindowToplevel''' TextToSend: $'''%horas_a_descontar%{Tab}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''''' Class: $'''gdkWindowToplevel''' TextToSend: $'''%natureza_falta_horas%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0063 - Quantidade de faltas e eventos maior que dias do mes.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''Quantidade de faltas e eventos maior que dias do mes.''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''0008 - Tecle <PF5> para confirmar''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        Excel.WriteToExcel.WriteCell Instance: planilha_faltas_rotina_normal Value: $'''Registro incluido com sucesso''' Column: $'''K''' Row: linha_coluna_status
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    LABEL 'Proximo Masp'
+    Variables.IncreaseVariable Value: linha_coluna_status IncrementValue: 1
+END
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+Excel.SaveExcel.Save Instance: planilha_faltas_rotina_normal
+Excel.CloseExcel.Close Instance: planilha_faltas_rotina_normal
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F12}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_e_hora_final
+DateTime.Subtract FromDate: data_e_hora_final SubstractDate: data_e_hora_inicio TimeUnit: DateTime.DifferenceTimeUnit.Minutes TimeDifference=> tempogasto
+WAIT 2
+Display.ShowMessageDialog.ShowMessage Message: $'''REGISTROS INCLUÕDOS EM %tempogasto% MINUTOS. VERIFICAR COLUNA DE STATUS.
+
+
+Desenvolvido por: Erik Morais
+D˙vidas e suporte atravÈs do E-mail: erik.morais@planejamento.mg.gov.br''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({Q})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: `` Visible: True ReadOnly: False Instance=> ExcelInstance
