@@ -37,7 +37,7 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{LShiftKey}({
 WAIT 1
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''Z''' Row: 1
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Down}){Down}{Right}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Down}){Down}{Right}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AA''' Row: 1
 Clipboard.SetText Text: $'''nome_arrumado'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
