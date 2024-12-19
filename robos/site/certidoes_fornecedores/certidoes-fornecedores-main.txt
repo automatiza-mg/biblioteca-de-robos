@@ -13,7 +13,7 @@ LOOP WHILE (linhaatual) < (qtde_a_conferir)
     Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''C''' StartRow: linhaatual ReadAsText: True CellValue=> cep
     Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''D''' StartRow: linhaatual ReadAsText: True CellValue=> município
     Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''E''' StartRow: linhaatual ReadAsText: True CellValue=> estado
-    CALL CRC_Cagef_MG
+    CALL CRC
     Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''F''' StartRow: linhaatual ReadAsText: True CellValue=> cagef
     # condicional alterada provisoriamente para conseguirmos testar todos os subfluxos em sequência
     IF cagef = $'''ativo''' THEN
