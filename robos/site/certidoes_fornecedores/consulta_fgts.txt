@@ -14,6 +14,11 @@ IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_fg
     END
 END
 WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_fgts Text: $'''Resultado da consulta''') FOR 60
+IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_fgts Text: $'''Empregador não cadastrado''') THEN
+    WebAutomation.CloseWebBrowser BrowserInstance: site_fgts
+    Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''não cadastrado''' Column: $'''k''' Row: linhaatual
+    EXIT FUNCTION
+END
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({C})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
 Clipboard.GetText Text=> situacap_fgts
