@@ -1,0 +1,65 @@
+Folder.GetFiles Folder: caminho_pasta FileFilter: $'''*''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> pasta
+LOOP FOREACH arquivo IN pasta
+    Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: arquivo Visible: True ReadOnly: False Instance=> arquivo_excel
+END
+WAIT 2
+/# - DEFINIR A PLANILHA 'CONTRATOS' COMO ATIVA
+- REEXIBIR LINHAS#/
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: arquivo_excel Name: $'''CONTRATOS'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: arquivo_excel TextToSend: $'''{Alt}COUH''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: arquivo_excel TextToSend: $'''{Alt}COUL''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+Excel.GetFirstFreeRowOnColumn Instance: arquivo_excel Column: $'''N''' FirstFreeRowOnColumn=> linha_livre_n
+# - ARRUMAR LISTA 'UNIDADE EXECUTORA'
+Excel.SelectCellsFromExcel.SelectNamedCell Instance: arquivo_excel CellName: $'''AB11'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: arquivo_excel TextToSend: $'''=ARRUMAR(M{NumPad1}{NumPad1}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+Excel.SelectCellsFromExcel.SelectCells Instance: arquivo_excel StartColumn: $'''AB''' StartRow: 11 EndColumn: $'''AB''' EndRow: linha_livre_n - 1
+WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+Excel.CopyCellsFromExcel.Copy Instance: arquivo_excel
+Excel.SelectCellsFromExcel.SelectNamedCell Instance: arquivo_excel CellName: $'''M11'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: arquivo_excel TextToSend: $'''{Alt}CVV''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+# - LER TODAS AS COLUNAS E LINHAS DA PLANILHA 'CONTRATOS'
+Excel.GetFirstFreeColumnRow Instance: arquivo_excel FirstFreeColumn=> coluna_livre
+Excel.ReadFromExcel.ReadCells Instance: arquivo_excel StartColumn: $'''A''' StartRow: 10 EndColumn: coluna_livre - 1 EndRow: linha_livre_n - 1 ReadAsText: False FirstLineIsHeader: True RangeValue=> planilha_excel
+/# - ELABORAR UMA LISTA A PARTIR DA COLUNA 'UNIDADE EXECUTORA'
+- REMOVER DADOS DUPICADOS DA LISTA#/
+Variables.RetrieveDataTableColumnIntoList DataTable: planilha_excel ColumnNameOrIndex: $'''Unidade Executora''' ColumnAsList=> coluna_filtro
+Variables.RemoveDuplicateItemsFromList List: coluna_filtro IgnoreCase: True
+LOOP FOREACH elemento IN coluna_filtro
+    IF IsEmpty(elemento) THEN
+        Variables.RemoveItemFromList.RemoveItemFromListByValue Item: elemento ItemMatchAllOccurrences: False List: coluna_filtro
+    END
+END
+Excel.CloseExcel.CloseAndSave Instance: arquivo_excel
+/# - LIMPAR TODOS OS FILTROS APLICADOS NA PLANILHA
+- PARA CADA UNIDADE EXECUTORA DA LISTA:
+  - FILTRAR A COLUNA M DA PLANILHA
+  - LISTAR TODAS AS DEMAIS UNIDADES EXECUTORAS
+  - SELECIONAR A ÁREA DA PLANILHA
+  - EXCLUIR A ÁREA DA PLANILHA
+  - LIMPAR FILTROS
+  - EXCLUIR LINHAS EM BRANCO
+  - SALVAR O ARQUIVO COM O NOME DA UNIDADE EXECUTORA QUE PERMANECEU LISTADA#/
+LOOP FOREACH unidade_executora IN coluna_filtro
+    Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: arquivo Visible: True ReadOnly: False Instance=> arquivo_excel
+    WAIT 2
+    Excel.ClearFilterFromExcel.ClearFilterSpecificColumnWorksheet Instance: arquivo_excel Column: $'''M'''
+    WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+    Excel.FilterCellsFromExcel.FilterAdvancedRangeCoordinates Instance: arquivo_excel Column: $'''M''' StartColumn: $'''A''' StartRow: 10 EndColumn: $'''AA''' EndRow: linha_livre_n - 1 AdvancedFilterFirstConditionOperator: Excel.FilterConditionOperator.NotEqual AdvancedFilterFirstConditionValue: unidade_executora AdvancedFilterSecondConditionOperator: Excel.FilterConditionOperator.None AdvancedFilterSecondConditionValue: $'''''' AdvancedFilterLogicalOperator: Excel.FilterLogicalOperator.IsOr
+    Excel.SelectCellsFromExcel.SelectCells Instance: arquivo_excel StartColumn: $'''A''' StartRow: 11 EndColumn: $'''AA''' EndRow: linha_livre_n - 1
+    WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: arquivo_excel TextToSend: $'''{LControlKey}({LShiftKey}({Down})){Delete}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    Excel.ClearFilterFromExcel.ClearFilterWorksheet Instance: arquivo_excel
+    # - RETIRAR AS LINHAS VAZIAS APÓS O FILTRO
+    Excel.SelectCellsFromExcel.SelectCells Instance: arquivo_excel StartColumn: $'''A''' StartRow: 10 EndColumn: $'''AA''' EndRow: linha_livre_n - 1
+    WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: arquivo_excel TextToSend: $'''{F5}{Tab}{Tab}{Space}{Down}{Down}{Down}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({Subtract}){Down}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+    Excel.CloseExcel.CloseAndSaveAs Instance: arquivo_excel DocumentFormat: Excel.ExcelFormat.FromExtension DocumentPath: $'''%caminho_pasta%%unidade_executora%.xlsx'''
+END
+Display.ShowMessageDialog.ShowMessage Title: $'''Desempilhamento realizado com sucesso!''' Message: $'''As informações sobre as seguintes unidades executoras foram salvas:
+
+%coluna_filtro%''' Icon: Display.Icon.Information Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False

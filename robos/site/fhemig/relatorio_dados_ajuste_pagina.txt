@@ -1,0 +1,28 @@
+Excel.ReadFromExcel.ReadCells Instance: planilha_bens StartColumn: $'''A''' StartRow: 2 EndColumn: $'''AG''' EndRow: 2073 ReadAsText: False FirstLineIsHeader: False RangeValue=> coluna_ua
+Variables.RetrieveDataTableColumnIntoList DataTable: coluna_ua ColumnNameOrIndex: 32 ColumnAsList=> coluna_filtro
+Variables.RemoveDuplicateItemsFromList List: coluna_filtro IgnoreCase: True
+Variables.RemoveItemFromList.RemoveItemFromListByValue Item: $'''ADC''' ItemMatchAllOccurrences: False List: coluna_filtro
+IF IsEmpty($'''elento''') THEN
+    Variables.RemoveItemFromList.RemoveItemFromListByValue Item: elemento ItemMatchAllOccurrences: False List: coluna_filtro
+END
+LOOP FOREACH elemento IN coluna_filtro
+    Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_bens Name: elemento
+    Excel.SelectCellsFromExcel.SelectNamedCell Instance: planilha_bens CellName: $'''A8'''
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Control}({T})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Alt}couh''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Up}{Alt}coun''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+    Excel.SelectCellsFromExcel.SelectNamedCell Instance: planilha_bens CellName: $'''A60'''
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Control}({Shift}({Up}))''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Alt}couh''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+    WAIT 2
+    Excel.SelectCellsFromExcel.SelectNamedCell Instance: planilha_bens CellName: $'''A59'''
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Control}({Shift}({Up}))''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Shift}({Down}){Shift}({Down})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Alt}coun''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+END
+Display.ShowMessageDialog.ShowMessage Message: $'''O fluxo foi realizado com sucesso!''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
