@@ -1,0 +1,3 @@
+CALL pag_relatorio
+CALL pag_dados
+CALL ajuste_pag_dados

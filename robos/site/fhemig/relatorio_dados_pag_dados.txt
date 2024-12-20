@@ -1,0 +1,34 @@
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_bens Name: $'''DADOS'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Delete}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+WAIT 2
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_bens Name: $'''Relatório de Composição'''
+Excel.CopyCellsFromExcel.CopyCells Instance: planilha_bens StartColumn: $'''A''' StartRow: 7 EndColumn: coluna_livre - 1 EndRow: linha_livre - 1
+WAIT 2
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_bens Name: $'''DADOS'''
+Excel.SelectCellsFromExcel.SelectCells Instance: planilha_bens StartColumn: $'''A''' StartRow: 2 EndColumn: $'''AC''' EndRow: 1048576
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Alt}cve''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+DISABLE Excel.PasteCellsToExcel.PasteAt Instance: $'''DSDS''' Column: $'''DSDS''' Row: $'''DS'''
+WAIT 2
+Excel.GetFirstFreeColumnRow Instance: planilha_bens FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.CopyCellsFromExcel.CopyCells Instance: planilha_bens StartColumn: $'''ag''' StartRow: 2 EndColumn: $'''ag''' EndRow: 5000
+WAIT 2
+Excel.SelectCellsFromExcel.SelectNamedCell Instance: planilha_bens CellName: $'''e2'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Alt}cvv''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Control}({T})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Alt}cfsl{Alt}(b)-{Space}{Tab}0,00{Tab}{Return}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Space}{Tab}{Tab}{Return}{Right}{Right}{Right}{Right}{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Alt}sga''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+DISABLE Excel.CopyCellsFromExcel.CopyCell Instance: planilha_bens StartColumn: $'''A''' StartRow: linha_livre - 1
+DISABLE Clipboard.GetText Text=> identificar_celula_vazia
+Excel.GetFirstFreeRowOnColumn Instance: planilha_bens Column: $'''A''' FirstFreeRowOnColumn=> linha_livre_coluna_A
+Excel.GetFirstFreeRowOnColumn Instance: planilha_bens Column: $'''AD''' FirstFreeRowOnColumn=> linha_livre_coluna_AD
+IF linha_livre_coluna_A > linha_livre_coluna_AD THEN
+    Excel.SelectCellsFromExcel.SelectCells Instance: planilha_bens StartColumn: $'''AD''' StartRow: linha_livre_coluna_AD - 1 EndColumn: $'''AG''' EndRow: linha_livre_coluna_AD - 1
+    Excel.CopyCellsFromExcel.Copy Instance: planilha_bens
+    Excel.SelectCellsFromExcel.SelectCells Instance: planilha_bens StartColumn: $'''AD''' StartRow: linha_livre_coluna_AD EndColumn: $'''AG''' EndRow: linha_livre_coluna_A - 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Alt}cvm''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+ELSE
+    Excel.SelectCellsFromExcel.SelectCells Instance: planilha_bens StartColumn: $'''A''' StartRow: linha_livre_coluna_A EndColumn: $'''xfd''' EndRow: linha_livre - 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_bens TextToSend: $'''{Control}{Subtract}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+END
