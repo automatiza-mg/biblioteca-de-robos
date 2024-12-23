@@ -78,3 +78,9 @@ Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''=ARRUMAR(C2){Return}{Up}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''V''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''V''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
+WAIT 3
