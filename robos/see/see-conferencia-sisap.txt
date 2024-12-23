@@ -1,4 +1,12 @@
 Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_sisap Visible: True ReadOnly: False Instance=> planilha_sisap
+Excel.ActivateCellInExcel.ActivateCell Instance: planilha_sisap Column: $'''D''' Row: 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_sisap TextToSend: $'''{LControlKey}({Space})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_sisap TextToSend: $'''{Alt}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_sisap TextToSend: $'''FS''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_sisap TextToSend: $'''S''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LShiftKey}({Tab})/{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+WAIT 3
 Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_formulario Name: $'''Respostas ao formulário 1'''
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AC''' Row: 2
 Clipboard.SetText Text: $'''=SEERRO(PROCV(AA2;\'[Lista_LC-100.xlsx]Lista LC 100\'!$C$6:$J$99469;8;FALSO);\"Não encontrado\")'''
