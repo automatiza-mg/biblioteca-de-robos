@@ -4,3 +4,5 @@ CALL 'Conferência de Processos'
 CALL 'Conferência Sisap'
 CALL 'Conferência Guias'
 CALL 'Campos Robô'
+Excel.SaveExcel.Save Instance: planilha_formulario
+Excel.CloseExcel.CloseAndSave Instance: planilha_formulario
