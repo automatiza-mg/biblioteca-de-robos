@@ -1,8 +1,26 @@
 Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_processos Visible: True ReadOnly: False Instance=> planilha_processos
 Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_AGE Visible: True ReadOnly: False Instance=> planilha_AGE
+Excel.GetFirstFreeColumnRow Instance: planilha_processos FirstFreeRow=> linha_livre_processos
+Excel.ActivateCellInExcel.ActivateCell Instance: planilha_processos Column: $'''C''' Row: 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_processos TextToSend: $'''{LControlKey}({Space})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_processos TextToSend: $'''{Alt}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_processos TextToSend: $'''FS''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_processos TextToSend: $'''S''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LShiftKey}({Tab})/{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_processos TextToSend: $'''{Right}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_processos TextToSend: $'''{LControlKey}({Space})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_processos TextToSend: $'''{Alt}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_processos TextToSend: $'''FS''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_processos TextToSend: $'''S''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LShiftKey}({Tab}).{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{LShiftKey}({Tab}{Tab}{Tab})-{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{Tab}{Tab}{Tab}{Tab}{Return}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+WAIT 3
 Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_formulario Name: $'''Respostas ao formulário 1'''
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AB''' Row: 2
-Clipboard.SetText Text: $'''=SE(OU(NÃO(ÉERROS(PROCV(AA2;\'[EXCLUSÃO AGE.xlsx]AGE\'!$B$5:$B$2577;1;FALSO)));NÃO(ÉERROS(PROCV(AA2;\'[RELATÓRIO SEFIP POR PROCESSOS.xlsx]Planilha1\'!$B$4:$B$7575;1;FALSO)))); \"Encontrado\"; \"Não encontrado\")'''
+Clipboard.SetText Text: $'''=SE(OU(NÃO(ÉERROS(PROCV(F2;\'[EXCLUSÃO AGE.xlsx]AGE\'!$A:$A;1;FALSO)));NÃO(ÉERROS(PROCV(F2;\'[RELATÓRIO SEFIP POR PROCESSOS.xlsx]Planilha1\'!$D:$D;1;FALSO)))); \"Encontrado\"; \"Não encontrado\")'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
