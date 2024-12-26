@@ -1,0 +1,14 @@
+LOOP pagina FROM 1 TO total_paginas_numero STEP 10
+    IF (pagina + 9) <= total_paginas_numero THEN
+        Pdf.ExtractPages PDFFile: caminho_pdf PageSelection: $'''%pagina% - %pagina + 9%''' ExtractedPDFPath: caminho_pdf IfFileExists: Pdf.IfFileExists.AddSequentialSuffix ExtractedPDFFile=> ExtractedPDF
+            ON ERROR
+                GOTO fim
+            END
+    ELSE
+        Pdf.ExtractPages PDFFile: caminho_pdf PageSelection: $'''%pagina% - %total_paginas_numero%''' ExtractedPDFPath: caminho_pdf IfFileExists: Pdf.IfFileExists.AddSequentialSuffix ExtractedPDFFile=> ExtractedPDF
+            ON ERROR
+                GOTO fim
+            END
+    END
+END
+LABEL fim
