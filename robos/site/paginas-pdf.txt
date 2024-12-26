@@ -1,3 +1,16 @@
+/# - No Google Chrome, acessar chrome://flags na barra de pesquisas, digitar Lens e desativar as opções exibidas na página
+#/
+WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://www.google.com/''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"}}''' BrowserInstance=> navegador
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: navegador TextToSend: $'''{Alt}({D}){Delete}%caminho_pdf%{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+WAIT 2
+/# Os números de tabs variam de navegador para navegador!!!
+Os 2 Tab são para ir para a página do documento
+O End é para ir para a última página, a fim de deixar o marcador de página na última do PDF
+Os 6 Tab são para o cursor chegar até a caixinha que indica o total de páginas no marcador presente no cabeçalho#/
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: navegador TextToSend: $'''{Tab: 2}{End}{Tab: 6}{Control}({C})''' DelayBetweenKeystrokes: 700 SendTextAsHardwareKeys: True
+WAIT 2
+Clipboard.GetText Text=> total_paginas
+Text.ToNumber Text: total_paginas Number=> total_paginas_numero
 LOOP pagina FROM 1 TO total_paginas_numero STEP 10
     IF (pagina + 9) <= total_paginas_numero THEN
         Pdf.ExtractPages PDFFile: caminho_pdf PageSelection: $'''%pagina% - %pagina + 9%''' ExtractedPDFPath: caminho_pdf IfFileExists: Pdf.IfFileExists.AddSequentialSuffix ExtractedPDFFile=> ExtractedPDF
