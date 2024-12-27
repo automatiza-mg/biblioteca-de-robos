@@ -1,0 +1,36 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: pasta_empilhamento[0] Visible: True ReadOnly: False Instance=> Planilha_empilhada
+WAIT (UIAutomation.WaitForWindow.ToOpenByInstanceOrHandle WindowInstance: Planilha_empilhada FocusWindow: True)
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: Planilha_empilhada Name: $'''ApontamentoListaContratos'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Alt}vl''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 1
+UIAutomation.GetWindow.GetForegroundWindow WindowTitle=> janela_protecao
+IF Contains(janela_protecao, $'''Desproteger Planilha''', False) THEN
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%senha%{Return}''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+ELSE
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Escape}''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+END
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Control}({T})''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Alt}coul''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+WAIT 0.5
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Control}({T})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Alt}couh''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 0.5
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Alt}csf''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 0.5
+Excel.SelectCellsFromExcel.SelectCells Instance: Planilha_empilhada StartColumn: $'''A''' StartRow: 2 EndColumn: $'''A''' EndRow: 1048576
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Alt}CKL''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 0.5
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Left}{Return}''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 0.5
+WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+Excel.SelectCellsFromExcel.SelectCells Instance: Planilha_empilhada StartColumn: $'''AB''' StartRow: 1 EndColumn: $'''AL''' EndRow: 1
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Alt}CKP''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 1
+Excel.DeleteWorksheet.DeleteWorksheetByName Instance: Planilha_empilhada Name: $'''ApontamentoSIGH'''
+Excel.RenameWorksheet.RenameWorksheetWithName Instance: Planilha_empilhada Name: $'''ApontamentoListaContratos''' NewName: $'''ContratosEmpilhados'''
+Excel.SaveExcel.SaveAs Instance: Planilha_empilhada DocumentFormat: Excel.ExcelFormat.OpenXmlWorkbook DocumentPath: $'''C:\\Users\\x10807108\\Desktop\\Planila Empilhar.xlsx'''
+Excel.CloseExcel.Close Instance: Planilha_empilhada
