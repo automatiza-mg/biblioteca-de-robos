@@ -1,0 +1,45 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\x10807108\\Desktop\\contratoEmpilhado.xlsx''' Visible: True ReadOnly: False Instance=> Planilha_empilhada
+WAIT (UIAutomation.WaitForWindow.ToOpenByInstanceOrHandle WindowInstance: Planilha_empilhada FocusWindow: True)
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: Planilha_empilhada Name: $'''ContratosEmpilhados'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({T}){Control}({T})''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Alt}CSF''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+Excel.ActivateCellInExcel.ActivateCell Instance: Planilha_empilhada Column: $'''N''' Row: 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({Down})''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab:7}vazia{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab:4}vazia{Return}''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 0.5
+WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+Excel.ActivateCellInExcel.ActivateCell Instance: Planilha_empilhada Column: $'''W''' Row: 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({Down})''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab:7}vazia{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab:4}vazia{Return}''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 0.5
+WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+Excel.ActivateCellInExcel.ActivateCell Instance: Planilha_empilhada Column: $'''M''' Row: 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({Down})''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab:4}vazia{Return}''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab:7}vazia{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+WAIT 0.5
+WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+Excel.ActivateCellInExcel.ActivateCell Instance: Planilha_empilhada Column: $'''D''' Row: 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({Down})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+DISABLE WAIT 6
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab:7}vazia{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab:4}vazia{Return}''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 0.5
+WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+Excel.ActivateCellInExcel.ActivateCell Instance: Planilha_empilhada Column: $'''A''' Row: 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Down}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({Shift}({Down}))''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Alt}CKL''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Left}{Return}''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+WAIT 20
+DISABLE WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Alt}CSF''' DelayBetweenKeystrokes: 1000 SendTextAsHardwareKeys: False
+WAIT 0.5
+WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Planilha_empilhada TextToSend: $'''{Alt}CSF''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+DISABLE Excel.SaveExcel.Save Instance: Planilha_empilhada
+Excel.CloseExcel.CloseAndSave Instance: Planilha_empilhada
+Display.ShowMessageDialog.ShowMessage Title: $'''Fluxo concluído!''' Message: $'''Empilhamento realizado com sucesso!''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False

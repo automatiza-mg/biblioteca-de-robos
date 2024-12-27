@@ -1,0 +1,39 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\x10807108\\Desktop\\contratoEmpilhado.xlsx''' Visible: True ReadOnly: False Instance=> Planilha_empilhada
+WAIT (UIAutomation.WaitForWindow.ToOpenByInstanceOrHandle WindowInstance: Planilha_empilhada FocusWindow: True)
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: Planilha_empilhada Name: $'''ContratosEmpilhados'''
+LOOP FOREACH arquivo IN pasta_empilhamento
+    Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: arquivo Visible: True ReadOnly: True Instance=> arquivo_selecionado
+    WAIT (UIAutomation.WaitForWindow.ToOpenByInstanceOrHandle WindowInstance: arquivo_selecionado FocusWindow: True)
+    Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: arquivo_selecionado Name: $'''ApontamentoListaContratos'''
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: arquivo_selecionado TextToSend: $'''{Alt}vl''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+    WAIT 0.7
+    UIAutomation.GetWindow.GetForegroundWindow WindowTitle=> janela_protecao
+    IF Contains(janela_protecao, $'''Desproteger Planilha''', False) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%senha%{Return}''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+    ELSE
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Escape}''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+    END
+    Excel.SelectCellsFromExcel.SelectCells Instance: arquivo_selecionado StartColumn: $'''A''' StartRow: 1 EndColumn: $'''AN''' EndRow: 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: arquivo_selecionado TextToSend: $'''{Alt}coul''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+    WAIT 0.5
+    Excel.SelectCellsFromExcel.SelectCells Instance: arquivo_selecionado StartColumn: $'''A''' StartRow: 1 EndColumn: $'''A''' EndRow: 500
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: arquivo_selecionado TextToSend: $'''{Alt}couh''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+    WAIT 0.5
+    Excel.ActivateCellInExcel.ActivateCell Instance: arquivo_selecionado Column: $'''A''' Row: 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: arquivo_selecionado TextToSend: $'''{Alt}csf''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+    WAIT 0.5
+    Excel.SelectCellsFromExcel.SelectCells Instance: arquivo_selecionado StartColumn: $'''A''' StartRow: 400 EndColumn: $'''A''' EndRow: 1048576
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: arquivo_selecionado TextToSend: $'''{Alt}CKL''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Left}{Return}''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: False
+    WAIT 0.5
+    WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+    Excel.GetFirstFreeColumnRow Instance: arquivo_selecionado FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+    Excel.CopyCellsFromExcel.CopyCells Instance: arquivo_selecionado StartColumn: $'''A''' StartRow: 2 EndColumn: $'''AA''' EndRow: linha_livre - 1
+    Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: Planilha_empilhada Name: $'''ContratosEmpilhados'''
+    Excel.GetFirstFreeColumnRow Instance: Planilha_empilhada FirstFreeColumn=> coluna_livre_empilhada FirstFreeRow=> linha_livre_empilhada
+    Excel.PasteCellsToExcel.PasteAt Instance: Planilha_empilhada Column: $'''A''' Row: linha_livre_empilhada
+    Excel.CloseExcel.Close Instance: arquivo_selecionado
+END
+Excel.SaveExcel.Save Instance: Planilha_empilhada
+Excel.CloseExcel.CloseAndSave Instance: Planilha_empilhada

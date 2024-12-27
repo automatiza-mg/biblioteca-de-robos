@@ -1,0 +1,4 @@
+Folder.GetFiles Folder: $'''C:\\Users\\julia\\Desktop\\Empilhamento''' FileFilter: $'''*.xlsx''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> pasta_empilhamento
+CALL preparar_planilha_empilhamento
+CALL empilhar
+CALL exclui_celulas_vazias
