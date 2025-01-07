@@ -1,0 +1,15 @@
+# Vamos iniciar o fluxo de publicação de Pareceres de Equivalência de Estudos
+File.ReadTextFromFile.ReadText File: $'''C:\\Users\\M14762637\\Documents\\Automatiza_MG\\promptparecer.txt''' Encoding: File.TextFileEncoding.UTF8 Content=> prompt
+Word.LaunchWord.LaunchAndOpen Path: $'''C:\\Users\\M14762637\\Documents\\Automatiza_MG\\modelo publicação Parecer Equivalência.rtf''' Visible: True ReadOnly: False Instance=> WordI
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\M14762637\\Documents\\Automatiza_MG\\processosequivalenciajjulho.xlsx''' Visible: True ReadOnly: False Instance=> excel
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: excel Name: $'''processos'''
+Excel.GetFirstFreeColumnRow Instance: excel FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.ReadFromExcel.ReadCells Instance: excel StartColumn: $'''a''' StartRow: 1 EndColumn: coluna_livre - 1 EndRow: linha_livre - 1 ReadAsText: False FirstLineIsHeader: True RangeValue=> basedados
+Excel.GetFirstFreeRowOnColumn Instance: excel Column: $'''B''' FirstFreeRowOnColumn=> linha_execucao
+Excel.GetFirstFreeColumnRow Instance: excel FirstFreeRow=> qtd_a_fazer
+CALL Loginsei
+CALL trocaunidade
+CALL registro_sei_word
+CALL criaprocessosei
+CALL autorizacao
+WebAutomation.LaunchChrome.LaunchChrome Url: $'''http://diarioweb.mg.gov.br/newsys/src/interno/index.php/login_externos''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile BrowserInstance=> iofmg
