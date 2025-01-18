@@ -1,0 +1,145 @@
+# Para não sobrecarregar o Sisap, sugerimos rodar o robô antes das 09:00 e depois das 16:00
+# Primeiro, criar as variáveis de Entrada usuario e senha, citadas na linha 6, com os dados de acesso ao Sisap (masp e senha do Sisap)
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_e_hora_inicio
+System.RunApplication.RunApplication ApplicationPath: $'''C:\\Program Files (x86)\\pw3270\\pw3270.exe''' WindowStyle: System.ProcessWindowStyle.Maximized ProcessId=> terminal
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''''' Class: $'''gdkWindowToplevel''' TextToSend: $'''sisap{Tab}%usuario%{Tab}%Senha%{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> TELA_SISAP
+WAIT 2
+IF Contains(TELA_SISAP, $'''Senha incorreta. Digite novamente''', True) THEN
+    EXIT Code: 0 ErrorMessage: $'''Senha incorreta na Variavel de Entrada \"Senha\". Verificar'''
+END
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''siap{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+/# Deverá ser inserido mais quantidades de TAB no envio de teclas na linha 15 quando o usuário possuir mais de uma opção para seleção na lista de restrição no Sisap:
+
+ VISHC000                                                              PRODEMGE
+ NISHC000        SISAP-MG - ADMINISTRACAO DE PESSOAL DO ESTADO       17/12/2024
+ M753077                                                               13:15:39
+                            Lista de RESTRICOES para selecao
+            *** Fim da Lista de RESTRICAO
+            _  1981-00000099 SUP.CENTRAL DE GESTAO DE RECURSOS HUMANOS
+            X  1501-00000099 SECRETARIA DE PLANEJAMENTO E GESTAO 
+
+Caso o usuario não tenha lista de restrições. desabilitar a linha 15 clicando com o botão direito do mouse em cima da respectiva linha e selecionar "Desablitar Ação"#/
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}X{Return}{F3}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''FERIAS REGULAMENTARES{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+# Inserir a planilha com o leiaute na linha 19 e 143
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: `` Visible: True ReadOnly: False Instance=> planilha_alteracao_ferias_reg
+Excel.GetFirstFreeRowOnColumn Instance: planilha_alteracao_ferias_reg Column: $'''A''' FirstFreeRowOnColumn=> tamanhoplanilha
+Excel.GetFirstFreeRowOnColumn Instance: planilha_alteracao_ferias_reg Column: $'''H''' FirstFreeRowOnColumn=> linhalivre
+LOOP WHILE (linhalivre) < (tamanhoplanilha)
+    Excel.ReadFromExcel.ReadCell Instance: planilha_alteracao_ferias_reg StartColumn: $'''B''' StartRow: linhalivre ReadAsText: True CellValue=> masp
+    Excel.ReadFromExcel.ReadCell Instance: planilha_alteracao_ferias_reg StartColumn: $'''C''' StartRow: linhalivre ReadAsText: True CellValue=> dv
+    Excel.ReadFromExcel.ReadCell Instance: planilha_alteracao_ferias_reg StartColumn: $'''D''' StartRow: linhalivre ReadAsText: True CellValue=> adm
+    Excel.ReadFromExcel.ReadCell Instance: planilha_alteracao_ferias_reg StartColumn: $'''E''' StartRow: linhalivre ReadAsText: True CellValue=> ano_ferias
+    Excel.ReadFromExcel.ReadCell Instance: planilha_alteracao_ferias_reg StartColumn: $'''F''' StartRow: linhalivre ReadAsText: True CellValue=> data_inicio_ferias
+    Excel.ReadFromExcel.ReadCell Instance: planilha_alteracao_ferias_reg StartColumn: $'''G''' StartRow: linhalivre ReadAsText: True CellValue=> dt_inicio_novo_periodo_ferias
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''pw3270 - bhmvst.prodemge.gov.br:23''' Class: $'''''' TextToSend: $'''%masp%%dv%%adm%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0041 - Digito Verificador invalido.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Digito Verificador invalido.''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0034 - MASP invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Masp invalido''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0010 - Servidor desligado.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Servidor desligado.''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0154 - Operador nao autorizado para ATUALIZAR ESTE SERVIDOR.....''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Operador nao autorizado para ATUALIZAR ESTE SERVIDOR.....''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0113 - Numero Admissao inexistente/invalido.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Numero Admissao inexistente/invalido.''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0222 - Servidor inativo na Instituicao''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Servidor inativo na Instituicao''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''*** Comando invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Comando inválido. Verificar exclusão manual''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%ano_ferias%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%data_inicio_ferias%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({a}){Control}({c})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0139 - Servidor nao tem ferias registradas para o ano''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Servidor nao tem ferias registradas para o periodo informado''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0002 - Preenchimento obrigatorio.''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Ano de férias não informado. Verificar''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''*** Comando invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Comando inválido. Verificar alteração manual''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0011 - Data invalida''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Data inicio ferias invalida. Verificar''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF IsEmpty(data_inicio_ferias) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Campo Data Inicio Ferias não preenchido. Verificar''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF StartsWith(data_inicio_ferias, $'''00''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Campo Data Inicio Ferias preenchido indevidamente. Verificar''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%dt_inicio_novo_periodo_ferias%{Return}{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({a}){Control}({c})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    IF Contains(TELA_SISAP, $'''0055 - Pagamento do mes ja processado''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Pagamento de Ferias do mes/ano informados já processado. Verificar''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0327 - Atencao! Servidor com afastamento''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Atenção! Servidor com afastamento no periodo''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0011 - Data invalida''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Data inicio ferias invalida. Verificar''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''*** Comando invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Comando inválido. Verificar alteração manual''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF IsEmpty(dt_inicio_novo_periodo_ferias) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Campo Data Inicio Novo Periodo de Ferias não preenchido. Verificar''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF StartsWith(dt_inicio_novo_periodo_ferias, $'''00''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Campo Data Inicio Novo Periodo de Ferias preenchido indevidamente. Verificar''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    IF Contains(TELA_SISAP, $'''0008 - Tecle <PF5> para confirmar.''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        Excel.WriteToExcel.WriteCell Instance: planilha_alteracao_ferias_reg Value: $'''Atualizacoes efetuadas com sucesso''' Column: $'''H''' Row: linhalivre
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}02{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    LABEL 'Proximo Masp'
+    Variables.IncreaseVariable Value: linhalivre IncrementValue: 1
+END
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+Excel.SaveExcel.Save Instance: planilha_alteracao_ferias_reg
+Excel.CloseExcel.Close Instance: planilha_alteracao_ferias_reg
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F12}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_e_hora_final
+DateTime.Subtract FromDate: data_e_hora_final SubstractDate: data_e_hora_inicio TimeUnit: DateTime.DifferenceTimeUnit.Minutes TimeDifference=> tempogasto
+WAIT 2
+Display.ShowMessageDialog.ShowMessage Message: $'''REGISTROS EFETUADOS EM %tempogasto% MINUTOS. VERIFICAR COLUNA DE STATUS.
