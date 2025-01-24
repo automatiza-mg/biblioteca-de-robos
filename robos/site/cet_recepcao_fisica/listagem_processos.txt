@@ -1,0 +1,62 @@
+WAIT 2
+WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() {
+    const botao = document.getElementsByClassName(\'ancoraPadraoPreta\');
+    for (let i = 0; i < botao.length; i++) {
+        if (botao[i].tabIndex === 454) {
+            botao[i].click();
+            break;
+        }
+    }
+}
+''' Result=> clique_tabela
+WAIT 2
+WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() {
+    const linhas = document.querySelectorAll(\'#tblMarcadores tr\'); // Seleciona todas as linhas da tabela
+
+    for (let i = 0; i < linhas.length; i++) {
+        const celulas = linhas[i].getElementsByTagName(\'td\');
+
+        // Verifica se a linha contém o texto \"CONSISTÊNCIA\"
+        if (celulas.length > 2 && celulas[2].innerText.includes(\'CONSISTÊNCIA\')) {
+            
+            // Procura o link com a classe \'ancoraPadraoAzul\' na primeira célula da linha
+            const link = celulas[0].querySelector(\'.ancoraPadraoAzul\');
+            
+            // Se o link existir, clica nele
+            if (link) {
+                link.click();
+                break; // Para após o clique na linha correta
+            }
+        }
+    }
+}
+''' Result=> clique_baixar
+WAIT 2
+WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { 
+botao_tabela = document.getElementsByClassName(\'fas fa-table\')
+botao_tabela[0].click()
+}''' Result=> clique_tabela
+WAIT 2
+WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() {
+baixar = document.getElementById(\'processoToCSV\')
+baixar.click()
+}''' Result=> clique_baixar
+WAIT 5
+Folder.GetFiles Folder: pasta_downloads FileFilter: $'''*.csv''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files
+WAIT 2
+File.RenameFiles.Rename Files: Files[0] NewName: $'''Processos para análise''' KeepExtension: True IfFileExists: File.IfExists.DoNothing RenamedFiles=> RenamedFiles
+File.ReadFromCSVFile.ReadCSVWithCustomSeparator CSVFile: $'''%pasta_downloads%\\Processos para análise.csv''' Encoding: File.CSVEncoding.UTF8 TrimFields: True FirstLineContainsColumnNames: True CustomColumnsSeparator: $''';''' CSVTable=> CSVTable
+Variables.CreateNewDatatable InputTable: { ^['ID', 'Protocolo', 'Link_Permanente', 'Atribuicao', 'Etiqueta', 'Etiqueta_Descricao', 'Anotacao', 'Anotacao_Responsavel', 'Ponto_Controle', 'Especificacao', 'Tipo', 'Data_Autuacao', 'Data_Autuacao_Descricao', 'Data_Recebimento', 'Data_Recebimento_Descricao', 'Data_Envio', 'Data_Envio_Descricao', 'Unidade_Envio', 'Documento_Incluido', 'Observacoes', 'Acompanhamento_Especial'], [$'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $''''''] } DataTable=> pertinentes
+LOOP FOREACH linha IN CSVTable
+    IF linha['Etiqueta'] = $'''CONSISTÊNCIA''' THEN
+        Variables.AddRowToDataTable.AppendRowToDataTable DataTable: pertinentes RowToAdd: linha
+    END
+END
+Variables.DeleteRowFromDataTable DataTable: pertinentes RowIndex: 0
+Variables.CreateNewList List=> processos
+SET linha_lista TO 0
+LOOP LoopIndex FROM 1 TO pertinentes.RowsCount STEP 1
+    Variables.AddItemToList Item: pertinentes[linha_lista]['Protocolo'] List: processos
+    Variables.IncreaseVariable Value: linha_lista IncrementValue: 1
+END
+WebAutomation.CloseWebBrowser BrowserInstance: sei
