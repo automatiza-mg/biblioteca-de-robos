@@ -4,13 +4,13 @@ Clipboard.Clear _
 Scripting.RunPowershellScript.RunPowershellScript Script: $'''Add-Type -AssemblyName System.Windows.Forms
 
 # Define o diretório onde os arquivos estão localizados
-$directoryPath = \"%caminho_pasta_chaves%\"
+$directoryPath = "%CAMINHO_PASTA_CHAVES%"
 
 # Define o padrão do nome dos arquivos (sem os números)
-$fileNamePattern = \"%NOME%\"
+$fileNamePattern = "%NOME%"
 
 # Busca os arquivos que contêm o padrão do nome
-$filePaths = Get-ChildItem -Path $directoryPath -Filter \"$fileNamePattern*.pdf\" | Select-Object -ExpandProperty FullName
+$filePaths = Get-ChildItem -Path $directoryPath -Filter "$fileNamePattern*.EXTENSÃO" | Select-Object -ExpandProperty FullName
 
 # Cria uma StringCollection para armazenar os caminhos dos arquivos
 $files = New-Object System.Collections.Specialized.StringCollection
