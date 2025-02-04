@@ -155,6 +155,14 @@ Informamos que esta chave tem validade de 20 dias.''' DelayBetweenKeystrokes: 10
         Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: FormattedDateTime Column: $'''AO''' Row: robô
         Variables.IncreaseVariable Value: robô IncrementValue: 1
         DISABLE GOTO início
+    ELSE IF resultado = $'''PROCESSO''' THEN
+        Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''PROCESSO''' Column: $'''AN''' Row: robô
+        Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: FormattedDateTime Column: $'''AO''' Row: robô
+        Variables.IncreaseVariable Value: robô IncrementValue: 1
+    ELSE IF resultado = $'''Duplicata''' THEN
+        Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Duplicata''' Column: $'''AN''' Row: robô
+        Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: FormattedDateTime Column: $'''AO''' Row: robô
+        Variables.IncreaseVariable Value: robô IncrementValue: 1
     ELSE
         Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Verificar motivo Resultado site CEF''' Column: $'''AN''' Row: robô
         Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: FormattedDateTime Column: $'''AO''' Row: robô
