@@ -84,11 +84,20 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: pla
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''V''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''V''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AA''' Row: 2
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''= SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(AA2;\"Á\";\"A\");\"Â\";\"A\"); \"É\"; \"E\"); \"Ê\"; \"E\");\"Í\";\"I\"); \"Ó\";\"O\");\"Ô\";\"O\");\"Ú\";\"U\");\"Ã\";\"A\"); \"Õ\";\"O\");\"Ç\";\"C\"){Return}{Up}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
-WAIT 1
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''V''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''V''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
+Excel.AddWorksheet Instance: planilha_formulario Name: $'''acentos-nomes''' WorksheetPosition: Excel.WorksheetPosition.Last
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_formulario Name: $'''acentos-nomes'''
+Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''A''' Row: 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''B''' Row: 2
+Clipboard.SetText Text: $'''=SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(SUBSTITUIR(A2;\"Á\";\"A\");\"Â\";\"A\"); \"É\"; \"E\"); \"Ê\"; \"E\");\"Í\";\"I\"); \"Ó\";\"O\");\"Ô\";\"O\");\"Ú\";\"U\");\"Ã\";\"A\"); \"Õ\";\"O\");\"Ç\";\"C\")'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V}){Return}{Up}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Shift}({Down}))''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+WAIT 1
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_formulario Name: $'''Respostas ao formulário 1'''
+Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AA''' Row: 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
