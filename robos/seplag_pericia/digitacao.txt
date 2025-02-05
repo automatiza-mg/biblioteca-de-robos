@@ -1,0 +1,47 @@
+Excel.GetFirstFreeRowOnColumn Instance: excel_pericia Column: coluna_livre - 1 FirstFreeRowOnColumn=> linha_loop
+Excel.GetFirstFreeRowOnColumn Instance: excel_pericia Column: $'''C''' FirstFreeRowOnColumn=> linha_livre
+LOOP LoopIndex2 FROM linha_loop TO linha_livre - 1 STEP 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''rev{Space}*{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Tab}x{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''01{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: coluna_livre - 12 StartRow: linha_loop ReadAsText: True CellValue=> masp_interessado
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''%masp_interessado%{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Tab}X{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    /# A ação 11 é para selecionar a admissão da pessoa. Pensar como fazê-lo
+#/
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    # A ação 13 é para selecionar o médico. Pode ser qualquer um.
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    # A ação 15 seleciona LTS
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''N''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    # A ação 17 marca "N" em "Prorrogacao" e já pula automático pro campo seguinte
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''N''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    # A ação 19 marca "N" em "Complemento de agenda" e já pula automático pro campo seguinte
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: coluna_livre - 9 StartRow: linha_loop ReadAsText: True CellValue=> CRM_peito
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: coluna_livre - 8 StartRow: linha_loop ReadAsText: True CellValue=> CRM_atestado
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: coluna_livre - 7 StartRow: linha_loop ReadAsText: True CellValue=> data_inicio_afastamento
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: coluna_livre - 6 StartRow: linha_loop ReadAsText: True CellValue=> data_emissao_atestado
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: coluna_livre - 5 StartRow: linha_loop ReadAsText: True CellValue=> data_revisao_atestado
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: coluna_livre - 4 StartRow: linha_loop ReadAsText: True CellValue=> dias_solicitados
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: coluna_livre - 3 StartRow: linha_loop ReadAsText: True CellValue=> cid_interessado
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''%data_inicio_afastamento%
+%dias_solicitados%
+{Tab}
+%data_emissao_atestado%
+%data_revisao_atestado%
+{F5}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''101{Tab}
+%dias_solicitados%
+{Tab}{Tab}{Tab}{Tab}
+%data_inicio_afastamento%
+%cid_interessado%
+{Tab}{Tab}{Tab}{Tab}
+%CRM_atestado%''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    # Ação 30: confirmar onde entra o CRM do médico perito
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F5}X{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    # Ação 33: esta é a última ação antes de confirmar o lançamento da perícia no Sisap. Depois dessa ação, é necessário adicionar o 'enviar teclas' restante e ações que retornem para o início do loop, talvez um F5 (? menu ?).
+END
