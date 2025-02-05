@@ -1,0 +1,16 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_excel Visible: True ReadOnly: False Instance=> excel_pericia
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: excel_pericia Name: $'''processos'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel_pericia TextToSend: $'''{LControlKey}({Down}{Down})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel_pericia TextToSend: $'''{LControlKey}({T})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel_pericia TextToSend: $'''{Alt}({C}{FN})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel_pericia TextToSend: $'''Texto{Enter}''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel_pericia TextToSend: $'''{Down}''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+WAIT 1
+Excel.GetFirstFreeColumnRow Instance: excel_pericia FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.ReadFromExcel.ReadCells Instance: excel_pericia StartColumn: $'''A''' StartRow: 1 EndColumn: coluna_livre - 1 EndRow: linha_livre - 1 ReadAsText: False FirstLineIsHeader: True RangeValue=> tabela
+Excel.GetFirstFreeRowOnColumn Instance: excel_pericia Column: $'''C''' FirstFreeRowOnColumn=> linha_loop
+Excel.ReadFromExcel.ReadCells Instance: excel_pericia StartColumn: $'''A''' StartRow: linha_loop EndColumn: $'''A''' EndRow: linha_livre - 1 ReadAsText: False FirstLineIsHeader: False RangeValue=> coluna_processos
