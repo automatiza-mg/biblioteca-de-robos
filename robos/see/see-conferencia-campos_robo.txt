@@ -1,3 +1,4 @@
+**REGION escreve cabeçalhos das colunas a serem usadas pelo robô - AJ até AO
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AJ''' Row: 1
 Clipboard.SetText Text: $'''DATA FIM'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
@@ -22,6 +23,7 @@ Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $''
 Clipboard.SetText Text: $'''Datetime email'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+**ENDREGION
 WAIT 2
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AJ''' Row: 2
 Clipboard.SetText Text: $'''=SE(X2=\"Sim\"; \"processo\"; SE(AB2=\"Encontrado\"; \"processo\"; SE(AH2=\"Não encontrado\"; \"conferir\"; SE(AI2=\"Não encontrado\"; \"conferir\"; SE(AG2=\"Não encontrado\"; \"conferir\"; \"31/12/2015\")))))'''
