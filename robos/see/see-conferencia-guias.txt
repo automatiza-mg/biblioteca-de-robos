@@ -1,7 +1,7 @@
 Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_FGTS Visible: True ReadOnly: False Instance=> planilha_FGTS
 Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_formulario Name: $'''Respostas ao formulário 1'''
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AH''' Row: 2
-Clipboard.SetText Text: $'''=SEERRO(PROCV(E2;\'[11parcelasFGTS_SEM_DUPLICATAS.xlsx]Planilha1\'!$A$2:$B$71219;1;FALSO);\"Não encontrado\")'''
+Clipboard.SetText Text: $'''=SEERRO(PROCV(E2;\'[FGTS_SEM_DUPLICATAS.xlsx]Planilha1\'!$A$2:$B$71219;1;FALSO);\"Não encontrado\")'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
@@ -12,7 +12,7 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: pla
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{Alt}({CVV})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 WAIT 1
 Excel.ActivateCellInExcel.ActivateCell Instance: planilha_formulario Column: $'''AI''' Row: 2
-Clipboard.SetText Text: $'''=SEERRO(PROCV(AA2;\'[11parcelasFGTS_SEM_DUPLICATAS.xlsx]Planilha1\'!$B$2:$B$71219;1;FALSO);\"Não encontrado\")'''
+Clipboard.SetText Text: $'''=SEERRO(PROCV(AA2;\'[FGTS_SEM_DUPLICATAS.xlsx]Planilha1\'!$B$2:$B$71219;1;FALSO);\"Não encontrado\")'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({V})
 {Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_formulario TextToSend: $'''{LControlKey}({Up})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
