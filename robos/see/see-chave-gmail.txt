@@ -12,8 +12,58 @@ LOOP WHILE (robô) < (qtde_a_fazer)
     Excel.ReadFromExcel.ReadCell Instance: ExcelInstance StartColumn: $'''AA''' StartRow: robô ReadAsText: False CellValue=> NOME
     Excel.ReadFromExcel.ReadCell Instance: ExcelInstance StartColumn: $'''AL''' StartRow: robô ReadAsText: False CellValue=> resultado
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-    Text.ConvertDateTimeToText.FromDateTime DateTime: CurrentDateTime StandardFormat: Text.WellKnownDateTimeFormat.GeneralDateTimeShortTime Result=> FormattedDateTime
+    Text.ConvertDateTimeToText.FromCustomDateTime DateTime: CurrentDateTime CustomFormat: $'''dd/MM/yyyy - hh:mm''' Result=> FormattedDateTime
     IF Contains(resultado, $'''Chave gerada''', False) THEN
+        WAIT 2
+        WebAutomation.GoToWebPage.ReloadWebPage BrowserInstance: sgp WaitForPageToLoadTimeout: 60
+        WAIT 2
+        DISABLE WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Pesquisar e-mail''')
+        WebAutomation.Click.Click BrowserInstance: sgp Control: appmask['Web Page \'https://mail.google.com/mail/u/1/#starred/p42\'']['Div \'Escrever\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
+        WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Nova Mensagem''')
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%email%{Return}{Tab}
+
+
+
+''' DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: False
+        WAIT 2
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''FGTS - Chave de Movimentacao{Tab}
+
+''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+        WAIT 1
+        Clipboard.SetText Text: $'''Prezado(a),
+
+Segue anexo chave de movimentação para saque de FGTS Acordo.
+
+Informamos que esta chave tem validade de 20 dias.
+
+Informamos que os pagamentos do Fundo de Garantia do Tempo de Serviço (FGTS) já estão disponíveis para consulta e movimentação por meio do aplicativo FGTS, disponibilizado pela Caixa Econômica Federal (CEF).
+
+Para facilitar o acesso a esses serviços, siga as instruções abaixo para baixar o aplicativo:
+
+1. Acesse a loja de aplicativos do seu celular:
+a. Se você utiliza um celular com sistema Android, abra a Play Store.
+b. Se você utiliza um iPhone (sistema iOS), abra a App Store.
+
+2. Busque por \"FGTS\":
+a. Na barra de pesquisa da loja de aplicativos, digite \"FGTS\" e pressione Enter ou a tecla de busca.
+
+3. Encontre o aplicativo oficial:
+a. Procure pelo aplicativo com o nome \"FGTS\" e verifique se o desenvolvedor é a \"Caixa Econômica Federal\".
+
+4. Instale o aplicativo:
+a. Clique no botão \"Instalar\" ou \"Obter\" para baixar e instalar o aplicativo no seu celular.
+
+5. Abra o aplicativo e siga as instruções:
+a. Após a instalação, abra o aplicativo FGTS e siga as instruções para realizar o seu cadastro ou login.
+
+Com o aplicativo FGTS, você poderá:
+• Consultar o saldo do seu FGTS
+• Verificar os extratos de depósito e saque
+• Solicitar o saque do FGTS em diversas situações
+• Acompanhar o andamento de solicitações
+• Receber notificações sobre o seu FGTS'''
+        WAIT 1
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({V})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
         Folder.GetFiles Folder: caminho_pasta_chaves FileFilter: $'''%NOME%*pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> chaves
         Clipboard.Clear _
         @@copilotGeneratedAction: 'False'
@@ -38,26 +88,6 @@ foreach ($filePath in $filePaths) {
 
 # Define os arquivos na área de transferência
 [System.Windows.Forms.Clipboard]::SetFileDropList($files)''' ScriptOutput=> PowershellOutput
-        WAIT 2
-        WebAutomation.GoToWebPage.ReloadWebPage BrowserInstance: sgp WaitForPageToLoadTimeout: 60
-        WAIT 2
-        DISABLE WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Pesquisar e-mail''')
-        WebAutomation.Click.Click BrowserInstance: sgp Control: appmask['Web Page \'https://mail.google.com/mail/u/1/#starred/p42\'']['Div \'Escrever\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
-        WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sgp Text: $'''Nova Mensagem''')
-        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%email%{Return}{Tab}
-
-
-
-''' DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: False
-        WAIT 2
-        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''FGTS - Chave de Movimentacao{Tab}
-
-''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
-        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''Prezado(a),
-
-Segue anexo chave de movimentação para saque de FGTS Acordo.
-
-Informamos que esta chave tem validade de 20 dias.''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
         WAIT 1
         MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({V})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
         WAIT 3
