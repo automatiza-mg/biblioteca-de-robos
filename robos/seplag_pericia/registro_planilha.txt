@@ -1,17 +1,21 @@
-Text.CropText.CropTextBetweenFlags Text: ExtractedPDFText FromFlag: $'''Licença para Tratamento de Saúde - Médicos Peritos Unidade interna''' ToFlag: $'''Referência: Processo nº''' IgnoreCase: False CroppedText=> texto_bim
+Text.CropText.CropTextBetweenFlags Text: ExtractedPDFText FromFlag: $'''Peritos''' ToFlag: $'''Referência: Processo nº''' IgnoreCase: True CroppedText=> texto_bim
 Text.CropText.CropTextBetweenFlags Text: texto_bim FromFlag: $'''IDENTIFICAÇÃO DO INTERESSADO''' ToFlag: $'''OBSERVAÇÕES:''' IgnoreCase: False CroppedText=> anamnese
 **REGION Registro na planilha do n° de BIMs do processo e se possui OBS
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: numero_bims Column: coluna_livre - 15 Row: linha_loop
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''N''' Column: coluna_livre - 14 Row: linha_loop
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: numero_bims Column: $'''B''' Row: linha_loop
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''N''' Column: $'''C''' Row: linha_loop
 **ENDREGION
 **REGION Tratamento e registro na planilha do nome do interessado
 Text.CropText.CropTextBetweenFlags Text: anamnese FromFlag: $''':''' ToFlag: $'''MASP''' IgnoreCase: False CroppedText=> nome_interessado
 Text.Trim Text: nome_interessado TrimOption: Text.TrimOption.Both TrimmedText=> nome_interessado
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: nome_interessado Column: coluna_livre - 13 Row: linha_loop
+IF IsEmpty(nome_interessado) THEN
+    Text.CropText.CropTextBetweenFlags Text: cabecalho FromFlag: $''':''' ToFlag: $'''MASP''' IgnoreCase: False CroppedText=> nome_interessado
+    Text.Trim Text: nome_interessado TrimOption: Text.TrimOption.Both TrimmedText=> nome_interessado
+END
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: nome_interessado Column: $'''D''' Row: linha_loop
 **ENDREGION
 **REGION Tratamento e registro na planilha do MASP do interessado
 Text.CropText.CropTextBetweenFlags Text: cabecalho FromFlag: $'''MASP/CPF: ''' ToFlag: $'''/''' IgnoreCase: False CroppedText=> masp_interessado
-Text.FromNumber Number: masp_interessado DecimalPlaces: 0 UseThousandsSeparator: True FormattedNumber=> masp_interessado
+DISABLE Text.FromNumber Number: masp_interessado DecimalPlaces: 0 UseThousandsSeparator: True FormattedNumber=> masp_interessado
 Scripting.RunPowershellScript.RunPowershellScript Script: $'''# Recebe o valor da variável do Power Automate
 $texto = \"%masp_interessado%\" 
 
@@ -21,12 +25,12 @@ $resultado = $texto.Length
 # Retorna o resultado para o Power Automate
 $resultado''' ScriptOutput=> caracteres_masp
 IF caracteres_masp > 16 THEN
-    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''Sem MASP''' Column: coluna_livre - 12 Row: linha_loop
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''Sem MASP''' Column: $'''E''' Row: linha_loop
 ELSE
     IF Contains(masp_interessado, $'''DATA''', True) THEN
         Text.Replace Text: masp_interessado TextToFind: $'''DATA''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> masp_interessado
         Text.Trim Text: masp_interessado TrimOption: Text.TrimOption.Both TrimmedText=> masp_interessado
-        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: masp_interessado Column: coluna_livre - 12 Row: linha_loop
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: masp_interessado Column: $'''E''' Row: linha_loop
     END
     Text.Replace Text: masp_interessado TextToFind: $'''.''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> masp_interessado
     Text.Replace Text: masp_interessado TextToFind: $''',''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> masp_interessado
@@ -43,22 +47,22 @@ $resultado''' ScriptOutput=> caracteres_masp
     IF caracteres_dia_afastamento = 7 THEN
         Text.Pad Text: dia_afastamento PadPosition: Text.PadPosition.Left PaddingText: 0 TotalLength: 8 PaddedText=> masp_interessado
     END
-    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: masp_interessado Column: coluna_livre - 12 Row: linha_loop
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: masp_interessado Column: $'''E''' Row: linha_loop
 END
 **ENDREGION
 **REGION Tratamento e registro na planilha do CPF do interessado
 IF caracteres_masp > 16 THEN
     Text.GetSubtext.GetSubtextFromStartTo Text: masp_interessado NumberOfChars: 14 Subtext=> cpf_interessado
     Text.Trim Text: cpf_interessado TrimOption: Text.TrimOption.Both TrimmedText=> cpf_interessado
-    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: cpf_interessado Column: coluna_livre - 11 Row: linha_loop
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: cpf_interessado Column: $'''F''' Row: linha_loop
 ELSE
     Text.CropText.CropTextBetweenFlags Text: cabecalho FromFlag: $'''MASP/CPF: ''' ToFlag: $'''REGIONAL''' IgnoreCase: False CroppedText=> cpf_interessado
     Text.CropText.CropTextAfterFlag Text: cpf_interessado FromFlag: $'''/''' IgnoreCase: False CroppedText=> cpf_interessado
     IF Contains(cpf_interessado, $'''/''', True) THEN
-        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''Sem CPF''' Column: coluna_livre - 11 Row: linha_loop
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''Sem CPF''' Column: $'''F''' Row: linha_loop
     ELSE
         Text.Trim Text: cpf_interessado TrimOption: Text.TrimOption.Both TrimmedText=> cpf_interessado
-        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: cpf_interessado Column: coluna_livre - 11 Row: linha_loop
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: cpf_interessado Column: $'''F''' Row: linha_loop
     END
 END
 **ENDREGION
@@ -66,7 +70,20 @@ END
 Text.CropText.CropTextAfterFlag Text: ExtractedPDFText FromFlag: $'''Cargo atual:''' IgnoreCase: True CroppedText=> cargo_interessado
 Text.CropText.CropTextBeforeFlag Text: cargo_interessado ToFlag: $'''NÚCLEO REGIONAL''' IgnoreCase: True CroppedText=> cargo_interessado
 Text.Trim Text: cargo_interessado TrimOption: Text.TrimOption.Both TrimmedText=> cargo_interessado
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: cargo_interessado Column: coluna_livre - 10 Row: linha_loop
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: cargo_interessado Column: $'''G''' Row: linha_loop
+**ENDREGION
+**REGION Tratamento e registro na planilha da regional do interessado
+Text.CropText.CropTextAfterFlag Text: ExtractedPDFText FromFlag: $'''REGIONAL DO SERVIDOR:''' IgnoreCase: True CroppedText=> regional
+Text.CropText.CropTextBeforeFlag Text: $'''%regional%%cargo_interessado%''' ToFlag: $'''ANAMNESE''' IgnoreCase: True CroppedText=> regional
+Text.CropText.CropTextBeforeFlag Text: regional ToFlag: $'''.''' IgnoreCase: True CroppedText=> regional
+Text.Trim Text: regional TrimOption: Text.TrimOption.Both TrimmedText=> regional
+IF IsEmpty(regional) THEN
+    Text.CropText.CropTextAfterFlag Text: cabecalho FromFlag: $'''REGIONAL DO SERVIDOR:''' IgnoreCase: True CroppedText=> regional
+    Text.CropText.CropTextBeforeFlag Text: $'''%regional%%cargo_interessado%''' ToFlag: $'''ANAMNESE''' IgnoreCase: True CroppedText=> regional
+    Text.CropText.CropTextBeforeFlag Text: regional ToFlag: $'''.''' IgnoreCase: True CroppedText=> regional
+    Text.Trim Text: regional TrimOption: Text.TrimOption.Both TrimmedText=> regional
+END
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: regional Column: $'''H''' Row: linha_loop
 **ENDREGION
 **REGION Tratamento e registro na planilha do CRM do Perito
 Text.CropText.CropTextAfterFlag Text: texto_bim FromFlag: $'''CRM do médico(a) perito(a): ''' IgnoreCase: False CroppedText=> CRM_perito
@@ -76,33 +93,35 @@ IF IsEmpty(CRM_perito) THEN
     Text.CropText.CropTextBeforeFlag Text: CRM_perito ToFlag: $'''PARA USO''' IgnoreCase: True CroppedText=> CRM_perito
     Text.Replace Text: CRM_perito TextToFind: $'''.''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> CRM_perito
     Text.Trim Text: CRM_perito TrimOption: Text.TrimOption.Both TrimmedText=> CRM_perito
-    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_perito Column: coluna_livre - 9 Row: linha_loop
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_perito Column: $'''I''' Row: linha_loop
 ELSE IF Contains(CRM_perito, $'''CRMMG:''', False) THEN
     Text.CropText.CropTextAfterFlag Text: CRM_perito FromFlag: $'''CRMMG:''' IgnoreCase: False CroppedText=> CRM_perito
     Text.Replace Text: CRM_perito TextToFind: $'''.''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> CRM_perito
     Text.Trim Text: CRM_perito TrimOption: Text.TrimOption.Both TrimmedText=> CRM_perito
-    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_perito Column: coluna_livre - 9 Row: linha_loop
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_perito Column: $'''I''' Row: linha_loop
 ELSE
     Text.Replace Text: CRM_perito TextToFind: $'''.''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> CRM_perito
     Text.Trim Text: CRM_perito TrimOption: Text.TrimOption.Both TrimmedText=> CRM_perito
-    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_perito Column: coluna_livre - 9 Row: linha_loop
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_perito Column: $'''I''' Row: linha_loop
 END
 **ENDREGION
 **REGION Tratamento e registro na planilha do CRM do atestado
 Text.CropText.CropTextBetweenFlags Text: anamnese FromFlag: $'''CRM:''' ToFlag: $'''.''' IgnoreCase: False CroppedText=> CRM_atestado
+Text.CropText.CropTextBetweenFlags Text: anamnese FromFlag: $'''CRM:''' ToFlag: $'''Período''' IgnoreCase: False CroppedText=> CRM_atestado
 Text.Trim Text: CRM_atestado TrimOption: Text.TrimOption.Both TrimmedText=> CRM_atestado
 IF IsEmpty(CRM_atestado) THEN
     Text.CropText.CropTextBetweenFlags Text: anamnese FromFlag: $'''CRMMG:''' ToFlag: $'''.''' IgnoreCase: False CroppedText=> CRM_atestado
+    Text.CropText.CropTextBetweenFlags Text: anamnese FromFlag: $'''CRMMG:''' ToFlag: $'''Período''' IgnoreCase: False CroppedText=> CRM_atestado
     Text.Trim Text: CRM_atestado TrimOption: Text.TrimOption.Both TrimmedText=> CRM_atestado
     IF Contains(CRM_atestado, $'''MG''', True) THEN
         Text.Replace Text: CRM_atestado TextToFind: $'''MG''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> CRM_atestado
         Text.Replace Text: CRM_atestado TextToFind: $'''.''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> CRM_atestado
         Text.Trim Text: CRM_atestado TrimOption: Text.TrimOption.Both TrimmedText=> CRM_atestado
-        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_atestado Column: coluna_livre - 8 Row: linha_loop
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_atestado Column: $'''J''' Row: linha_loop
     ELSE
         Text.Replace Text: CRM_atestado TextToFind: $'''.''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> CRM_atestado
         Text.Trim Text: CRM_atestado TrimOption: Text.TrimOption.Both TrimmedText=> CRM_atestado
-        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_atestado Column: coluna_livre - 8 Row: linha_loop
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_atestado Column: $'''J''' Row: linha_loop
     END
 ELSE
     IF Contains(CRM_atestado, $'''MG''', True) THEN
@@ -110,12 +129,12 @@ ELSE
         Text.Replace Text: CRM_atestado TextToFind: $'''.''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> CRM_atestado
         Text.Replace Text: CRM_atestado TextToFind: $'''-''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> CRM_atestado
         Text.Trim Text: CRM_atestado TrimOption: Text.TrimOption.Both TrimmedText=> CRM_atestado
-        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_atestado Column: coluna_livre - 8 Row: linha_loop
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_atestado Column: $'''J''' Row: linha_loop
     ELSE
         Text.Replace Text: CRM_atestado TextToFind: $'''.''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> CRM_atestado
         Text.Replace Text: CRM_atestado TextToFind: $'''-''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> CRM_atestado
         Text.Trim Text: CRM_atestado TrimOption: Text.TrimOption.Both TrimmedText=> CRM_atestado
-        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_atestado Column: coluna_livre - 8 Row: linha_loop
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: CRM_atestado Column: $'''J''' Row: linha_loop
     END
 END
 **ENDREGION
@@ -163,7 +182,7 @@ $resultado''' ScriptOutput=> caracteres_ano_afastamento
 IF caracteres_ano_afastamento = 2 THEN
     Text.Pad Text: ano_afastamento PadPosition: Text.PadPosition.Left PaddingText: 20 TotalLength: 4 PaddedText=> ano_afastamento
 END
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''%dia_afastamento%%mes_afastamento%%ano_afastamento%''' Column: coluna_livre - 7 Row: linha_loop
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''%dia_afastamento%%mes_afastamento%%ano_afastamento%''' Column: $'''K''' Row: linha_loop
 **ENDREGION
 **REGION Tratamento e registro na planilha da data de emissão do atestado
 Text.CropText.CropTextBetweenFlags Text: anamnese FromFlag: $'''datado de ''' ToFlag: $''' emitido''' IgnoreCase: False CroppedText=> data_emissao_atestado
@@ -209,7 +228,7 @@ $resultado''' ScriptOutput=> caracteres_ano_emissao
 IF caracteres_ano_emissao = 2 THEN
     Text.Pad Text: ano_emissao PadPosition: Text.PadPosition.Left PaddingText: 20 TotalLength: 4 PaddedText=> ano_emissao
 END
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''%dia_emissao%%mes_emissao%%ano_emissao%''' Column: coluna_livre - 6 Row: linha_loop
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''%dia_emissao%%mes_emissao%%ano_emissao%''' Column: $'''L''' Row: linha_loop
 **ENDREGION
 **REGION Tratamento e registro na planilha da data de revisão do atestado
 Text.CropText.CropTextBetweenFlags Text: texto_bim FromFlag: $'''Documento assinado eletronicamente''' ToFlag: $'''às''' IgnoreCase: False CroppedText=> data_revisao_atestado
@@ -256,12 +275,16 @@ $resultado''' ScriptOutput=> caracteres_ano_revisao
 IF caracteres_ano_revisao = 2 THEN
     Text.Pad Text: ano_revisao PadPosition: Text.PadPosition.Left PaddingText: 20 TotalLength: 4 PaddedText=> ano_revisao
 END
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''%dia_revisao%%mes_revisao%%ano_revisao%''' Column: coluna_livre - 5 Row: linha_loop
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''%dia_revisao%%mes_revisao%%ano_revisao%''' Column: $'''M''' Row: linha_loop
 **ENDREGION
 **REGION Tratamento e registro na planilha dos dias solicitados
 Text.CropText.CropTextBetweenFlags Text: anamnese FromFlag: $'''Período solicitado no atestado ''' ToFlag: $''' dia''' IgnoreCase: True CroppedText=> dias_solicitados
 Text.Trim Text: dias_solicitados TrimOption: Text.TrimOption.Both TrimmedText=> dias_solicitados
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: dias_solicitados Column: coluna_livre - 4 Row: linha_loop
+IF IsEmpty(dias_solicitados) THEN
+    Text.CropText.CropTextBetweenFlags Text: cabecalho FromFlag: $'''Período solicitado no atestado ''' ToFlag: $''' dia''' IgnoreCase: True CroppedText=> dias_solicitados
+    Text.Trim Text: dias_solicitados TrimOption: Text.TrimOption.Both TrimmedText=> dias_solicitados
+END
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: dias_solicitados Column: $'''N''' Row: linha_loop
 **ENDREGION
 **REGION Tratamento e registro na planilha da CID do interessado
 Text.CropText.CropTextAfterFlag Text: texto_bim FromFlag: $'''CID Principal:''' IgnoreCase: False CroppedText=> cid_interessado
@@ -275,5 +298,19 @@ END
 Text.Replace Text: cid_interessado TextToFind: $'''.''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> cid_interessado
 Text.Replace Text: cid_interessado TextToFind: $'''-''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> cid_interessado
 Text.Trim Text: cid_interessado TrimOption: Text.TrimOption.Both TrimmedText=> cid_interessado
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: cid_interessado Column: coluna_livre - 3 Row: linha_loop
+IF IsEmpty(cid_interessado) THEN
+    Text.CropText.CropTextAfterFlag Text: cabecalho FromFlag: $'''CID Principal:''' IgnoreCase: False CroppedText=> cid_interessado
+    Text.CropText.CropTextBeforeFlag Text: cid_interessado ToFlag: $'''OBSERVAÇÕES''' IgnoreCase: True CroppedText=> cid_interessado
+    IF Contains(cid_interessado, $'''Secundário''', True) THEN
+        Text.CropText.CropTextBeforeFlag Text: cid_interessado ToFlag: $'''CID Secundário''' IgnoreCase: True CroppedText=> cid_interessado
+    END
+    IF Contains(cid_interessado, $'''Artigo''', True) THEN
+        Text.CropText.CropTextBeforeFlag Text: cid_interessado ToFlag: $'''Artigo''' IgnoreCase: True CroppedText=> cid_interessado
+    END
+    Text.Replace Text: cid_interessado TextToFind: $'''.''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> cid_interessado
+    Text.Replace Text: cid_interessado TextToFind: $'''-''' IsRegEx: False IgnoreCase: True ReplaceWith: vazio ActivateEscapeSequences: False Result=> cid_interessado
+    Text.Trim Text: cid_interessado TrimOption: Text.TrimOption.Both TrimmedText=> cid_interessado
+END
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: cid_interessado Column: $'''O''' Row: linha_loop
 **ENDREGION
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''%ano_emissao%%mes_emissao%''' Column: $'''R''' Row: linha_loop
