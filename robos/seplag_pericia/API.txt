@@ -52,54 +52,106 @@ Trata texto uma vez que url recebida contém problemas de encoding.#/
             UIAutomation.CloseWindow.CloseByInstanceOrHandle WindowInstance: sei_baixar_processo
             GOTO processo_sem_documentos
         END
-        WebAutomation.ExtractData.ExtractHtmlTable BrowserInstance: sei_baixar_processo Control: $'''html > body > div:eq(0) > div > div > form > div:eq(1) > table''' ExtractionParameters: {[$'''Value #1''', $'''Processo / Documento''', $'''Tipo''', $'''Data''', $'''Unidade''', $'''Ações'''], [$'''''', $'''''', $'''''', $'''''', $'''''', $''''''] } PostProcessData: False TimeoutInSeconds: 60 ExtractedData=> tabela_processos
-        Variables.DeleteEmptyRowsFromDataTable DataTable: tabela_processos
-        WebAutomation.ExecuteJavascript BrowserInstance: sei_baixar_processo Javascript: $'''function ExecuteScript() { 
-let rows = document.querySelectorAll(\"#tblDocumentos tbody tr\");
+        Text.Replace Text: processo_atual TextToFind: $'''/''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''_''' ActivateEscapeSequences: False Result=> processo_atual
+        Text.Replace Text: processo_atual TextToFind: $'''-''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''_''' ActivateEscapeSequences: False Result=> processo_atual
+        **REGION extração do BIM SERVIDOR e de seus dados - Admissão e Vínculo (efetivo = 101 e não efetivo = 60)
+        WebAutomation.ExecuteJavascript BrowserInstance: sei_baixar_processo Javascript: $'''function ExecuteScript() {
+function baixarDocumento() {
+    // Seleciona todas as linhas da tabela
+    let linhas = document.querySelectorAll(\"#tblDocumentos tbody tr\");
 
-let found = false;
-
-const tiposDesejados = [
-
-    \"Perícia Médica - BIM - Servidor Não Efetivo\",
-
-    \"Perícia Médica - BIM - Servidor Efetivo\"
-
-];
- 
-rows.forEach(row => {
-
-    let tipoCell = row.cells[2]; // A terceira coluna contém o tipo
-
-    if (tipoCell && tiposDesejados.includes(tipoCell.textContent.trim())) {
-
-        let checkbox = row.querySelector(\"input[type=\'checkbox\']\");
-
-        if (checkbox) {
-
-            checkbox.click(); // Clica na caixa de seleção
-
-            console.log(`Checkbox clicado para \'${tipoCell.textContent.trim()}\'`);
-
-            found = true;
-
-        }
-
+    if (linhas.length < 2) {
+        console.log(\"Menos de duas linhas encontradas. Encerrando execução.\");
+        return;
     }
 
-});
- 
-if (found) {
+    // Seleciona a segunda linha (índice 1, pois começa em 0)
+    let segundaLinha = linhas[1];
 
-    gerarPdf(); // Gera o PDF apenas se pelo menos um checkbox foi selecionado
+    // Seleciona o checkbox dentro da primeira coluna
+    let checkbox = segundaLinha.querySelector(\"input[type=\'checkbox\']\");
 
-} else {
+    if (!checkbox) {
+        console.log(\"Checkbox não encontrado.\");
+        return;
+    }
 
-    console.log(\"Nenhum documento correspondente encontrado.\");
+    // Se o checkbox não estiver marcado, marca
+    if (!checkbox.checked) {
+        checkbox.click();
+        console.log(\"Checkbox marcado.\");
+    }
 
+    // Aguarda um tempo curto para garantir que o sistema registre a seleção antes de clicar no botão
+    setTimeout(() => {
+        // Seleciona o botão \"Gerar PDF\"
+        let botaoGerarPdf = document.querySelector(\"button[name=\'btnGerarPdf\']\");
+
+        if (!botaoGerarPdf) {
+            console.log(\"Botão \'Gerar PDF\' não encontrado.\");
+            return;
+        }
+
+        // Clica no botão para gerar o PDF
+        botaoGerarPdf.click();
+        console.log(\"Botão \'Gerar PDF\' clicado.\");
+
+        // Aguarda um tempo antes de desmarcar o checkbox
+        setTimeout(() => {
+            if (checkbox.checked) {
+                checkbox.click();
+                console.log(\"Checkbox desmarcado.\");
+            }
+        }, 3000); // Aguarda 3 segundos antes de desmarcar
+
+    }, 1000); // Aguarda 1 segundo antes de clicar no botão \"Gerar PDF\"
 }
+
+// Inicia o processo
+baixarDocumento();
+
+}''' Result=> Result
+        WAIT (File.WaitForFile.Created File: $'''%pasta_SEI%/SEI_%processo_atual%.pdf''')
+        IF (File.IfFile.Exists File: $'''%pasta_SEI%/SEI_%processo_atual%.pdf''') THEN
+            Pdf.ExtractTextFromPDF.ExtractText PDFFile: $'''%pasta_SEI%/SEI_%processo_atual%.pdf''' DetectLayout: False ExtractedText=> BIM_servidor
+            Text.CropText.CropTextBetweenFlags Text: BIM_servidor FromFlag: $'''CARGO ATUAL:''' ToFlag: $'''efetivo''' IgnoreCase: True CroppedText=> adm_vinculo IsFlagFound=> IsFlagFound
+            Text.GetSubtext.GetSubtext Text: adm_vinculo CharacterPosition: 0 NumberOfChars: 3 Subtext=> admissao
+            Text.Trim Text: admissao TrimOption: Text.TrimOption.Both TrimmedText=> admissao
+            File.RenameFiles.RenameAddText Files: $'''%pasta_SEI%/SEI_%processo_atual%.pdf''' TextToAdd: $'''BIM_servidor''' TextPosition: File.AddTextPosition.AfterName IfFileExists: File.IfExists.Overwrite RenamedFiles=> BIM_servidor
+            DISABLE File.Move Files: $'''%pasta_SEI%/SEI_%processo_atual%BIM_servidor.pdf''' Destination: $'''C:\\Users\\m6695506\\Downloads\\SEI\\servidor''' IfFileExists: File.IfExists.Overwrite MovedFiles=> MovedFiles
+        ELSE
+            Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''BIM servidor não encontrado''' Column: $'''R''' Row: linha_loop
+            Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''BIM servidor não encontrado''' Column: $'''T''' Row: linha_loop
+        END
+        **ENDREGION
+        WebAutomation.ExtractData.ExtractHtmlTable BrowserInstance: sei_baixar_processo Control: $'''html > body > div:eq(0) > div > div > form > div:eq(1) > table''' ExtractionParameters: {[$'''Value #1''', $'''Processo / Documento''', $'''Tipo''', $'''Data''', $'''Unidade''', $'''Ações'''], [$'''''', $'''''', $'''''', $'''''', $'''''', $''''''] } PostProcessData: False TimeoutInSeconds: 60 ExtractedData=> tabela_processos
+        Variables.DeleteEmptyRowsFromDataTable DataTable: tabela_processos
+        WebAutomation.ExecuteJavascript BrowserInstance: sei_baixar_processo Javascript: $'''function ExecuteScript() {
+let rows = document.querySelectorAll(\"#tblDocumentos tbody tr\");
+    let found = false;
+    let nomesSelecionados = new Set(); // Usando Set para armazenar nomes únicos
+    const tiposDesejados = [
+\"Perícia Médica - BIM - Servidor Não Efetivo\",
+\"Perícia Médica - BIM - Servidor Efetivo\"
+    ];
+    rows.forEach(row => {
+        let tipoCell = row.cells[2]; // A terceira coluna contém o tipo
+        if (tipoCell && tiposDesejados.includes(tipoCell.textContent.trim())) {
+            let checkbox = row.querySelector(\"input[type=\'checkbox\']\");
+            if (checkbox) {
+                checkbox.click(); // Clica na caixa de seleção
+                nomesSelecionados.add(tipoCell.textContent.trim()); // Adiciona o nome ao Set (sem duplicar)
+                found = true;
+            }
+        }
+    });
+    if (found) {
+        gerarPdf(); // Gera o PDF apenas se pelo menos um checkbox foi selecionado
+    }
+    // Converte o Set para array e junta como string separada por vírgula
+    return Array.from(nomesSelecionados).join(\", \");
 }
-''' Result=> Result
+''' Result=> BIM_perito
         WAIT 5
         WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sei_baixar_processo Text: processo_formatado)
         WAIT 1
@@ -114,8 +166,6 @@ if (found) {
             Variables.IncreaseVariable Value: numero_bims IncrementValue: 1
         END
     END
-    Text.Replace Text: processo_atual TextToFind: $'''/''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''_''' ActivateEscapeSequences: False Result=> processo_atual
-    Text.Replace Text: processo_atual TextToFind: $'''-''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''_''' ActivateEscapeSequences: False Result=> processo_atual
     Variables.FilterDataTable DataTable: tabela_processos FilterParameters: { ^['RULE', 'COLUMN', 'OPERATOR', 'VALUE'], [$'''''', $'''tipo''', $'''Contains''', $'''Perícia Médica - BIM - Servidor'''] } FilteredDataTable=> tabela_processos
     IF numero_bims = 0 THEN
         Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: numero_bims Column: $'''B''' Row: linha_loop
@@ -158,7 +208,7 @@ if (found) {
             Text.CropText.CropTextBeforeFlag Text: observacoes ToFlag: $'''LICENÇA PARA TRATAMENTO DE SAÚDE REDUZIDA''' IgnoreCase: False CroppedText=> observacoes
             Text.Trim Text: observacoes TrimOption: Text.TrimOption.Both TrimmedText=> observacoes
             IF observacoes <> $'''( )''' THEN
-                Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''S''' Column: $'''C''' Row: linha_loop
+                Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: observacoes Column: $'''C''' Row: linha_loop
                 Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: numero_bims Column: $'''B''' Row: linha_loop
             ELSE
                 CALL registro_planilha

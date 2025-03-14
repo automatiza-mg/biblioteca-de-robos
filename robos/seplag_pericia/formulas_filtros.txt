@@ -1,3 +1,4 @@
+# status de conferência da coluna P usada para fins de monitoramento e revisão dos documentos. O que irá determinar as ações no SISAP é a coluna Q, advinda da marcação do médico perito no BIM perito (subfluxo decisao_LTS)
 **REGION Criação da fórmula de conferência
 Excel.ActivateCellInExcel.ActivateCell Instance: excel_pericia Column: $'''A''' Row: 1
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel_pericia TextToSend: $'''{LControlKey}({Down}){Down}{Right}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}.{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
@@ -26,27 +27,26 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({V})'''
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}{Left}{LControlKey}({Down}){Right}{LShiftKey}({LControlKey}({Up})){LControlKey}({D})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
 **ENDREGION
 **REGION Ajuste da coluna de status do registro no Sisap
-Excel.ActivateCellInExcel.ActivateCell Instance: excel_pericia Column: $'''Q''' Row: 2
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel_pericia TextToSend: $'''{Alt}({C}{FN})''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+Excel.ActivateCellInExcel.ActivateCell Instance: excel_pericia Column: $'''U''' Row: 2
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}(CFN)''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
 WAIT 1
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''Geral{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
 WAIT 1
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Down}''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
 **ENDREGION
+# Ativação dos filrtos desativada, pois planilha modelo é reutilizada e o filtro já foi ativado na rodada anterior
 **REGION Ativação dos filtros
-Excel.ActivateCellInExcel.ActivateCell Instance: excel_pericia Column: $'''B''' Row: 1
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}(CSF)''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
-DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{{LControlKey}({Shift}(L))}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({Down})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
-WAIT 1
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Down}{Down}{Down}{Down}{Down}{Down}{Down}{Down}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
-WAIT 1
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''1{Enter}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
-Excel.ActivateCellInExcel.ActivateCell Instance: excel_pericia Column: $'''C''' Row: 1
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({Down})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
-WAIT 1
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Down}{Down}{Down}{Down}{Down}{Down}{Down}{Down}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
-WAIT 1
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''N{Enter}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+DISABLE Excel.ActivateCellInExcel.ActivateCell Instance: excel_pericia Column: $'''B''' Row: 1
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}(CSF)''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({Down})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+DISABLE WAIT 1
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Down}{Down}{Down}{Down}{Down}{Down}{Down}{Down}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+DISABLE WAIT 1
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''1{Enter}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+DISABLE Excel.ActivateCellInExcel.ActivateCell Instance: excel_pericia Column: $'''C''' Row: 1
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({Down})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+DISABLE WAIT 1
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Down}{Down}{Down}{Down}{Down}{Down}{Down}{Down}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+DISABLE WAIT 1
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''N{Enter}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
 **ENDREGION

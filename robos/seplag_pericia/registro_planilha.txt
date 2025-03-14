@@ -2,7 +2,10 @@ Text.CropText.CropTextBetweenFlags Text: ExtractedPDFText FromFlag: $'''Peritos'
 Text.CropText.CropTextBetweenFlags Text: texto_bim FromFlag: $'''IDENTIFICAÇÃO DO INTERESSADO''' ToFlag: $'''OBSERVAÇÕES:''' IgnoreCase: False CroppedText=> anamnese
 **REGION Registro na planilha do n° de BIMs do processo e se possui OBS
 Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: numero_bims Column: $'''B''' Row: linha_loop
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''N''' Column: $'''C''' Row: linha_loop
+Text.CropText.CropTextAfterFlag Text: texto_bim FromFlag: $'''OBSERVAÇÕES:''' IgnoreCase: False CroppedText=> observacoes
+Text.CropText.CropTextBeforeFlag Text: observacoes ToFlag: $'''(''' IgnoreCase: False CroppedText=> observacoes
+Text.Trim Text: observacoes TrimOption: Text.TrimOption.Both TrimmedText=> observacoes
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: observacoes Column: $'''C''' Row: linha_loop
 **ENDREGION
 **REGION Tratamento e registro na planilha do nome do interessado
 Text.CropText.CropTextBetweenFlags Text: anamnese FromFlag: $''':''' ToFlag: $'''MASP''' IgnoreCase: False CroppedText=> nome_interessado
@@ -138,7 +141,7 @@ ELSE
     END
 END
 **ENDREGION
-**REGION Tratamento e registro na planilha da data de início de afastamento
+**REGION Tratamento e registro da data de início de afastamento LICENÇA CONCEDIDA
 Text.CropText.CropTextBetweenFlags Text: anamnese FromFlag: $'''concedido de ''' ToFlag: $''' a''' IgnoreCase: True CroppedText=> data_inicio_afastamento
 Text.Trim Text: data_inicio_afastamento TrimOption: Text.TrimOption.Both TrimmedText=> data_inicio_afastamento
 Text.CropText.CropTextBeforeFlag Text: data_inicio_afastamento ToFlag: $'''/''' IgnoreCase: False CroppedText=> dia_afastamento
@@ -313,4 +316,20 @@ IF IsEmpty(cid_interessado) THEN
 END
 Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: cid_interessado Column: $'''O''' Row: linha_loop
 **ENDREGION
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''%ano_emissao%%mes_emissao%''' Column: $'''R''' Row: linha_loop
+**REGION Tratamento e registro do vínculo e da admissão
+# Admissão e vínculo salvos do BIM servidor
+IF Contains(adm_vinculo, $'''Não''', False) THEN
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: 60 Column: $'''R''' Row: linha_loop
+ELSE
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: 101 Column: $'''R''' Row: linha_loop
+END
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: admissao Column: $'''T''' Row: linha_loop
+# Vínculo salvo do nome do arquivo gerado para o BIM perito
+Text.CropText.CropTextAfterFlag Text: BIM_perito FromFlag: $'''Servidor''' IgnoreCase: False CroppedText=> servidor
+IF Contains(servidor, $'''Não''', False) THEN
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: 60 Column: $'''S''' Row: linha_loop
+ELSE
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: 101 Column: $'''S''' Row: linha_loop
+END
+**ENDREGION
+CALL decisao_LTS
