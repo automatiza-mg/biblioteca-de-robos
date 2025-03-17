@@ -1,0 +1,31 @@
+DISABLE WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''function ExecuteScript() { 
+// Encontre o elemento pelo ID
+var elemento = document.getElementById(\'frmMenuSuperior:barraMenuSuperior:dropDowMenuTrabalhoProducao:j_idt72\');
+
+// Verifique se o elemento existe e clique nele
+if (elemento) {
+  elemento.click();
+} else {
+  console.log(\'Elemento não encontrado!\');
+}
+
+}'''
+WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''function ExecuteScript() {
+ddo=document.getElementsByClassName(\'rf-ddm-itm-lbl\') 
+let situacaoProcurada;
+for (let i = 0; i < ddo.length; i++) {
+  if (ddo[i].innerText === \'Emitir DDO\') {
+    situacaoProcurada = ddo[i];
+    break;
+  }
+}
+situacaoProcurada.click()
+}'''
+WAIT 1
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sigpri Text: $'''Nenhum registro encontrado''')
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: $'''{Tab: 4}%data_relatorio%{Tab: 3}{Space}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
+WAIT 10
+WebAutomation.ExtractData.ExtractHtmlTableInExcel BrowserInstance: sigpri Control: $'''html > body > div:eq(1) > span:eq(1) > span > div > iframe > html > body > div > div:eq(0) > table > tbody > tr:eq(1) > td > form > table:eq(3)''' ExtractionParameters: {[$'''Value #1''', $'''Value #2''', $'''Value #3''', $'''Value #4''', $'''Value #5''', $'''Value #6''', $'''Value #7''', $'''Value #8''', $'''Value #9''', $'''Value #10''', $'''Value #11''', $'''Value #12''', $'''Value #13'''], [$'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $'''''', $''''''] } PostProcessData: False TimeoutInSeconds: 60 ExcelInstance=> planilha_excel
+WAIT 5
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: planilha_excel Name: $'''Planilha1'''
