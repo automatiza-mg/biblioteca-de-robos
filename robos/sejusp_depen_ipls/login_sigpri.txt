@@ -1,0 +1,36 @@
+/# ##SIGPRI
+(extrair planilha para excel)
+  - Trabalho e Produção > Folha de Frequência/Pagamento > Integração SIAFI > Emitir DDO
+  - Determinar um período e extrair a planilha para Excel
+(baixar .pdf)
+ - Trabalho e Produção > Folha de Frequência/Pagamento > Relatório Financeiro
+(baixar .txt)
+#/
+WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://sigpri.mg.gov.br''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> sigpri
+DISABLE WebAutomation.LaunchEdge.LaunchEdge Url: $'''https://sigpri.mg.gov.br''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> sigpri
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sigpri Text: $'''Esqueceu sua senha?''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: $'''%cpf%{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: senha_sigpri DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sigpri Text: $'''UNIDADE GERENCIADORA DO SISTEMA PRISIONAL''')
+WAIT 1
+WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''function ExecuteScript() { 
+form=document.getElementById(\"form:richTable:6029:n\")
+form.click()
+}'''
+WAIT 1
+WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''function ExecuteScript() { 
+selecionar=document.getElementsByName(\"form:j_idt15\")
+selecionar[0].click()
+}'''
+WAIT 1
+WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''function ExecuteScript() { 
+fechar=document.getElementById(\"fechar:button\")
+fechar.click()
+}'''
+WAIT 1
+WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''function ExecuteScript() { 
+fechar2=document.getElementById(\"fecharPopupAlertaAoIniciarAplicacaoTrabalho:button\")
+fechar2.click()
+}'''
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sigpri Text: $'''Bem-vindo!''')

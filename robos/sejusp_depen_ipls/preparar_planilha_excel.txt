@@ -1,0 +1,29 @@
+# Prepara a planilha excel
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_excel TextToSend: $'''{Control}({T})''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_excel TextToSend: $'''{Alt}cfsl{Alt}(b){LControlKey}({J}){Tab: 3}{Return}{Escape}{Tab: 4}{Return}''' DelayBetweenKeystrokes: 500 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_excel TextToSend: $'''{Alt}cq{Alt}cq''' DelayBetweenKeystrokes: 500 SendTextAsHardwareKeys: False
+Excel.FilterCellsFromExcel.FilterAdvancedWorksheet Instance: planilha_excel Column: $'''I''' AdvancedFilterFirstConditionOperator: Excel.FilterConditionOperator.Contains AdvancedFilterFirstConditionValue: $'''Ressarcim. Energia''' AdvancedFilterSecondConditionOperator: Excel.FilterConditionOperator.Contains AdvancedFilterSecondConditionValue: $'''Ressarcim. Água''' AdvancedFilterLogicalOperator: Excel.FilterLogicalOperator.IsOr
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_excel TextToSend: $'''{Down}{Control}({Left}){Control}({Shift}({Down})){Control}({Shift}({Right}))''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_excel TextToSend: $'''{Alt}ckl{Alt}csf''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+Excel.DeleteColumn Instance: planilha_excel Column: $'''A'''
+Excel.DeleteColumn Instance: planilha_excel Column: $'''D:E'''
+Excel.DeleteColumn Instance: planilha_excel Column: $'''I:J'''
+Excel.InsertColumn Instance: planilha_excel Column: $'''A'''
+Excel.WriteToExcel.WriteCell Instance: planilha_excel Value: $'''Documento''' Column: $'''A''' Row: 1
+Excel.WriteToExcel.WriteCell Instance: planilha_excel Value: $'''RT''' Column: $'''B''' Row: 1
+Excel.WriteToExcel.WriteCell Instance: planilha_excel Value: $'''.TXT''' Column: $'''J''' Row: 1
+Excel.WriteToExcel.WriteCell Instance: planilha_excel Value: $'''Data de geração''' Column: $'''K''' Row: 1
+Excel.GetFirstFreeColumnRow Instance: planilha_excel FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.SelectCellsFromExcel.SelectNamedCell Instance: planilha_excel CellName: $'''L2'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: planilha_excel TextToSend: $'''=TEXTO(DATA(;C{NumPad2};{NumPad1});\"mmmm\")
+''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+Excel.SelectCellsFromExcel.SelectCells Instance: planilha_excel StartColumn: $'''L''' StartRow: 2 EndColumn: $'''L''' EndRow: linha_livre - 1
+WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecomeDifferentThan MousePointerState: MouseAndKeyboard.MousePointerState.WaitCursor)
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({D})''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+WAIT 5
+Excel.ResizeColumnsOrRows.AutofitAllColumns Instance: planilha_excel
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateOnly CurrentDateTime=> data_hoje1
+Text.ConvertDateTimeToText.FromDateTime DateTime: data_hoje1 StandardFormat: Text.WellKnownDateTimeFormat.ShortDate Result=> data_hoje1
+Text.Replace Text: data_hoje1 TextToFind: $'''/''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''.''' ActivateEscapeSequences: False Result=> data_hoje1
+Text.Replace Text: data_relatorio TextToFind: $'''/''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''.''' ActivateEscapeSequences: False Result=> data_relatorio1
+Excel.SaveExcel.SaveAs Instance: planilha_excel DocumentFormat: Excel.ExcelFormat.FromExtension DocumentPath: $'''%caminho_download%\\Parcerias %data_relatorio1% a %data_hoje1%.xlsx'''

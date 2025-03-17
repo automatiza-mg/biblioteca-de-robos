@@ -1,0 +1,53 @@
+@@statistics_statistics_TextBlock: '1'
+@@statistics_statistics_Action_Submit: '2'
+Display.ShowCustomDialog CardTemplateJson: '''{
+  \"type\": \"AdaptiveCard\",
+  \"version\": \"1.4\",
+  \"id\": \"AdaptiveCard\",
+  \"body\": [
+    {
+      \"type\": \"TextBlock\",
+      \"id\": \"Text block\",
+      \"text\": \"${Text_block_Text}\",
+      \"horizontalAlignment\": \"center\",
+      \"spacing\": \"large\"
+    }
+  ],
+  \"actions\": [
+    {
+      \"type\": \"Action.Submit\",
+      \"id\": \"sim\",
+      \"title\": \"${sim_Title}\"
+    },
+    {
+      \"type\": \"Action.Submit\",
+      \"id\": \"nao\",
+      \"title\": \"${nao_Title}\"
+    }
+  ],
+  \"FormTitle\": \"${AdaptiveCard_FormTitle}\"
+}''' ButtonPressed=> botao_relatorio @AdaptiveCard_FormTitle: $'''Selecione uma das opções''' @Text_block_Text: $'''Deseja gerar um novo relatório?''' @sim_Title: $'''Sim''' @nao_Title: $'''Não'''
+IF Contains(botao_relatorio, $'''sim''', False) THEN
+    Display.SelectDateDialog.SelectDate Title: $'''Data Relatório DDO''' Message: $'''Informe a data de início do relatório.''' DateDialogFormat: Display.DateDialogFormat.DateOnly IsTopMost: False SelectedDate=> data_relatorio
+    Text.ConvertDateTimeToText.FromDateTime DateTime: data_relatorio StandardFormat: Text.WellKnownDateTimeFormat.ShortDate Result=> data_relatorio
+    CALL login_sigpri
+    CALL extrair_planilha
+    CALL preparar_planilha_excel
+    CALL emitir_txt_pdf
+    CALL login_sei
+    CALL trocar_unidade_sei
+    CALL cria_processo_sei
+    CALL cria_memorando_sei
+    CALL insere_anexo_sei
+ELSE IF Contains(botao_relatorio, $'''nao''', False) THEN
+    Folder.GetFiles Folder: caminho_download FileFilter: $'''*.xlsx''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.Name SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> files
+    Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: files[0] Visible: True ReadOnly: False Instance=> planilha_excel
+    Excel.GetFirstFreeColumnRow Instance: planilha_excel FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+    CALL login_sigpri
+    CALL emitir_txt_pdf
+    CALL login_sei
+    CALL trocar_unidade_sei
+    CALL cria_processo_sei
+    CALL cria_memorando_sei
+    CALL insere_anexo_sei
+END
