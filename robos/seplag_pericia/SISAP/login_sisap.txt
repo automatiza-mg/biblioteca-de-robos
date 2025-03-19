@@ -1,0 +1,31 @@
+System.RunApplication.RunApplicationAndWaitToLoad ApplicationPath: $'''C:/Program Files/pw3270/pw3270.exe''' WindowStyle: System.ProcessWindowStyle.Normal Timeout: 0
+SET terminal TO $'''pw3270:A - bhmvsb.prodemge.gov.br'''
+WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: terminal Class: $'''''' FocusWindow: True)
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''sisap{Tab}%usuario_sisap%{Tab}%senha_sisap%{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+WAIT 1
+LABEL teste_login_terminal
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({a}){Control}({c})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> texto_inicio_terminal
+IF NotContains(texto_inicio_terminal, $'''Logon executado com sucesso''', True) THEN
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
+    GOTO teste_login_terminal
+ELSE
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''siap{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
+END
+Clipboard.Clear _
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Tab}X{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+# A ação 12 é para selecionar o 'perfil'. Caso o seu usuário só tenha um perfil, exclua essa ação.
+DISABLE WAIT 1
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Tab}X{Enter}''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: True
+DISABLE WAIT 1
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: True
+DISABLE WAIT 1
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+DISABLE Clipboard.GetText Text=> texto_terminal
+DISABLE LOOP WHILE (NotContains(texto_terminal, 'M E N U', True)) = ($'''True''')
+    DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    DISABLE WAIT 1
+    DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Escape}{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    DISABLE Clipboard.GetText Text=> texto_terminal
+DISABLE END

@@ -1,0 +1,3 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_excel Visible: True ReadOnly: False Instance=> excel_pericia
+CALL login
+CALL digitacao_efetivo

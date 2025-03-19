@@ -1,0 +1,99 @@
+Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''SERVIDOR NÃO-EFETIVO - ATUALIZAR SUBFLUXO''' Column: $'''W''' Row: linha_loop
+**REGION mesmas telas do fluxo efetivo
+# envio de F6 para aparecer seletor de unidade
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Delete}{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+DISABLE WAIT 2
+# seleção da unidade SEPLAG - código (REPLICAR MESMA ESTRUTURA DE LOOP DO ROMANO PARA SELECINOAR UNIDADE, PODENDO SER INCLUSIVE A NRPMSO)
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Tab}X{Enter}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+# seleção da INSPEÇÃO MÉDICA NÃO AGENDADA (no meu perfil, é a segunda opção)
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Tab}{Tab}X{Enter}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+# Incluir Inspecao Medica - Cpf/Masp  (opção 1)
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''01{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+# seleção da opção COM MASP
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+/# As ações a seguir são para selecionar a admissão da pessoa, a partir de um loop na tela da seleção da admissão
+#/
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''%masp_interessado%{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+DISABLE Clipboard.GetText Text=> tela_admissao
+DISABLE IF IsEmpty(tela_admissao[14]) THEN
+    DISABLE IF Contains(tela_admissao[12], $'''DESLIGADO''', False) THEN
+        DISABLE CALL afastamento_previdenciario
+    DISABLE END
+    DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+DISABLE ELSE
+    DISABLE Text.CropText.CropTextBetweenFlags Text: tela_admissao FromFlag: $''' -------------------------------------------------------------------------------''' ToFlag: $'''Comando:''' IgnoreCase: False CroppedText=> tela_admissao IsFlagFound=> IsFlagFound
+    DISABLE Text.SplitText.Split Text: tela_admissao StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> linhas_admissao
+    DISABLE SET count_admissao TO 0
+    DISABLE LOOP FOREACH linha_adm IN linhas_admissao
+        DISABLE IF NotContains(linha_adm, $'''DESLIGADO''', True) THEN
+            DISABLE IF Contains(linha_adm, admissao_servidor, True) THEN
+                DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+            DISABLE END
+            DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+        DISABLE END
+        DISABLE Variables.IncreaseVariable Value: count_admissao IncrementValue: 1
+    DISABLE END
+DISABLE END
+DISABLE IF count_admissao = 0 THEN
+    DISABLE Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''admissão não localizada''' Column: $'''W''' Row: linha_loop
+DISABLE END
+DISABLE Clipboard.Clear _
+# A ação a seguir é para selecionar o médico. Pode ser qualquer um.
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+**ENDREGION
+# PESQUISAR FINALIDADE DE INSPEÇÃO MÉDICA: EFETIVO = 01 E NÃO-EFETIVO = 60; na primeira opção, basta enviar um X{Enter}; a segunda será abordada no subfluxo 'não-efetivo'
+**REGION não-efetivo
+LABEL próxima_tela_finalidade
+Clipboard.Clear _
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> finalidade_n_efet
+IF Contains(finalidade_n_efet, $'''60   AFASTAMENTO PREVID''', False) THEN
+    Text.CropText.CropTextBetweenFlags Text: tela_admissao FromFlag: $''' -------------------------------------------------------------------------------''' ToFlag: $'''Comando:''' IgnoreCase: False CroppedText=> finalidade_n_efet IsFlagFound=> IsFlagFound
+    Text.SplitText.Split Text: finalidade_n_efet StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> finalidade_n_efet
+    SET count_finalidade TO 0
+    LOOP FOREACH linha_finalidade IN finalidade_n_efet
+        IF Contains(linha_adm, 60, True) THEN
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+        END
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+    END
+ELSE
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F8}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+    GOTO próxima_tela_finalidade
+END
+# A ação 17 marca "N" em "Prorrogacao" e já pula automático pro campo seguinte
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''N''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''%data_inicio_afastamento%
+%dias_solicitados%
+{Tab}
+%data_emissao_atestado%
+%data_revisao_atestado%
+{F5}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+WAIT 1
+Clipboard.Clear _
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> confirmacao_agendamento
+IF Contains(confirmacao_agendamento, $'''CONVOCADO/DESLIG/CONTRATO ADM./REC. AMPLO LS - ATE 15 DIAS''', False) THEN
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''CONSULTAR RPM DO PERICIANDO - POSSÍVEL JÁ TER SIDO PUBLICADO''' Column: $'''W''' Row: linha_loop
+    GOTO 'fim dessa linha'
+END
+# aqui é possível de ter que confirmar quantos dias de fato o perito aprovou
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''%vinculo_interessado%{Tab}
+%dias_solicitados%
+{Tab}{Tab}{Tab}{Tab}
+%data_inicio_afastamento%
+%cid_interessado%
+{Tab}{Tab}{Tab}{Tab}
+%CRM_atestado%''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+# Ação 30: confirmar onde entra o CRM do médico perito
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F5}X{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+# Ação 33: esta é a última ação antes de confirmar o lançamento da perícia no Sisap. Depois dessa ação, é necessário adicionar o 'enviar teclas' restante e ações que retornem para o início do loop, talvez um F5 (? menu ?).
+IF Contains($'''texto tela final SISAP''', $'''REGISTRO INCLUIDO COM SUCESSO''', False) THEN
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''BIM digitado no SISAP para publicação''' Column: $'''W''' Row: linha_loop
+END
+LABEL 'fim dessa linha'
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+**ENDREGION
+EXIT FUNCTION

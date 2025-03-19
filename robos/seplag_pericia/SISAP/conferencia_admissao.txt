@@ -1,0 +1,63 @@
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+# envio de F6 para aparecer seletor de unidade
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Delete}{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F6}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+WAIT 2
+# seleção da unidade SEPLAG
+Clipboard.Clear _
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> unidade
+Text.SplitText.Split Text: unidade StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> unidade
+LOOP FOREACH linha IN unidade
+    IF Contains(linha, $'''1501-00000099''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+        EXIT LOOP
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
+END
+WAIT 2
+# seleção da opção RPM na lista de comandos disponíveis
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}{Tab}{Tab}{Tab}X{Enter}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''X{Enter}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+# digitação do MASP
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%masp_interessado%{Enter}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+# busca admissão na lista disponível
+Clipboard.Clear _
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> RPM_admissao
+IF IsEmpty(RPM_admissao[13]) THEN
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+ELSE
+    Text.CropText.CropTextBetweenFlags Text: tela_admissao FromFlag: $''' -------------------------------------------------------------------------------''' ToFlag: $'''Comando:''' IgnoreCase: False CroppedText=> RPM_admissao IsFlagFound=> IsFlagFound
+    Text.SplitText.Split Text: RPM_admissao StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> RPM_admissao
+    SET count_RPM TO 0
+    LOOP FOREACH linha_rpm_adm IN RPM_admissao
+        IF Contains(linha_rpm_adm, admissao_servidor, True) THEN
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+        END
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+        Variables.IncreaseVariable Value: count_RPM IncrementValue: 1
+    END
+END
+IF count_RPM = 0 THEN
+    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''admissão não localizada''' Column: $'''W''' Row: linha_loop
+    EXIT FUNCTION
+END
+# busca data na tela de RPM da admissão
+LABEL 'próxima tela RPM'
+Clipboard.Clear _
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> RPM_datas
+IF NotContains(RPM_datas, $'''0009 - Esta e\' a ultima tela. ''', False) THEN
+    IF Contains(RPM_datas, data_emissao_atestado, False) THEN
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''LTS já publicada, verificar RPM''' Column: $'''W''' Row: linha_loop
+        EXIT FUNCTION
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F8}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    GOTO 'próxima tela RPM'
+ELSE
+    IF Contains(RPM_datas, data_emissao_atestado, False) THEN
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''LTS já publicada, verificar RPM''' Column: $'''W''' Row: linha_loop
+        EXIT FUNCTION
+    END
+END

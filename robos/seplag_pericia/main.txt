@@ -1,5 +1,0 @@
-CALL leitura_planilha
-CALL API
-CALL formulas_filtros
-CALL login_sisap
-CALL Digitação
