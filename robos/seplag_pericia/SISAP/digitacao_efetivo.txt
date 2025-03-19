@@ -22,10 +22,6 @@ LOOP LoopIndex2 FROM linha_loop TO linha_livre - 1 STEP 1
         MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
         GOTO 'próxima linha'
     END
-    # envio de F6 para aparecer seletor de unidade
-    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Delete}{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
-    WAIT 2
-    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F6}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
     # seleção da unidade SEPLAG - código (REPLICAR MESMA ESTRUTURA DE LOOP DO ROMANO PARA SELECINOAR UNIDADE, PODENDO SER INCLUSIVE A NRPMSO)
     MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Tab}X{Enter}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
     # seleção da INSPEÇÃO MÉDICA NÃO AGENDADA (no meu perfil, é a segunda opção)
@@ -49,16 +45,23 @@ LOOP LoopIndex2 FROM linha_loop TO linha_livre - 1 STEP 1
         MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
     ELSE
         Text.CropText.CropTextBetweenFlags Text: tela_admissao FromFlag: $''' -------------------------------------------------------------------------------''' ToFlag: $'''Comando:''' IgnoreCase: False CroppedText=> tela_admissao IsFlagFound=> IsFlagFound
+        # excluir linhas em branco
         Text.SplitText.Split Text: tela_admissao StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> linhas_admissao
         SET count_admissao TO 0
         LOOP FOREACH linha_adm IN linhas_admissao
-            IF NotContains(linha_adm, $'''DESLIGADO''', True) THEN
-                IF Contains(linha_adm, admissao_servidor, True) THEN
-                    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+            IF IsEmpty(linha_adm) THEN
+                GOTO linha_vazia
+            ELSE
+                IF NotContains(linha_adm, $'''DESLIGADO''', True) THEN
+                    IF Contains(linha_adm, admissao_servidor, True) THEN
+                        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+                        EXIT LOOP
+                    END
+                    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
                 END
-                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+                Variables.IncreaseVariable Value: count_admissao IncrementValue: 1
             END
-            Variables.IncreaseVariable Value: count_admissao IncrementValue: 1
+            LABEL linha_vazia
         END
     END
     IF count_admissao = 0 THEN
@@ -108,4 +111,9 @@ LOOP LoopIndex2 FROM linha_loop TO linha_livre - 1 STEP 1
     END
     LABEL 'fim dessa linha'
     MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+    # envio de F6 para aparecer seletor de unidade
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Delete}{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F6}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
 END
