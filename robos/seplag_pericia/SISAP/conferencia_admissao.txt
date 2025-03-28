@@ -60,48 +60,99 @@ Text.CropText.CropTextBetweenFlags Text: datas_admissao FromFlag: $''' Dt.Fim Ef
 Text.CropText.CropTextBetweenFlags Text: datas_admissao FromFlag: $'''------------------------------------------------------------------------------''' ToFlag: $'''------------------------------------------------------------------------------''' IgnoreCase: False CroppedText=> datas_admissao IsFlagFound=> IsFlagFound
 Text.SplitText.Split Text: datas_admissao StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> datas_admissao
 Variables.RemoveItemFromList.RemoveItemFromListByIndex ItemIndex: 0 List: datas_admissao
-DateTime.GetCurrentDateTime.Windows DateTimeFormat: DateTime.DateTimeFormat.DateOnly TimeZoneLocation: DateTime.TimeZoneLocation.BahiaStandardTime CurrentDateTime=> hoje
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateOnly CurrentDateTime=> hoje
 Text.ConvertDateTimeToText.FromDateTime DateTime: hoje StandardFormat: Text.WellKnownDateTimeFormat.ShortDate Result=> hoje
+Text.GetSubtext.GetSubtext Text: data_emissao_atestado CharacterPosition: 0 NumberOfChars: 2 Subtext=> dia_atestado
+Text.GetSubtext.GetSubtext Text: data_emissao_atestado CharacterPosition: 2 NumberOfChars: 2 Subtext=> mes_atestado
+Text.GetSubtext.GetSubtext Text: data_emissao_atestado CharacterPosition: 4 NumberOfChars: 4 Subtext=> ano_atestado
+SET data_emissao_atestado TO $'''%dia_atestado%/%mes_atestado%/%ano_atestado%'''
+DISABLE Text.ConvertTextToDateTime.ToDateTime Text: data_emissao_atestado DateTime=> data_emissao_atestado
 LOOP FOREACH linha_datas_adm IN datas_admissao
     Text.GetSubtext.GetSubtext Text: linha_datas_adm CharacterPosition: 53 NumberOfChars: 10 Subtext=> data_inicio_adm
     Text.Replace Text: data_inicio_adm TextToFind: $'''.''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''/''' ActivateEscapeSequences: False Result=> data_inicio_adm
+    DISABLE Text.ConvertTextToDateTime.ToDateTime Text: data_inicio_adm DateTime=> data_inicio_adm
     Text.GetSubtext.GetSubtext Text: linha_datas_adm CharacterPosition: 66 NumberOfChars: 10 Subtext=> data_fim_adm
     IF NotContains(data_fim_adm, 20, False) THEN
         SET data_fim_adm TO hoje
     ELSE
         Text.Replace Text: data_fim_adm TextToFind: $'''.''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''/''' ActivateEscapeSequences: False Result=> data_fim_adm
+        DISABLE Text.ConvertTextToDateTime.ToDateTime Text: data_fim_adm DateTime=> data_fim_adm
     END
-    # converter data_emissao_atestado para dd/mm/aaaaa e ver alternativa para erro de sintaxe desse script
-    DISABLE Scripting.RunPythonScript PythonCode: `from datetime import datetime
- 
-# Variáveis do PAD (não modifique estas linhas)
-data_verificar_str = "%data_emissao_atestado%"
-data_inicio_str = "%data_inicio_adm%"
-data_fim_str = "%data_fim_adm%"
- 
-def converter_data(data_str):
-    try:
-        return datetime.strptime(data_str, '%d/%m/%Y')
-    except ValueError:
-        return None
- 
-try:
-    data_verificar = converter_data(data_verificar_str)
-    data_inicio = converter_data(data_inicio_str)
-    data_fim = converter_data(data_fim_str)
- 
-    if None in [data_verificar, data_inicio, data_fim]:
-        print("Erro: Formato de data inválido")
-    elif data_inicio <= data_verificar <= data_fim:
-        print("Dentro do intervalo")
-    else:
-        print("Fora do intervalo")
-except Exception as e:
-    print(f"Erro inesperado: {str(e)}")` PythonVersion: System.PythonVersion.Python3 ScriptOutput=> PythonScriptOutput
-    DISABLE SET result_intervalo_data_adm TO PythonScriptOutput
-    DISABLE IF result_intervalo_datas_adm = $'''Dentro do intervalo''' THEN
-        DISABLE EXIT FUNCTION
-    DISABLE END
+    WebAutomation.ExecuteJavascript BrowserInstance: Browser_para_javascript Javascript: $'''function ExecuteScript() {
+
+function DataAlternativa(dia, mes, ano) {
+    this.dia = parseInt(dia, 10);
+    this.mes = parseInt(mes, 10);
+    this.ano = parseInt(ano, 10);
+}
+
+DataAlternativa.prototype.isMenorOuIgual = function(outro) {
+    if (this.ano < outro.ano) return true;
+    if (this.ano === outro.ano && this.mes < outro.mes) return true;
+    if (this.ano === outro.ano && this.mes === outro.mes && this.dia <= outro.dia) return true;
+    return false;
+};
+
+DataAlternativa.prototype.isMaiorOuIgual = function(outro) {
+    if (this.ano > outro.ano) return true;
+    if (this.ano === outro.ano && this.mes > outro.mes) return true;
+    if (this.ano === outro.ano && this.mes === outro.mes && this.dia >= outro.dia) return true;
+    return false;
+};
+
+function converterData(dataStr) {
+    if (typeof dataStr !== \"string\") return null;
+    if (dataStr.startsWith(\"%') && dataStr.endsWith('%\")) return null;
+
+    var partes = dataStr.trim().split(\"/\");
+    if (partes.length !== 3) return null;
+
+    return {
+        dia: parseInt(partes[0], 10),
+        mes: parseInt(partes[1], 10),
+        ano: parseInt(partes[2], 10)
+    };
+}
+
+function isMaiorOuIgual(d1, d2) {
+    if (d1.ano > d2.ano) return true;
+    if (d1.ano === d2.ano && d1.mes > d2.mes) return true;
+    if (d1.ano === d2.ano && d1.mes === d2.mes && d1.dia >= d2.dia) return true;
+    return false;
+}
+
+function isMenorOuIgual(d1, d2) {
+    if (d1.ano < d2.ano) return true;
+    if (d1.ano === d2.ano && d1.mes < d2.mes) return true;
+    if (d1.ano === d2.ano && d1.mes === d2.mes && d1.dia <= d2.dia) return true;
+    return false;
+}
+
+var data_verificar_str = \"%data_emissao_atestado%\";
+var data_inicio_str = \"%data_inicio_adm%\";
+var data_fim_str = \"%data_fim_adm%\";
+
+var data_verificar = converterData(data_verificar_str);
+var data_inicio = converterData(data_inicio_str);
+var data_fim = converterData(data_fim_str);
+
+var resultado = \"\";
+
+if (!data_verificar || !data_inicio || !data_fim) {
+    resultado = \"Erro: Data inválida ou variável não substituída\";
+} else if (isMaiorOuIgual(data_verificar, data_inicio) && isMenorOuIgual(data_verificar, data_fim)) {
+    resultado = \"Dentro do intervalo\";
+} else {
+    resultado = \"Fora do intervalo\";
+}
+
+return resultado;
+
+
+}''' Result=> Result
+    IF Result = $'''Dentro do intervalo''' THEN
+        EXIT FUNCTION
+    END
 END
 Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''Admissão informada fora dos intervalos de data''' Column: $'''W''' Row: linha_loop
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True

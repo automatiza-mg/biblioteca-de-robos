@@ -5,21 +5,27 @@ LOOP LoopIndex2 FROM linha_loop TO linha_livre - 1 STEP 1
     # leitura dos campos de cada coluna da planilha gerada após assimilar infos do SEI (BIM servidor - Folha 01 e BIM perito), uma linha de cada vez neste loop
     DISABLE SET masp_interessado TO 11281714
     Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''E''' StartRow: linha_loop ReadAsText: True CellValue=> masp_interessado
-    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''I''' StartRow: linha_loop ReadAsText: True CellValue=> CRM_peito
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''I''' StartRow: linha_loop ReadAsText: True CellValue=> CRM_perito
     Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''J''' StartRow: linha_loop ReadAsText: True CellValue=> CRM_atestado
     Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''K''' StartRow: linha_loop ReadAsText: True CellValue=> data_inicio_afastamento
     Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''L''' StartRow: linha_loop ReadAsText: True CellValue=> data_emissao_atestado
     Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''M''' StartRow: linha_loop ReadAsText: True CellValue=> data_revisao_atestado
     Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''N''' StartRow: linha_loop ReadAsText: True CellValue=> dias_solicitados
     Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''O''' StartRow: linha_loop ReadAsText: True CellValue=> dias_concedidos
-    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''P''' StartRow: linha_loop ReadAsText: True CellValue=> cid_interessado
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''P''' StartRow: linha_loop ReadAsText: True CellValue=> data_fim_afastamento
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''Q''' StartRow: linha_loop ReadAsText: True CellValue=> cid_interessado
     Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''S''' StartRow: linha_loop ReadAsText: True CellValue=> codigo_decisao_LTS
     Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''T''' StartRow: linha_loop ReadAsText: True CellValue=> vinculo_interessado
     DISABLE SET admissao TO 3
     Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''V''' StartRow: linha_loop ReadAsText: True CellValue=> admissao_servidor
     IF vinculo_interessado = 60 THEN
         CALL não_efetivo
-        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Delete}{F3}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+        GOTO 'próxima linha'
+    END
+    CALL conferencia_admissao
+    Excel.ReadFromExcel.ReadCell Instance: excel_pericia StartColumn: $'''W''' StartRow: linha_loop ReadAsText: True CellValue=> status
+    IF IsNotEmpty(status) THEN
         GOTO 'próxima linha'
     END
     # seleção da unidade SEPLAG - código (REPLICAR MESMA ESTRUTURA DE LOOP DO ROMANO PARA SELECINOAR UNIDADE, PODENDO SER INCLUSIVE A NRPMSO)
@@ -45,23 +51,18 @@ LOOP LoopIndex2 FROM linha_loop TO linha_livre - 1 STEP 1
         MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
     ELSE
         Text.CropText.CropTextBetweenFlags Text: tela_admissao FromFlag: $''' -------------------------------------------------------------------------------''' ToFlag: $'''Comando:''' IgnoreCase: False CroppedText=> tela_admissao IsFlagFound=> IsFlagFound
-        # excluir linhas em branco
+        Variables.RemoveItemFromList.RemoveItemFromListByIndex ItemIndex: 0 List: datas_admissao
         Text.SplitText.Split Text: tela_admissao StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> linhas_admissao
         SET count_admissao TO 0
         LOOP FOREACH linha_adm IN linhas_admissao
-            IF IsEmpty(linha_adm) THEN
-                GOTO linha_vazia
-            ELSE
-                IF NotContains(linha_adm, $'''DESLIGADO''', True) THEN
-                    IF Contains(linha_adm, admissao_servidor, True) THEN
-                        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
-                        EXIT LOOP
-                    END
-                    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+            IF NotContains(linha_adm, $'''DESLIGADO''', True) THEN
+                IF Contains(linha_adm, admissao_servidor, True) THEN
+                    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+                    EXIT LOOP
                 END
-                Variables.IncreaseVariable Value: count_admissao IncrementValue: 1
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
             END
-            LABEL linha_vazia
+            Variables.IncreaseVariable Value: count_admissao IncrementValue: 1
         END
     END
     IF count_admissao = 0 THEN
@@ -71,49 +72,71 @@ LOOP LoopIndex2 FROM linha_loop TO linha_livre - 1 STEP 1
     Clipboard.Clear _
     # A ação a seguir é para selecionar o médico. Pode ser qualquer um.
     MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
-    # PESQUISAR FINALIDADE DE INSPEÇÃO MÉDICA: EFETIVO = 01 E NÃO-EFETIVO = 60; na primeira opção, basta enviar um X{Enter}; a segunda será abordada no subfluxo 'não-efetivo'
+    # PESQUISAR FINALIDADE DE INSPEÇÃO MÉDICA: EFETIVO = 01 E NÃO-EFETIVO = 60; na primeira opção, basta enviar um X{Enter}; a segunda é direcionada para o subfluxo 'não-efetivo', neste mesmo subfluxo, logo após a leitura das colunas do excel
     MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
     # A ação 17 marca "N" em "Prorrogacao" e já pula automático pro campo seguinte
     MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''N''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
     MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''%data_inicio_afastamento%
-%dias_solicitados%
-{Tab}
-%data_emissao_atestado%
-%data_revisao_atestado%
-{F5}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+%dias_solicitados%''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Tab}
+''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''%data_emissao_atestado%
+%data_revisao_atestado%''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
     WAIT 1
+    Clipboard.Clear _
     MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
     Clipboard.GetText Text=> confirmacao_agendamento
-    IF Contains(confirmacao_agendamento, $'''erro''', True) THEN
-        DISABLE Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''CONSULTAR RPM DO PERICIANDO - POSSÍVEL JÁ TER SIDO PUBLICADO''' Column: $'''W''' Row: linha_loop
-        CALL conferencia_admissao
+    WAIT 1
+    IF Contains(confirmacao_agendamento, $'''Responsavel pelo Resultado:''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''%codigo_decisao_LTS%{Tab}{Tab}
+%dias_concedidos%''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Tab}{Tab}{Tab}{Tab}%data_fim_afastamento%''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''%cid_interessado%{Tab}{Tab}{Tab}{Tab}{Tab}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    ELSE IF Contains(confirmacao_agendamento, $'''Servidor com afastamento pendente''', False) THEN
+        WAIT 1
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''n{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+        WAIT 1
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F2}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''Servidor com afastamento pendente''' Column: $'''W''' Row: linha_loop
+        GOTO 'fim dessa linha'
+    ELSE IF Contains(confirmacao_agendamento, $'''erro''', False) THEN
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''CONSULTAR RPM DO PERICIANDO - POSSÍVEL JÁ TER SIDO PUBLICADO''' Column: $'''W''' Row: linha_loop
+        CALL conferencia_LTS_publicada
         IF IsNotEmpty(linha_loop) THEN
+            Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''FAZER ACERTO MANUAL DE DATAS NA TELA DE AGENDAMENTO DO PERICIANDO''' Column: $'''W''' Row: linha_loop
             GOTO 'fim dessa linha'
         END
     END
-    # aqui é possível de ter que confirmar quantos dias de fato o perito aprovou
-    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''%vinculo_interessado%{Tab}
-%dias_solicitados%
-{Tab}{Tab}{Tab}{Tab}
-%data_inicio_afastamento%
-%cid_interessado%
-{Tab}{Tab}{Tab}{Tab}
-%CRM_atestado%''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
-    # Ação 30: confirmar onde entra o CRM do médico perito
     WAIT 1
-    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F5}X{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
-    # Ação 33: esta é a última ação antes de confirmar o lançamento da perícia no Sisap. Depois dessa ação, é necessário adicionar o 'enviar teclas' restante e ações que retornem para o início do loop, talvez um F5 (? menu ?).
-    IF Contains($'''texto tela agendamento SISAP''', $'''CONVOCADO/DESLIG/CONTRATO ADM./REC. AMPLO LS - ATE 15 DIAS''', False) THEN
-        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''CONSULTAR RPM DO PERICIANDO - POSSÍVEL JÁ TER SIDO PUBLICADO''' Column: $'''S''' Row: linha_loop
-    END
-    IF Contains($'''texto tela final SISAP''', $'''REGISTRO INCLUIDO COM SUCESSO''', False) THEN
+    # coleta do número da portaria/comunicação no Diário Oficial
+    Clipboard.Clear _
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> portaria
+    IF Contains($'''texto tela final SISAP''', $'''Registro Incluido com sucesso''', True) THEN
         Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''BIM digitado no SISAP para publicação''' Column: $'''W''' Row: linha_loop
+        Text.CropText.CropTextBetweenFlags Text: portaria FromFlag: $'''Portaria:''' ToFlag: $'''Protocolo:''' IgnoreCase: False CroppedText=> CroppedText IsFlagFound=> IsFlagFound2
+        Text.Trim Text: portaria TrimOption: Text.TrimOption.Both TrimmedText=> portaria
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: portaria Column: $'''X''' Row: linha_loop
+    ELSE
+        Display.ShowMessageDialog.ShowMessage Title: $'''corrigir dado na tela de confirmação''' Message: $'''clique neste botão e corrija o problema nesta tela em até 30 segundos para gerar a portaria/comunicação''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed
+        WAIT 30
+        IF Contains($'''texto tela final SISAP''', $'''Registro Incluido com sucesso''', True) THEN
+            Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''BIM digitado no SISAP para publicação''' Column: $'''W''' Row: linha_loop
+            Text.CropText.CropTextBetweenFlags Text: portaria FromFlag: $'''Portaria:''' ToFlag: $'''Protocolo:''' IgnoreCase: False CroppedText=> CroppedText IsFlagFound=> IsFlagFound2
+            Text.Trim Text: portaria TrimOption: Text.TrimOption.Both TrimmedText=> portaria
+            Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: portaria Column: $'''X''' Row: linha_loop
+        ELSE
+            Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''Verificar dados na última tela de confirmação''' Column: $'''W''' Row: linha_loop
+        END
     END
     LABEL 'fim dessa linha'
+    WAIT 2
     MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
     # envio de F6 para aparecer seletor de unidade
     WAIT 2
-    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Delete}{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Delete}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
     WAIT 2
     MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F6}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
 END
