@@ -66,8 +66,8 @@ if (tdElement) {
         MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: aba_txt TextToSend: $'''{LControlKey}({W})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
         GOTO aumentar_variável
     END
-    WebAutomation.LaunchChrome.AttachToForegroundChrome AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela_download
-    DISABLE WebAutomation.LaunchEdge.AttachToTheForegroundEdge AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela_download
+    DISABLE WebAutomation.LaunchChrome.AttachToForegroundChrome AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela_download
+    WebAutomation.LaunchEdge.AttachToTheForegroundEdge AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela_download
     UIAutomation.CloseWindow.CloseByInstanceOrHandle WindowInstance: janela_download
     Folder.GetFiles Folder: caminho_download FileFilter: $'''*.txt''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> download_txt
     IF Contains(tipo_dae, $'''Líquido Benefício''', True) THEN
@@ -114,8 +114,12 @@ if (tdElement) {
 }
 }'''
         WAIT 5
-        WebAutomation.LaunchChrome.AttachToForegroundChrome AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela_download
-        DISABLE WebAutomation.LaunchEdge.AttachToTheForegroundEdge AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela_download
+        IF (OCR.IfTextOnScreen.TextOnScreenExistsWithWindowsOcr TextToFind: $'''não possui conta beneficio cadastrada no sistema.''' IsRegex: False WindowsOcrLanguage: OCR.WindowsOcrLanguage.Portuguese SearchForTextOn: OCR.SearchTarget.ForegroundWindow ImageWidthMultiplier: 1 ImageHeightMultiplier: 1) THEN
+            MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: aba_txt TextToSend: $'''{LControlKey}({W})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+            GOTO aumentar_variável
+        END
+        DISABLE WebAutomation.LaunchChrome.AttachToForegroundChrome AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela_download
+        WebAutomation.LaunchEdge.AttachToTheForegroundEdge AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela_download
         UIAutomation.CloseWindow.CloseByInstanceOrHandle WindowInstance: janela_download
         Folder.GetFiles Folder: caminho_download FileFilter: $'''*.txt''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> download_txt
         WAIT 2
@@ -146,8 +150,8 @@ if (linkElement) {
         MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: aba_pdf TextToSend: $'''{Tab}%ano%''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
         WebAutomation.PressButton.PressButton BrowserInstance: aba_pdf Control: appmask['Web Page \'h ... eiro.xhtml\'']['Span \'...\' 2'] WaitForPageToLoadTimeout: 60
         WAIT 1
-        WebAutomation.LaunchChrome.AttachToForegroundChrome AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela
-        DISABLE WebAutomation.LaunchEdge.AttachToTheForegroundEdge AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela
+        DISABLE WebAutomation.LaunchChrome.AttachToForegroundChrome AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela
+        WebAutomation.LaunchEdge.AttachToTheForegroundEdge AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> janela
         WebAutomation.ExecuteJavascript BrowserInstance: janela Javascript: $'''function ExecuteScript() { 
 document.querySelector(\'input[type=\"submit\"][name=\"evento\"][value=\"Limpar\"]\').click()
 }'''
@@ -185,15 +189,12 @@ document.querySelector(\'input[type=\"submit\"][name=\"evento\"][value=\"Imprimi
         WAIT 2
         File.RenameFiles.Rename Files: download_pdf[0] NewName: $'''RT %rt% - %mes%-%ano%''' KeepExtension: True IfFileExists: File.IfExists.Overwrite
     END
+    Excel.SaveExcel.Save Instance: planilha_excel
     LABEL aumentar_variável
     Variables.IncreaseVariable Value: linha_planilha IncrementValue: 1
 END
 Excel.DeleteColumn Instance: planilha_excel Column: $'''L'''
 Excel.SaveExcel.Save Instance: planilha_excel
-Folder.GetFiles Folder: caminho_download FileFilter: $'''*.pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> download_pdf
-Folder.GetFiles Folder: caminho_download FileFilter: $'''*.txt''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> download_txt
-Compression.ZipFiles ArchivePath: $'''%caminho_download%\\Relatórios Finaceiros.zip''' FilesOrFoldersToZip: download_pdf CompressionLevel: Compression.CompressionLevel.BestBalanceOfSpeedAndCompression ArchiveComment: $'''''' ZipFile=> zip_pdf
-Compression.ZipFiles ArchivePath: $'''%caminho_download%\\Arquivos TXT.zip''' FilesOrFoldersToZip: download_txt CompressionLevel: Compression.CompressionLevel.BestBalanceOfSpeedAndCompression ArchiveComment: $'''''' ZipFile=> zip_txt
 
 # [ControlRepository][PowerAutomateDesktop]
 
