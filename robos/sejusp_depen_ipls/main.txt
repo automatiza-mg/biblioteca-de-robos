@@ -35,10 +35,9 @@ IF Contains(botao_relatorio, $'''sim''', False) THEN
     CALL preparar_planilha_excel
     CALL emitir_txt_pdf
     CALL login_sei
-    CALL trocar_unidade_sei
+    CALL troca_unidade_sei
     CALL cria_processo_sei
     CALL cria_memorando_sei
-    CALL insere_anexo_sei
 ELSE IF Contains(botao_relatorio, $'''nao''', False) THEN
     Folder.GetFiles Folder: caminho_download FileFilter: $'''*.xlsx''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.Name SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> files
     Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: files[0] Visible: True ReadOnly: False Instance=> planilha_excel
@@ -46,8 +45,7 @@ ELSE IF Contains(botao_relatorio, $'''nao''', False) THEN
     CALL login_sigpri
     CALL emitir_txt_pdf
     CALL login_sei
-    CALL trocar_unidade_sei
+    CALL troca_unidade_sei
     CALL cria_processo_sei
     CALL cria_memorando_sei
-    CALL insere_anexo_sei
 END
