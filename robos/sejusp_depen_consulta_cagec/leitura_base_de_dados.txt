@@ -1,0 +1,3 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: Caminho_excel Visible: True ReadOnly: False Instance=> tabela
+Excel.GetFirstFreeColumnRow Instance: tabela FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.GetFirstFreeRowOnColumn Instance: tabela Column: $'''E''' FirstFreeRowOnColumn=> linha_acao
