@@ -1,0 +1,22 @@
+WAIT 1
+IF linha[34] = $'''Aprovado em reunião''' THEN
+    SET decisao TO $'''aprovou'''
+ELSE IF linha[34] = $'''Aprovado parcialmente em reunião''' THEN
+    SET decisao TO $'''aprovou parcialmente'''
+END
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})[pronome_1]{Escape}%mundo_filtrado[0][3]%''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})[pronome_2]{Escape}%mundo_filtrado[0][4]%''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})[reuniao]{Escape}%reuniao%''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})[data_reuniao]{Escape}%data_reuniao%''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})[decisao]{Escape}%decisao%''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+IF linha[14] = $'''Objeto''' THEN
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})[artigo_orgao]{Escape}%mundo_filtrado[0][7]%''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})[sigla_orgao]{Escape}%mundo_filtrado[0][6]%''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+END
+# Assinatura:
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})Marcel Dornas Beghini{Escape}Luiz Claudio Fernandes Lourenço Gomes''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})Secretário-Geral do Estado de Minas Gerais{Escape}Secretário de Estado de Fazenda de Minas Gerais''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})Presidente do Comitê de Orçamento e Finanças{Escape}Presidente do Comitê de Orçamento e Finanças, em exercício''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})[pronome_3]{Escape}%mundo_filtrado[0][5]%''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})[dirigente_max]{Escape}%mundo_filtrado[0][2]%''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})[cargo_dirigente]{Escape}%mundo_filtrado[0][8]%''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
