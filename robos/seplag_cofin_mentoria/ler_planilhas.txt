@@ -1,0 +1,12 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_mundo Visible: False ReadOnly: False Instance=> mundo
+Excel.ReadFromExcel.ReadCells Instance: mundo StartColumn: $'''A''' StartRow: 1 EndColumn: $'''K''' EndRow: 80 ReadAsText: True FirstLineIsHeader: True RangeValue=> tabela_mundo
+WAIT 3
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_modelos Visible: True ReadOnly: False Instance=> modelos
+Excel.ReadFromExcel.ReadCells Instance: modelos StartColumn: $'''A''' StartRow: 1 EndColumn: $'''D''' EndRow: 59 ReadAsText: False FirstLineIsHeader: True RangeValue=> tabela_modelos
+WAIT 3
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_andamento Visible: True ReadOnly: False Instance=> andamento
+Excel.GetFirstFreeRowOnColumn Instance: andamento Column: $'''A''' FirstFreeRowOnColumn=> linha_livre
+Excel.ReadFromExcel.ReadCells Instance: andamento StartColumn: $'''A''' StartRow: 1 EndColumn: $'''AJ''' EndRow: linha_livre - 1 ReadAsText: False FirstLineIsHeader: True RangeValue=> tabela_andamento
+Excel.GetFirstFreeRowOnColumn Instance: andamento Column: $'''AJ''' FirstFreeRowOnColumn=> linha_analisar
+SET linha_inicial_andamento TO 2
+WAIT 2

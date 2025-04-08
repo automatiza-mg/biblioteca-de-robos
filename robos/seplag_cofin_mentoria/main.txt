@@ -1,0 +1,60 @@
+CALL baixar_planilha
+# O fluxo se inicia com o download da planilha de andamento do google drive, que contém as informações relativas aos pleitos que estão atualmente abertos no Cofin. Destaca-se que, dentre esses processos, nem todos estão inseridos na pauta da reunião e, consequentemente, irão decorrer na elaboração de um ofício.
+Display.InputDialog Title: $'''Reunião COFIN''' Message: $'''Qual foi a reunião realizada?''' DefaultValue: $'''ª Reunião''' InputType: Display.InputType.SingleLine IsTopMost: False UserInput=> reuniao ButtonPressed=> ButtonPressed
+Display.InputDialog Title: $'''Data da reunião''' Message: $'''Qual a data da reunião realizada? (Formato: DD de MMMM de AAAA)''' InputType: Display.InputType.SingleLine IsTopMost: False UserInput=> data_reuniao ButtonPressed=> ButtonPressed2
+# A especificação da reunião (o número, se é extraordinária ou não), assim como a data de sua realização, são informações voláteis, sujeitas a alterações constantes, que não estão planilhadas e, portanto, devem ser inseridas manualmente no início do fluxo para garantir uma maior adaptabilidade da automatização.
+DISABLE Display.InputDialog Title: $'''Data do Ofício''' Message: $'''Qual a data do Ofício?''' InputType: Display.InputType.SingleLine IsTopMost: False UserInput=> data_extenso
+CALL ler_planilhas
+/# No subfluxo acima são abertas e incorporadas três planilhas, sendo:
+
+- Pleitos em andamento: Planilha baixada no início do fluxo que serve como base para toda a automatização, contendo informações vitais como o processo SEI do pleito, sua classificação (Tipo, Categoria e Subcategoria), órgão demandante, tipo de documento e data em que foi submetido o pleito, entre outros.
+- Modelos: Planilha previamente elaborada que apresenta todas as combinações de classificação (passíveis de automatização) atreladas a um código de documento modelo Ofício Cofin, armazenado em processo SEI dedicado a essa armazenagem.
+- Mundo: Planilha interna que contém informações relativas aos órgãos do Estado de MG, contendo informações relevantes à elaboração dos ofícios como o dirigente máximo, os pronomes de tratamento adequados, assim como a vinculação dos órgãos. 
+
+Destaca-se que o caminho para acessar as planilhas deve ser alterado de acordo com o computador que o usuário estiver rodando o robo.#/
+CALL obter_data
+# Obtém a data atual e ajusta para o formato utilizado na elaboração do ofício.
+CALL entrar_sei
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Escape}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+# Entra no SEI com o login, senha e unidade informados. O envio da tecla "Esc" serve para fechar eventuais avisos e informativos que possam atrapalhar a automação.
+LOOP FOREACH linha IN tabela_andamento
+    IF linha['Decisão'] = $'''Arquivado ou devolvido''' THEN
+        Excel.WriteToExcel.WriteCell Instance: andamento Value: $'''ok''' Column: $'''AJ''' Row: linha_inicial_andamento
+        Variables.IncreaseVariable Value: linha_inicial_andamento IncrementValue: 1
+    ELSE IF IsEmpty(linha['Decisão']) THEN
+        Variables.IncreaseVariable Value: linha_inicial_andamento IncrementValue: 1
+    ELSE IF IsNotEmpty(linha['Resumo Deliberação']) THEN
+        Variables.IncreaseVariable Value: linha_inicial_andamento IncrementValue: 1
+        # Tendo como base a planilha "Pleitos em Andamento", cria-se um looping para analisar cada linha, identificando quais pleitos estão aptos para a elaboração do ofício ou não. Para fins da automação, consideram-se "Aptos" os pleitos que apresentam o campo de decisão preenchido, não contém a decisão "Arquivado ou Devolvido" e não apresentam o campo "Resumo Deliberação" preenchido, este que geralmente apresenta a transcrição de ofícios que já foram previamente elaborados. Assim, se o pleito não é considerado apto, aumenta-se a variável da linha em 1, efetivamente pulando para a próxima.
+    ELSE IF linha['Decisão'] = $'''Negado em reunião''' THEN
+        CALL negado
+        # No caso dos pleitos negados, o texto do Ofíco é em geral mais simples, tendo um modelo comum aplicável a todos os processos independente de sua classificação. Dessa forma, ocorre procedimento semelhante ao que será descrito adiante, mas com menor complexidade.
+    ELSE
+        Variables.FilterDataTable DataTable: tabela_modelos FilterParameters: { ^['RULE', 'COLUMN', 'OPERATOR', 'VALUE'], [$'''And''', $'''Tipo''', $'''Equal''', linha[14]], [$'''And''', $'''Categoria''', $'''Equal''', linha[12]], [$'''And''', $'''Subcategoria''', $'''Equal''', linha[13]] } FilteredDataTable=> modelo_filtrado
+        # Utiliza-se as informações adiquiridas na tabela "Pleitos em Andamento" referentes à classificação para filtrar a tabela "Modelos", de forma a obter o código do documento a ser utilizado como modelo ao inserir o Ofício Cofin no processo SEI da linha em análise.
+        Variables.FilterDataTable DataTable: tabela_mundo FilterParameters: { ^['RULE', 'COLUMN', 'OPERATOR', 'VALUE'], [$'''And''', $'''SIGLA''', $'''Equal''', linha[2].ToUpper] } FilteredDataTable=> mundo_filtrado
+        # Utiliza-se a informação do órgão demandante para filtrar a tabela "Mundo", de forma a obter informações adicionais sobre o órgão necessárias para a elaboração do Ofício.
+        CALL Pesquisar_inserir_doc
+        # Na página do SEI, que já foi aberta anteriormente, é realizada a pesquisa do processo analisado na linha em questão. Aberto o processo, é inserido o documento utilizando o código do modelo filtrado.
+        CALL cabeçalho_ref
+        # Utiliza informações das planilhas e a data adiquirida anteriormente para preencher o cabeçalho do ofício, assim como o campo de Ref: do Ofício.
+        CALL corpo_texto
+        # Utiliza do comando Ctrl+F+[texto]+Esc para localizar e substituir (enviar teclas) as informações personalizáveis no corpo do texto utilizando como base as informações de data de reunião, número da reunião (caixa de texto), pronomes de tratatamento, dirigente máximo, órgão por extenso (Tabela Mundo) e a decisão obtida na reunião (Pleitos em andamento).
+        CALL encaminhamentos
+        # Identifica e insere os encaminhamentos a serem feitos no Ofício, mais especificamente se o pleito é de um órgão vinculado encaminha para a Secretaria a que é vinculado (utilizando a planilha Mundo) e se existe algum parecer técnico, encaminha para a área técnica competente.
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({Alt}({S}))''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+        WAIT 3
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({F4})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+        Excel.WriteToExcel.WriteCell Instance: andamento Value: $'''ok''' Column: $'''AJ''' Row: linha_inicial_andamento
+        # Salva, fecha o documento no SEI e em seguida da um "ok" na planilha de andamento para facilitar a conferência final.
+        Variables.IncreaseVariable Value: linha_inicial_andamento IncrementValue: 1
+    END
+END
+Excel.CloseExcel.Close Instance: mundo
+Excel.CloseExcel.Close Instance: modelos
+Display.ShowMessageDialog.ShowMessage Title: $'''Conferiu?''' Message: $'''A planilha foi conferida?''' Icon: Display.Icon.Warning Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed3
+Excel.CloseExcel.Close Instance: andamento
+# Fecha todas as planilhas utilizadas, mas antes de fechar a planilha de andamento questiona se ela já foi conferida.
+EXIT Code: 0
+File.Delete Files: $'''C:\\Users\\x12567158677\\Downloads\\Pleitos em Andamento.xlsx'''
+# Como a planilha deve ser baixada toda vez que o robo é ativado, exclui a planilha ao final do processo para não gerar duplicidade.

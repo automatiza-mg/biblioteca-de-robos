@@ -1,0 +1,18 @@
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+Clipboard.GetText Text=> data_cabeçalho
+Text.Replace Text: data_cabeçalho TextToFind: $'''[data_extenso]''' IsRegEx: False IgnoreCase: False ReplaceWith: data_extenso ActivateEscapeSequences: False Result=> data_cabeçalho
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%data_cabeçalho%{Tab}{Control}({Shift}({Down})){Control}({C})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+Clipboard.GetText Text=> ref
+IF linha[4] = $'''OF''' THEN
+    SET tipo_doc TO $'''Ofício'''
+ELSE IF linha[4] = $'''FORM''' THEN
+    SET tipo_doc TO $'''Formulário'''
+ELSE IF linha[4] = $'''MEMO''' THEN
+    SET tipo_doc TO $'''Memorando'''
+END
+Text.Replace Text: ref TextToFind: $'''[tipo_doc]''' IsRegEx: False IgnoreCase: False ReplaceWith: tipo_doc ActivateEscapeSequences: False Result=> ref
+Text.Replace Text: ref TextToFind: $'''[num_doc]''' IsRegEx: False IgnoreCase: False ReplaceWith: linha[3] ActivateEscapeSequences: False Result=> ref
+Text.Replace Text: ref TextToFind: $'''[data_doc]''' IsRegEx: False IgnoreCase: False ReplaceWith: linha[5] ActivateEscapeSequences: False Result=> ref
+Text.Replace Text: ref TextToFind: $''' 00:00:00''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''.''' ActivateEscapeSequences: False Result=> ref
+Text.Replace Text: ref TextToFind: $'''[orgao_extenso]''' IsRegEx: False IgnoreCase: False ReplaceWith: mundo_filtrado[0][0] ActivateEscapeSequences: False Result=> ref
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%ref%{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False

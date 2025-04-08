@@ -1,0 +1,31 @@
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateOnly CurrentDateTime=> data_atual
+IF data_atual.Month = $'''01''' THEN
+    SET mes_extenso TO $'''janeiro'''
+ELSE IF data_atual.Month = $'''02''' THEN
+    SET mes_extenso TO $'''fevereiro'''
+ELSE IF data_atual.Month = $'''03''' THEN
+    SET mes_extenso TO $'''março'''
+ELSE IF data_atual.Month = $'''04''' THEN
+    SET mes_extenso TO $'''abril'''
+ELSE IF data_atual.Month = $'''05''' THEN
+    SET mes_extenso TO $'''maio'''
+ELSE IF data_atual.Month = $'''06''' THEN
+    SET mes_extenso TO $'''junho'''
+ELSE IF data_atual.Month = $'''07''' THEN
+    SET mes_extenso TO $'''julho'''
+ELSE IF data_atual.Month = $'''08''' THEN
+    SET mes_extenso TO $'''agosto'''
+ELSE IF data_atual.Month = $'''09''' THEN
+    SET mes_extenso TO $'''setembro'''
+ELSE IF data_atual.Month = 10 THEN
+    SET mes_extenso TO $'''outubro'''
+ELSE IF data_atual.Month = 11 THEN
+    SET mes_extenso TO $'''novembro'''
+ELSE IF data_atual.Month = 12 THEN
+    SET mes_extenso TO $'''dezembro'''
+END
+IF data_atual.Day < 10 THEN
+    SET data_extenso TO $'''0%data_atual.Day% de %mes_extenso% de %data_atual.Year%'''
+ELSE
+    SET data_extenso TO $'''%data_atual.Day% de %mes_extenso% de %data_atual.Year%'''
+END
