@@ -1,0 +1,9 @@
+DateTime.GetCurrentDateTime.Windows DateTimeFormat: DateTime.DateTimeFormat.DateAndTime TimeZoneLocation: DateTime.TimeZoneLocation.UTC CurrentDateTime=> data_consulta
+Text.GetSubtext.GetSubtextFromStartTo Text: data_consulta NumberOfChars: 10 Subtext=> data_consulta_final
+Text.Replace Text: data_consulta_final TextToFind: $'''/''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''_''' ActivateEscapeSequences: False Result=> data_documento
+Folder.Create FolderPath: caminho_pasta FolderName: $'''Consulta_CAGEC_%data_documento%''' Folder=> pasta_documentos
+CALL leitura_base_de_dados
+CALL portal_cagec
+CALL login_sei
+CALL insere_anexo_e_gera_notificacao
+Display.ShowMessageDialog.ShowMessage Title: $'''Tarefa realizada!''' Message: $'''A situação do CAGEC de todas as parcerias firmadas foram analisadas.''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed
