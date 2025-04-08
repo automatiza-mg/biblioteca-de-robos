@@ -1,2 +1,2 @@
 Folder.GetFiles Folder: pasta_downloads FileFilter: $'''*.pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> pdf_processos_sei
-File.Move Files: pdf_processos_sei Destination: $'''C:\\Users\\x15501492\\OneDrive - CAMG\\7. DCD\\Automatiza.MG\\Automatização de processos\\Teste Correios''' IfFileExists: File.IfExists.Overwrite MovedFiles=> MovedFiles
+File.Move Files: pdf_processos_sei Destination: pasta_onedrive IfFileExists: File.IfExists.Overwrite MovedFiles=> MovedFiles
