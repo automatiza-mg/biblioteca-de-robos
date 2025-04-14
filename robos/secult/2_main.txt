@@ -1,0 +1,5 @@
+CALL planilha_excel
+CALL login_sei
+CALL trocar_unidade_sei
+CALL login_plataforma
+CALL inserir_parecer_plataforma

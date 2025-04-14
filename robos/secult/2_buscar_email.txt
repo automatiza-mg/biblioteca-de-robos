@@ -1,0 +1,26 @@
+# O código abaixo busca o endereço de e-mail do proponente e do representante legal.
+WebAutomation.ExecuteJavascript BrowserInstance: plataforma Javascript: $'''function ExecuteScript() { 
+// Seleciona o link pelo seu href
+const link = document.querySelector(\'a[class=\"btn btn-default dropdown-toggle\"]\');
+
+// Verifica se o link foi encontrado e simula o clique
+if (link) {
+    link.click();
+} else {
+    console.log(\"Link não encontrado.\");
+}
+
+}'''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: plataforma TextToSend: $'''{Tab}{Return}''' DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: False
+DISABLE WebAutomation.LaunchChrome.AttachToForegroundChrome AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> guia_email
+WebAutomation.LaunchEdge.AttachToTheForegroundEdge AttachTimeout: 5 TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> guia_email
+WAIT 5
+WebAutomation.GetDetailsOfWebPage BrowserInstance: guia_email DetailsType: WebAutomation.DetailsType.Text Details=> texto_pagina
+WAIT 5
+Text.CropText.CropTextBetweenFlags Text: texto_pagina FromFlag: $'''E-mail''' ToFlag: $'''Representante''' IgnoreCase: False CroppedText=> email_proponente
+Text.Trim Text: email_proponente TrimOption: Text.TrimOption.Both TrimmedText=> email_proponente
+Text.CropText.CropTextAfterFlag Text: texto_pagina FromFlag: $'''Representante''' IgnoreCase: False CroppedText=> email_representante
+Text.CropText.CropTextBetweenFlags Text: email_representante FromFlag: $'''E-mail''' ToFlag: $'''Auxiliares''' IgnoreCase: False CroppedText=> email_representante
+Text.Trim Text: email_representante TrimOption: Text.TrimOption.Both TrimmedText=> email_representante
+WAIT 3
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: plataforma TextToSend: $'''{Control}({W})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
