@@ -1,0 +1,19 @@
+# As seguintes ações realizam a leitura dos dados da planilha
+Folder.GetFiles Folder: pasta_planilha FileFilter: $'''*.xlsx''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> planilha_excel
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: planilha_excel[0] Visible: True ReadOnly: False Instance=> excel
+IF (OCR.IfTextOnScreen.TextOnScreenExistsWithWindowsOcr TextToFind: $'''Reabrir''' IsRegex: False WindowsOcrLanguage: OCR.WindowsOcrLanguage.Portuguese SearchForTextOn: OCR.SearchTarget.EntireScreen ImageWidthMultiplier: 1 ImageHeightMultiplier: 1) THEN
+    MouseAndKeyboard.MoveMouseToTextOnScreenWithOCR.WaitForTextToAppearAndMoveMouseToTextOnScreenWithWindowsOcr TextToFind: $'''Reabrir''' IsRegEx: False WindowsOcrLanguage: MouseAndKeyboard.WindowsOcrLanguage.Portuguese Occurence: 1 SearchForTextOn: MouseAndKeyboard.SearchTarget.EntireScreen ImageWidthMultiplier: 1 ImageHeightMultiplier: 1 MovementStyle: MouseAndKeyboard.MovementStyle.Instant Timeout: 5 PositionRelativeToText: MouseAndKeyboard.PositionOnImage.MiddleCenter OffsetX: 0 OffsetY: 0
+END
+Excel.GetFirstFreeColumnRow Instance: excel FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+SET linha_planilha TO 2
+/# Para as próximas ações, é necessário que algumas colunas estejam nomeadas da seguinte forma:
+
+Empreendedor
+Protocolo
+Processo
+Status
+Notificação
+Plataforma#/
+DISABLE Excel.FindAndReplace.FindSingle Instance: excel TextToFind: $'''Notificação''' MatchCase: False MatchEntireCellContents: False SearchBy: Excel.SearchOrder.Columns FoundColumnIndex=> coluna_notificacao
+DISABLE Excel.FindAndReplace.FindSingle Instance: excel TextToFind: $'''STATUS''' MatchCase: False MatchEntireCellContents: True SearchBy: Excel.SearchOrder.Columns FoundColumnIndex=> coluna_status_projeto
+Excel.FindAndReplace.FindSingle Instance: excel TextToFind: $'''Nº PROCESSO SEI''' MatchCase: False MatchEntireCellContents: True SearchBy: Excel.SearchOrder.Columns FoundColumnIndex=> coluna_processo_sei
