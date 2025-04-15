@@ -1,11 +1,13 @@
+LABEL 'retorno seleção unidade'
+# seleção da unidade SEPLAG
+Clipboard.Clear _
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Escape}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
 Clipboard.GetText Text=> unidade
-IF NotContains(unidade, $'''Lista de RESTRICAO''', True) THEN
-    Display.ShowMessageDialog.ShowMessage Title: $'''verificar tela do usuário''' Message: $'''determinar qual caminho anterior à da seleção de unidade''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed2
-END
 WAIT 2
-# seleção da unidade SEPLAG
+Text.CropText.CropTextAfterFlag Text: unidade FromFlag: $'''*** Fim da Lista de RESTRICAO ''' IgnoreCase: False CroppedText=> unidade IsFlagFound=> IsFlagFound
 Text.SplitText.Split Text: unidade StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> unidade
+Variables.RemoveItemFromList.RemoveItemFromListByIndex ItemIndex: 0 List: unidade
 LOOP FOREACH linha IN unidade
     IF Contains(linha, $'''1981-00000099''', True) THEN
         MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
@@ -16,7 +18,38 @@ END
 WAIT 2
 /# PESQUISA DADOS SERVIDOR SISAP
 #/
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}X{Enter}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}.{Enter}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''pesquisa *{Enter}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+WAIT 2
+LABEL 'seleção pesquisa dados servidor'
+Clipboard.Clear _
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Escape}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> pesquisa_dados_servidor
+IF Contains(pesquisa_dados_servidor, $'''comandos para o prefixo da''', False) THEN
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Delete}{Delete}{Delete}{Delete}{Delete}{Delete}{Delete}{Delete}{Delete}{Delete}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F6}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    GOTO 'retorno seleção unidade'
+END
+IF NotContains(pesquisa_dados_servidor, $'''SERVIDOR SISAP''', True) THEN
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    GOTO 'seleção pesquisa dados servidor'
+ELSE
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
+    WAIT 2
+    Text.CropText.CropTextAfterFlag Text: pesquisa_dados_servidor FromFlag: $'''Selecione o Comando com um \'X\' ''' IgnoreCase: False CroppedText=> pesquisa_dados_servidor IsFlagFound=> IsFlagFound5
+    Text.SplitText.Split Text: pesquisa_dados_servidor StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> lista_pesquisa_dados_servidor
+    Variables.RemoveItemFromList.RemoveItemFromListByIndex ItemIndex: 0 List: lista_pesquisa_dados_servidor
+    Variables.RemoveItemFromList.RemoveItemFromListByIndex ItemIndex: 0 List: lista_pesquisa_dados_servidor
+    LOOP FOREACH linha IN lista_pesquisa_dados_servidor
+        IF Contains(linha, $'''SERVIDOR SISAP''', True) THEN
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+            EXIT LOOP
+        END
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
+    END
+    WAIT 2
+END
 /# DADOS FUNCIONAIS
 #/
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''08{Enter}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
@@ -30,55 +63,68 @@ Clipboard.Clear _
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Escape}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
 Clipboard.GetText Text=> selecao_admissao
-IF IsEmpty(selecao_admissao[13]) THEN
-    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
-ELSE
-    Text.CropText.CropTextBetweenFlags Text: selecao_admissao FromFlag: $'''------------------------------------------------------------------------''' ToFlag: $'''Comando''' IgnoreCase: False CroppedText=> selecao_admissao IsFlagFound=> IsFlagFound3
-    Text.CropText.CropTextAfterFlag Text: selecao_admissao FromFlag: $'''(''' IgnoreCase: False CroppedText=> selecao_admissao IsFlagFound=> IsFlagFound4
-    Text.SplitText.Split Text: selecao_admissao StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> selecao_admissao
-    SET count_selecao TO 0
-    LOOP FOREACH linha_selecao_adm IN selecao_admissao
-        Text.GetSubtext.GetSubtext Text: linha_selecao_adm CharacterPosition: 0 NumberOfChars: 20 Subtext=> linha_selecao_adm
-        IF Contains(linha_selecao_adm, admissao_servidor, True) THEN
-            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
-            EXIT LOOP
-        END
-        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
-        Variables.IncreaseVariable Value: count_selecao IncrementValue: 1
-    END
-END
-IF count_selecao = 0 THEN
-    Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''admissão não localizada''' Column: $'''W''' Row: linha_loop
-    EXIT FUNCTION
-END
-# Coleta e tabulação dos dados da admissão
-Clipboard.Clear _
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Escape}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
-Clipboard.GetText Text=> datas_admissao
-Text.CropText.CropTextBetweenFlags Text: datas_admissao FromFlag: $''' Dt.Fim Efet.''' ToFlag: $'''_ Cod.Recebimento''' IgnoreCase: False CroppedText=> datas_admissao IsFlagFound=> IsFlagFound
-Text.CropText.CropTextBetweenFlags Text: datas_admissao FromFlag: $'''------------------------------------------------------------------------------''' ToFlag: $'''------------------------------------------------------------------------------''' IgnoreCase: False CroppedText=> datas_admissao IsFlagFound=> IsFlagFound
-Text.SplitText.Split Text: datas_admissao StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> datas_admissao
-Variables.RemoveItemFromList.RemoveItemFromListByIndex ItemIndex: 0 List: datas_admissao
-DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateOnly CurrentDateTime=> hoje
-Text.ConvertDateTimeToText.FromDateTime DateTime: hoje StandardFormat: Text.WellKnownDateTimeFormat.ShortDate Result=> hoje
-Text.GetSubtext.GetSubtext Text: data_emissao_atestado CharacterPosition: 0 NumberOfChars: 2 Subtext=> dia_atestado
-Text.GetSubtext.GetSubtext Text: data_emissao_atestado CharacterPosition: 2 NumberOfChars: 2 Subtext=> mes_atestado
-Text.GetSubtext.GetSubtext Text: data_emissao_atestado CharacterPosition: 4 NumberOfChars: 4 Subtext=> ano_atestado
-SET data_emissao_atestado TO $'''%dia_atestado%/%mes_atestado%/%ano_atestado%'''
-DISABLE Text.ConvertTextToDateTime.ToDateTime Text: data_emissao_atestado DateTime=> data_emissao_atestado
-LOOP FOREACH linha_datas_adm IN datas_admissao
-    Text.GetSubtext.GetSubtext Text: linha_datas_adm CharacterPosition: 53 NumberOfChars: 10 Subtext=> data_inicio_adm
-    Text.Replace Text: data_inicio_adm TextToFind: $'''.''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''/''' ActivateEscapeSequences: False Result=> data_inicio_adm
-    DISABLE Text.ConvertTextToDateTime.ToDateTime Text: data_inicio_adm DateTime=> data_inicio_adm
-    Text.GetSubtext.GetSubtext Text: linha_datas_adm CharacterPosition: 66 NumberOfChars: 10 Subtext=> data_fim_adm
-    IF NotContains(data_fim_adm, 20, False) THEN
-        SET data_fim_adm TO hoje
+IF Contains(selecao_admissao, $'''IDENTIFICAR CARGO''', True) THEN
+    DISABLE IF Contains(selecao_admissao, $'''SELECIONAR CARGO''', False) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+        WAIT 2
+        MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Delete}{F6}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+        EXIT FUNCTION
+    DISABLE ELSE IF NotContains(selecao_admissao[13], $'''(''', False) THEN
+        DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''X{Return}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
     ELSE
-        Text.Replace Text: data_fim_adm TextToFind: $'''.''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''/''' ActivateEscapeSequences: False Result=> data_fim_adm
-        DISABLE Text.ConvertTextToDateTime.ToDateTime Text: data_fim_adm DateTime=> data_fim_adm
+        Text.CropText.CropTextBetweenFlags Text: selecao_admissao FromFlag: $'''------------------------------------------------------------------------''' ToFlag: $'''Comando''' IgnoreCase: False CroppedText=> selecao_admissao IsFlagFound=> IsFlagFound3
+        Text.CropText.CropTextAfterFlag Text: selecao_admissao FromFlag: $'''(''' IgnoreCase: False CroppedText=> selecao_admissao IsFlagFound=> IsFlagFound4
+        Text.SplitText.Split Text: selecao_admissao StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> selecao_admissao
+        SET count_selecao TO 0
+        LOOP FOREACH linha_selecao_adm IN selecao_admissao
+            Text.GetSubtext.GetSubtext Text: linha_selecao_adm CharacterPosition: 0 NumberOfChars: 20 Subtext=> linha_selecao_adm
+            IF Contains(linha_selecao_adm, admissao_servidor, True) THEN
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+                EXIT LOOP
+            END
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+            Variables.IncreaseVariable Value: count_selecao IncrementValue: 1
+        END
     END
-    WebAutomation.ExecuteJavascript BrowserInstance: Browser_para_javascript Javascript: $'''function ExecuteScript() {
+    IF count_selecao = 0 THEN
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''admissão não localizada''' Column: $'''W''' Row: linha_loop
+        EXIT FUNCTION
+    END
+    # Tratamento das datas do BIM para comparação com períodos das admissões
+    DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateOnly CurrentDateTime=> hoje
+    Text.ConvertDateTimeToText.FromDateTime DateTime: hoje StandardFormat: Text.WellKnownDateTimeFormat.ShortDate Result=> hoje
+    Text.GetSubtext.GetSubtext Text: data_emissao_atestado CharacterPosition: 0 NumberOfChars: 2 Subtext=> dia_atestado
+    Text.GetSubtext.GetSubtext Text: data_emissao_atestado CharacterPosition: 2 NumberOfChars: 2 Subtext=> mes_atestado
+    Text.GetSubtext.GetSubtext Text: data_emissao_atestado CharacterPosition: 4 NumberOfChars: 4 Subtext=> ano_atestado
+    SET data_emissao_atestado TO $'''%dia_atestado%/%mes_atestado%/%ano_atestado%'''
+    # Coleta e tabulação dos dados da admissão
+    LABEL 'próxima tela admissão'
+    Clipboard.Clear _
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Escape}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> datas_admissao
+    Text.CropText.CropTextBetweenFlags Text: datas_admissao FromFlag: $''' Dt.Fim Efet.''' ToFlag: $'''_ Cod.Recebimento''' IgnoreCase: False CroppedText=> datas_admissao IsFlagFound=> IsFlagFound
+    Text.CropText.CropTextBetweenFlags Text: datas_admissao FromFlag: $'''------------------------------------------------------------------------------''' ToFlag: $'''------------------------------------------------------------------------------''' IgnoreCase: False CroppedText=> datas_admissao IsFlagFound=> IsFlagFound
+    Text.Trim Text: datas_admissao TrimOption: Text.TrimOption.ToEnd TrimmedText=> datas_admissao
+    Text.SplitText.Split Text: datas_admissao StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> lista_datas_admissao
+    Variables.RemoveItemFromList.RemoveItemFromListByIndex ItemIndex: 0 List: lista_datas_admissao
+    DISABLE Variables.RemoveDuplicateItemsFromList List: lista_datas_admissao IgnoreCase: False
+    LOOP FOREACH linha_datas_adm IN lista_datas_admissao
+        Text.GetSubtext.GetSubtext Text: linha_datas_adm CharacterPosition: 53 NumberOfChars: 10 Subtext=> data_inicio_adm
+        Text.Replace Text: data_inicio_adm TextToFind: $'''.''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''/''' ActivateEscapeSequences: False Result=> data_inicio_adm
+        DISABLE Text.ConvertTextToDateTime.ToDateTime Text: data_inicio_adm DateTime=> data_inicio_adm
+        IF linha_datas_adm < 66 THEN
+            SET data_fim_adm TO hoje
+        ELSE
+            Text.GetSubtext.GetSubtext Text: linha_datas_adm CharacterPosition: 66 NumberOfChars: 10 Subtext=> data_fim_adm
+        END
+        IF NotContains(data_fim_adm, 20, False) THEN
+            SET data_fim_adm TO hoje
+        ELSE
+            Text.Replace Text: data_fim_adm TextToFind: $'''.''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''/''' ActivateEscapeSequences: False Result=> data_fim_adm
+            DISABLE Text.ConvertTextToDateTime.ToDateTime Text: data_fim_adm DateTime=> data_fim_adm
+        END
+        WebAutomation.ExecuteJavascript BrowserInstance: Browser_para_javascript Javascript: $'''function ExecuteScript() {
 
 function DataAlternativa(dia, mes, ano) {
     this.dia = parseInt(dia, 10);
@@ -150,11 +196,16 @@ return resultado;
 
 
 }''' Result=> Result
-    IF Result = $'''Dentro do intervalo''' THEN
-        EXIT FUNCTION
+        IF Result = $'''Dentro do intervalo''' THEN
+            MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Delete}{F6}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+            EXIT FUNCTION
+        END
     END
-END
-Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''Admissão informada fora dos intervalos de data''' Column: $'''W''' Row: linha_loop
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{Delete}{F6}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
-EXIT FUNCTION
+    DISABLE IF Contains(datas_admissao, $'''0009 - Esta e\' a ultima tela.''', False) THEN
+        Excel.WriteToExcel.WriteCell Instance: excel_pericia Value: $'''Admissão informada fora dos intervalos de data''' Column: $'''W''' Row: linha_loop
+    DISABLE ELSE
+        DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''{F8}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: True
+        DISABLE GOTO 'próxima tela admissão'
+    DISABLE END
+    EXIT FUNCTION
