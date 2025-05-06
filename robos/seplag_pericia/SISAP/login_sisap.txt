@@ -1,9 +1,13 @@
-System.RunApplication.RunApplicationAndWaitToLoad ApplicationPath: $'''C:/Program Files/pw3270/pw3270.exe''' WindowStyle: System.ProcessWindowStyle.Normal Timeout: 0
-SET terminal TO $'''pw3270:A - bhmvsb.prodemge.gov.br'''
-WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: terminal Class: $'''''' FocusWindow: True)
+WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://www.google.com.br/''' WindowState: WebAutomation.BrowserWindowState.Minimized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> Browser_para_javascript
+System.RunApplication.RunApplicationAndWaitToLoad ApplicationPath: $'''C:/Program Files/pw3270/pw3270.exe''' WindowStyle: System.ProcessWindowStyle.Maximized Timeout: 0
+DISABLE SET terminal TO $'''pw3270:A - bhmvsb.prodemge.gov.br'''
+SET terminal TO $'''pw3270:A - bhmvst.prodemge.gov.br'''
+WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: terminal Class: $'''''' FocusWindow: False)
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: terminal Class: $'''''' TextToSend: $'''sisap{Tab}%usuario_sisap%{Tab}%senha_sisap%{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
 WAIT 1
 LABEL teste_login_terminal
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Escape}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+Clipboard.Clear _
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({a}){Control}({c})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
 Clipboard.GetText Text=> texto_inicio_terminal
 IF NotContains(texto_inicio_terminal, $'''Logon executado com sucesso''', True) THEN
