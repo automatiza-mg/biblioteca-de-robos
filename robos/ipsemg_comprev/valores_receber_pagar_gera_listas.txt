@@ -1,6 +1,6 @@
 **REGION gera_listas_excel
-File.ReadFromCSVFile.ReadCSV CSVFile: $'''C:\\Users\\m753070\\Desktop\\comprev\\%mes_competencia%%processo%.csv''' Encoding: File.CSVEncoding.SystemDefault TrimFields: True FirstLineContainsColumnNames: True ColumnsSeparator: File.CSVColumnsSeparator.Semicolon CSVTable=> CSVTable
-Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\m753070\\Desktop\\comprev\\Lista de SEIs de Pagamento.xlsx''' Visible: True ReadOnly: False Instance=> lista_sei_cnpj
+File.ReadFromCSVFile.ReadCSV CSVFile: $'''C:\\Users\\x10382795\\Desktop\\comprev\\%mes_competencia%%processo%.csv''' Encoding: File.CSVEncoding.SystemDefault TrimFields: True FirstLineContainsColumnNames: True ColumnsSeparator: File.CSVColumnsSeparator.Semicolon CSVTable=> CSVTable
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\x10382795\\Desktop\\comprev\\Lista de SEIs de Pagamento.xlsx''' Visible: True ReadOnly: False Instance=> lista_sei_cnpj
 Excel.GetFirstFreeColumnRow Instance: lista_sei_cnpj FirstFreeColumn=> coluna_livre_lista FirstFreeRow=> linha_livre_lista
 Excel.ReadFromExcel.ReadCells Instance: lista_sei_cnpj StartColumn: $'''A''' StartRow: 1 EndColumn: coluna_livre_lista EndRow: linha_livre_lista ReadAsText: False FirstLineIsHeader: True RangeValue=> lista_cnpj
 **ENDREGION
