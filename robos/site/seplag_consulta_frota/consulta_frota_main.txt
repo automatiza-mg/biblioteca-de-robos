@@ -1,0 +1,4 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\breno\\Downloads\\Planilha Modelo 1.xlsx''' Visible: True ReadOnly: False UseMachineLocale: False Instance=> Planilha_veiculos
+CALL DNIT
+CALL 'cidadao.mg'
+CALL PRF

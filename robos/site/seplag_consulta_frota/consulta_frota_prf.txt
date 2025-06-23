@@ -1,0 +1,30 @@
+Excel.GetFirstFreeColumnRow Instance: Planilha_veiculos FirstFreeColumn=> FirstFreeColumn FirstFreeRow=> FirstFreeRow
+Excel.ReadFromExcel.ReadCells Instance: Planilha_veiculos StartColumn: $'''a''' StartRow: 1 EndColumn: FirstFreeColumn - 1 EndRow: FirstFreeRow - 1 ReadAsText: False FirstLineIsHeader: True RangeValue=> base_de_dados
+SET linha_PRF TO 2
+LOOP WHILE (linha_PRF) <= (FirstFreeRow - 1)
+    WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://pesquisa-auto.prf.gov.br/#/pesquisa/consultar-debitos''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> Site_PRF
+    WAIT 1
+    Excel.ReadFromExcel.ReadCell Instance: Planilha_veiculos StartColumn: $'''e''' StartRow: linha_PRF ReadAsText: False CellValue=> campo_situacao_prf
+    IF IsNotEmpty(campo_situacao_prf) THEN
+        GOTO linha_ocupada
+    END
+    WebAutomation.ExecuteJavascript BrowserInstance: Site_PRF Javascript: $'''function ExecuteScript() { 
+
+document.getElementsByName(\"placa\")[0].focus()
+
+}''' Result=> Result
+    Excel.ReadFromExcel.ReadCell Instance: Planilha_veiculos StartColumn: $'''a''' StartRow: linha_PRF ReadAsText: False CellValue=> Placa
+    Excel.ReadFromExcel.ReadCell Instance: Planilha_veiculos StartColumn: $'''c''' StartRow: linha_PRF ReadAsText: False CellValue=> Renavam
+    UIAutomation.FocusWindow.FocusByInstanceOrHandle WindowInstance: Site_PRF
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%Placa%{Tab}{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%Renavam%{Tab}{Enter}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+    WAIT 3
+    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: Site_PRF Text: $'''Nenhum registro encontrado para os parâmetros informados''') THEN
+        Excel.WriteToExcel.WriteCell Instance: Planilha_veiculos Value: $'''Nenhum registro encontrado ''' Column: $'''e''' Row: linha_PRF
+    ELSE
+        Excel.WriteToExcel.WriteCell Instance: Planilha_veiculos Value: $'''Débito encontrado''' Column: $'''e''' Row: linha_PRF
+    END
+    LABEL linha_ocupada
+    Variables.IncreaseVariable Value: linha_PRF IncrementValue: 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({F4})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+END
