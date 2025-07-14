@@ -1,0 +1,293 @@
+# Para não sobrecarregar o Sisap, sugerimos rodar o robô antes das 09:00 e depois das 16:00
+/# Primeiro, criar as variáveis de Entrada usuario e senha, citadas na linha 7, com os dados de acesso ao Sisap (masp e senha do Sisap).
+
+Posteriormente, criar a varivel de entrada: caminho_documento e atribuir o caminho do arquivo na seção Valor Padrão.#/
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_e_hora_inicio
+System.RunApplication.RunApplication ApplicationPath: $'''C:\\Program Files (x86)\\pw3270\\pw3270.exe''' WindowStyle: System.ProcessWindowStyle.Maximized ProcessId=> terminal
+WAIT 2
+# Para masps com mais de 6 digitos, retirar o comando {Tab} abaixo que se encontra na frente do texto "sisap".
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''sisap{Tab}%usuário%{Tab}%senha%{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+Clipboard.GetText Text=> TELA_SISAP
+IF Contains(TELA_SISAP, $'''Senha incorreta. Digite novamente''', True) THEN
+    EXIT Code: 0 ErrorMessage: $'''Senha incorreta na Variavel de Entrada \"Senha\". Verificar'''
+END
+/# Deverá ser inserido mais quantidades de TAB no envio de teclas na linha 14 quando o usuário possuir mais de uma opção para seleção na lista de restrição no Sisap:
+
+ VISHC000                                                              PRODEMGE
+ NISHC000        SISAP-MG - ADMINISTRACAO DE PESSOAL DO ESTADO       17/12/2024
+ M753077                                                               13:15:39
+                            Lista de RESTRICOES para selecao
+            *** Fim da Lista de RESTRICAO
+            _  1981-00000099 SUP.CENTRAL DE GESTAO DE RECURSOS HUMANOS
+            X  1501-00000099 SECRETARIA DE PLANEJAMENTO E GESTAO 
+
+Caso o usuario não tenha lista de restrições. desabilitar a linha 14 clicando com o botão direito do mouse em cima da respectiva linha e selecionar "Desablitar Ação"#/
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}X{Return}{F3}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''siap{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''QUINQUENIO ADICIONAL.10{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+WAIT 2
+# Utilizar a variável de entrada chamada: "caminho_documento"  no caminho do documento na ação "Iniciar Excel" abaixo.
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: caminho_documento Visible: True ReadOnly: False UseMachineLocale: False Instance=> inclusao_quinquenio
+Excel.GetFirstFreeRowOnColumn Instance: inclusao_quinquenio Column: $'''A''' FirstFreeRowOnColumn=> linhalivre
+Excel.GetFirstFreeRowOnColumn Instance: inclusao_quinquenio Column: $'''M''' FirstFreeRowOnColumn=> linha
+LOOP WHILE (linha) < (linhalivre)
+    Excel.ReadFromExcel.ReadCell Instance: inclusao_quinquenio StartColumn: $'''B''' StartRow: linha ReadAsText: True CellValue=> Masp1
+    Excel.ReadFromExcel.ReadCell Instance: inclusao_quinquenio StartColumn: $'''C''' StartRow: linha ReadAsText: True CellValue=> DV
+    Excel.ReadFromExcel.ReadCell Instance: inclusao_quinquenio StartColumn: $'''D''' StartRow: linha ReadAsText: True CellValue=> ADMISSAO
+    Excel.ReadFromExcel.ReadCell Instance: inclusao_quinquenio StartColumn: $'''E''' StartRow: linha ReadAsText: True CellValue=> REFERENCIA
+    Excel.ReadFromExcel.ReadCell Instance: inclusao_quinquenio StartColumn: $'''F''' StartRow: linha ReadAsText: True CellValue=> tipo_quinquenio
+    Excel.ReadFromExcel.ReadCell Instance: inclusao_quinquenio StartColumn: $'''G''' StartRow: linha ReadAsText: True CellValue=> natureza_quinquenio
+    Excel.ReadFromExcel.ReadCell Instance: inclusao_quinquenio StartColumn: $'''H''' StartRow: linha ReadAsText: True CellValue=> DATAPUBLICACAO
+    Excel.ReadFromExcel.ReadCell Instance: inclusao_quinquenio StartColumn: $'''I''' StartRow: linha ReadAsText: True CellValue=> DATAVIGENCIA
+    Excel.ReadFromExcel.ReadCell Instance: inclusao_quinquenio StartColumn: $'''J''' StartRow: linha ReadAsText: True CellValue=> PERCENTUAL
+    Excel.ReadFromExcel.ReadCell Instance: inclusao_quinquenio StartColumn: $'''K''' StartRow: linha ReadAsText: True CellValue=> INSERIR_OCORRENCIA
+    Excel.ReadFromExcel.ReadCell Instance: inclusao_quinquenio StartColumn: $'''L''' StartRow: linha ReadAsText: True CellValue=> DESCRITOROCORRENCIA
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''pw3270 - bhmvst.prodemge.gov.br:23''' Class: $'''''' TextToSend: $'''%Masp1%%DV%%ADMISSAO%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    WAIT 2
+    IF Contains(TELA_SISAP, $'''0222 - Servidor inativo na Instituicao''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Servidor inativo na Instituicao''' Column: $'''M''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0154 - Operador nao autorizado para incluir''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Operador nao autorizado para incluir''' Column: $'''M''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0034 - MASP invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''MASP invalido''' Column: $'''M''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0113 - Numero Admissao inexistente/invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Numero Admissao inexistente/invalido''' Column: $'''M''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''0041 - Digito Verificador invalido''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Digito Verificador invalido''' Column: $'''M''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    ELSE IF Contains(TELA_SISAP, $'''NISHC714''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''x{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    WAIT 2
+    IF Contains(TELA_SISAP, $'''NISHC531''', True) THEN
+        Clipboard.GetText Text=> tela_quinquenio
+        Text.SplitText.Split Text: tela_quinquenio StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> TextList
+        Text.SplitText.Split Text: TextList[15] StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> TextList2
+        Text.ParseText.RegexParseForFirstOccurrence Text: TextList2 TextToFind: TextList2 StartingPosition: 0 IgnoreCase: True OccurrencePosition=> Position Match=> Match
+        WAIT 3
+        IF NotContains(Match, $'''                           /    /            /    /''', True) THEN
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F8}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: REFERENCIA DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: tipo_quinquenio DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: natureza_quinquenio DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: DATAPUBLICACAO DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: DATAVIGENCIA DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%PERCENTUAL%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            Clipboard.GetText Text=> TELA_SISAP
+            IF Contains(TELA_SISAP, $'''0255 - Quinquenio informado(a) mais de uma vez''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Quinquenio existente. Verificar''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0252 - Nao existe(m)''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Verificar se a referência do quinquenio cadastrada para o servidor é sequencial''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0152 - Natureza incompativel com Vigencia a partir de 28/05/2020 LC.173''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Verificar se a natureza do quinquenio é compatível''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0327 - Atencao! Natureza incompativel com o tipo''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Natureza do quinquenio incompatível com o tipo de quinquenio''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0188 - Data publicacao deve ser maior que data vigencia''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Data publicacao deve ser maior que data vigencia''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0152 - Natureza Beneficio incompativel com Instituicao Servidor''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Natureza do quinquenio incompatível com a instituição do servidor''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0152 - Data Vigencia incompativel com Vigencia da natureza''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Data Vigencia incompativel com Vigencia da natureza do quinquenio''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0185 - Informe data vigencia na ordem correta''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Verificar Data Vigencia''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0152 - Percentual quinquenio incompativel com periodo aquisitivo''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Verificar percentual do quinquenio''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0188 - Data vigencia maior que data da aposentadoria''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Verificar data vigencia e data da aposentadoria''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+        END
+        IF Contains(Match, $'''                           /    /            /    /''', True) THEN
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: REFERENCIA DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: tipo_quinquenio DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: natureza_quinquenio DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: DATAPUBLICACAO DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: DATAVIGENCIA DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%PERCENTUAL%{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            Clipboard.GetText Text=> TELA_SISAP
+            IF Contains(TELA_SISAP, $'''0255 - Quinquenio informado(a) mais de uma vez''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Quinquenio existente. Verificar''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0252 - Nao existe(m)''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Verificar se a referência do quinquenio cadastrada para o servidor é sequencial''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0152 - Natureza incompativel com Vigencia a partir de 28/05/2020 LC.173''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Verificar se a natureza do quinquenio é compatível''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0327 - Atencao! Natureza incompativel com o tipo''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Natureza do quinquenio incompatível com o tipo de quinquenio''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0188 - Data publicacao deve ser maior que data vigencia''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Data publicacao deve ser maior que data vigencia''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0152 - Natureza Beneficio incompativel com Instituicao Servidor''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Natureza do quinquenio incompatível com a instituição do servidor''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0152 - Data Vigencia incompativel com Vigencia da natureza''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Data Vigencia incompativel com Vigencia da natureza do quinquenio''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0185 - Informe data vigencia na ordem correta''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Verificar Data Vigencia''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0152 - Percentual quinquenio incompativel com periodo aquisitivo''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Verificar percentual do quinquenio''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+            IF Contains(TELA_SISAP, $'''0188 - Data vigencia maior que data da aposentadoria''', True) THEN
+                Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro não incluido. Verificar data vigencia e data da aposentadoria''' Column: $'''M''' Row: Linha
+                MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+                GOTO 'Proximo Masp'
+            END
+        END
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    WAIT 3
+    IF Contains(TELA_SISAP, $'''0008 - Tecle <PF5> para confirmar.''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+        WAIT 3
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    WAIT 4
+    IF Contains(TELA_SISAP, $'''SISHCD7B''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+        Clipboard.GetText Text=> TELA_SISAP
+        WAIT 3
+        IF Contains(TELA_SISAP, $'''0039 - Opcao invalida''', True) THEN
+            Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Opção inválida nos dados financeiros. Excluir o quinquenio e incluir novamente''' Column: $'''M''' Row: Linha
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}{Return}{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            GOTO 'Proximo Masp'
+        END
+        IF Contains(TELA_SISAP, $'''0447 - Valor do lancamento excedido''', True) THEN
+            Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Valor do lancamento excedido. Porém, quinquenio incluido com sucesso e sem inclusão de ocorrencia''' Column: $'''M''' Row: Linha
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}{Return}{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            GOTO 'Proximo Masp'
+        END
+        IF Contains(TELA_SISAP, $'''0412 - Lancamento de referencia nao pode ser modificado''', True) THEN
+            Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Lancamento de referencia nao pode ser modificado. Porém, quinquenio incluido com sucesso e sem inclusão de ocorrencia''' Column: $'''M''' Row: Linha
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}{Return}{F2}1{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            GOTO 'Proximo Masp'
+        END
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    WAIT 2
+    IF Contains(TELA_SISAP, $'''SISHCD7B''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    WAIT 4
+    IF Contains(TELA_SISAP, $'''SISHCD7C''', True) THEN
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+        WAIT 2
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''S{Return}''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%INSERIR_OCORRENCIA%{Return}''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+    END
+    IF Contains(INSERIR_OCORRENCIA, $'''n''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro incluido com sucesso''' Column: $'''M''' Row: Linha
+        Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Sem inclusão de ocorrencia relativa ao quinquenio''' Column: $'''N''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 250 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    WAIT 4
+    IF Contains(TELA_SISAP, $'''SISHCD7E''', True) THEN
+        Clipboard.GetText Text=> manutencao_ocorrencia
+        Text.SplitText.Split Text: manutencao_ocorrencia StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> TextList
+        Text.SplitText.Split Text: TextList[8] StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> TextList2
+        Text.ParseText.RegexParseForFirstOccurrence Text: TextList2 TextToFind: TextList2 StartingPosition: 0 IgnoreCase: True OccurrencePosition=> Position Match=> Match
+        IF Contains(Match, $'''< ______________________________________________________________________ >''', False) THEN
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: DESCRITOROCORRENCIA DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F5}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Efetuada inclusão de ocorrencia relativa ao quinquenio''' Column: $'''N''' Row: Linha
+        ELSE
+            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+            Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Sem inclusão da ocorrencia relativa ao quinquenio''' Column: $'''N''' Row: Linha
+        END
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({C})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+    Clipboard.GetText Text=> TELA_SISAP
+    WAIT 4
+    IF Contains(TELA_SISAP, $'''0346 - Registro incluido com sucesso! Tecle <ENTER>''', True) THEN
+        Excel.WriteToExcel.WriteCell Instance: inclusao_quinquenio Value: $'''Registro incluido com sucesso''' Column: $'''M''' Row: Linha
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+        GOTO 'Proximo Masp'
+    END
+    LABEL 'Proximo Masp'
+    Variables.IncreaseVariable Value: linha IncrementValue: 1
+END
+Excel.SaveExcel.Save Instance: inclusao_quinquenio
+Excel.CloseExcel.Close Instance: inclusao_quinquenio
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F3}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F12}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_e_hora_final
+DateTime.Subtract FromDate: data_e_hora_final SubstractDate: data_e_hora_inicio TimeUnit: DateTime.DifferenceTimeUnit.Minutes TimeDifference=> tempogasto
+WAIT 2
+Display.ShowMessageDialog.ShowMessage Message: $'''REGISTROS INCLUÍDOS EM %tempogasto% MINUTOS. VERIFICAR COLUNA DE STATUS.
