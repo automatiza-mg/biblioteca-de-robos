@@ -1,0 +1,21 @@
+Scripting.RunPowershellScript.RunPowershellScript Script: $'''Get-Date -Format \"dd/MM/yyyy\"''' ScriptOutput=> data_dia
+/# Fluxo para login no SEI:
+
+Necessário criar variáveis de entrada:
+
+login_sei: login para entrar no SEI. Valor cadastrado para a variável deverá conter CPF com exatamente 11 caracteres numéricos. Favor não incluir pontos (.) ou hífen (-).
+
+orgao_sei: orgão de login no SEI. Valor cadastrado para variável deverá ser exatamente igual à existente na lista de órgãos disponíveis na página inicial de login, inclusive com todas as letras maiúsculas.
+
+senha_sei: senha para login no SEI. Recomendamos incluir variável como confidencial.#/
+CALL 'Login SEI'
+# Abre a planilha de processos e a planilha de registro de PADs, define as variáveis, organiza as planilhas e transfere os processos sem marcador para a planilha de registro de PADs
+CALL excel
+Display.ShowMessageDialog.ShowMessage Title: PAD Message: $'''Os processos sem marcador foram transferidos para a planilha de registro de PADs. Clique em \"OK\" para marcar os processos identificados.''' Icon: Display.Icon.Warning Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> transferencia_concluida
+UIAutomation.FocusWindow.FocusByInstanceOrHandle WindowInstance: sei
+# Coloca o marcador nos processos identificados na data de hoje, caso ainda permaneçam sem marcador
+CALL marcar_processos
+Excel.CloseExcel.Close Instance: planilha_processos
+DISABLE File.Delete Files: arquivo_processos
+Display.ShowMessageDialog.ShowMessage Title: $'''Resultado''' Message: $'''Executado com sucesso! Na data %data_dia% foram recebidos os processos: 
+%lista_processos%''' Icon: Display.Icon.Warning Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed

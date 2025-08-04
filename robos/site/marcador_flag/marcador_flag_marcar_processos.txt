@@ -1,0 +1,19 @@
+Display.SelectDateDialog.SelectDate Title: $'''Data atual''' Message: $'''Insira a data desejada''' DateDialogFormat: Display.DateDialogFormat.DateOnly DefaultValue: Data_dia IsTopMost: False SelectedDate=> data_desejada ButtonPressed=> botão
+SET linha_index TO 1
+BLOCK 'Processo fechado'
+ON BLOCK ERROR
+    REPEAT BLOCK
+END
+    Variables.IncreaseVariable Value: linha_index IncrementValue: 1
+    Excel.ReadFromExcel.ReadCell Instance: PAD StartColumn: $'''C''' StartRow: linha_index GetCellContentsMode: Excel.GetCellContentsMode.FormattedTextValues CellValue=> data_recebimento
+    Variables.CreateNewList List=> lista_processos
+    LOOP WHILE (data_recebimento) >= (data_desejada)
+        Excel.ReadFromExcel.ReadCell Instance: PAD StartColumn: $'''B''' StartRow: linha_index GetCellContentsMode: Excel.GetCellContentsMode.FormattedTextValues CellValue=> processo
+        CALL marcador_flag
+        Variables.IncreaseVariable Value: linha_index IncrementValue: 1
+        Excel.ReadFromExcel.ReadCell Instance: PAD StartColumn: $'''C''' StartRow: linha_index GetCellContentsMode: Excel.GetCellContentsMode.FormattedTextValues CellValue=> data_recebimento
+        Variables.AddItemToList Item: processo List: lista_processos
+    END
+END
+Excel.SortCellsFromExcel.SortWorksheet Instance: PAD SortParameters: { ^['Column1', 'Column2'], [$'''C''', $'''asc'''] } FirstRowIsHeader: True
+Excel.SaveExcel.Save Instance: PAD

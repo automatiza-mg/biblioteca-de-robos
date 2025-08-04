@@ -1,0 +1,18 @@
+Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''Caminho PAD''' Message: $'''A Planilha de PAD deve ser salva como Recurso_PAD''' Icon: Display.Icon.Warning Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 3 ButtonPressed=> SeiPRO
+SET caminho_pad TO $'''%pasta_download%\\Recursos_PAD.xlsx
+'''
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\m1177904\\Downloads\\Recurso_PAD.ods''' Visible: True ReadOnly: False UseMachineLocale: False Instance=> PAD
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: PAD Name: $'''Recursos_2025'''
+Excel.GetFirstFreeRowOnColumn Instance: PAD Column: $'''B''' FirstFreeRowOnColumn=> linha_gravar
+Excel.ReadFromExcel.ReadCell Instance: planilha_processos StartColumn: $'''E''' StartRow: linha_indice GetCellContentsMode: Excel.GetCellContentsMode.FormattedTextValues CellValue=> etiqueta
+LOOP WHILE (etiqueta) = ($'''-''')
+    Excel.ReadFromExcel.ReadCell Instance: planilha_processos StartColumn: $'''B''' StartRow: linha_indice GetCellContentsMode: Excel.GetCellContentsMode.FormattedTextValues CellValue=> processo
+    Excel.GetFirstFreeRowOnColumn Instance: PAD Column: $'''B''' FirstFreeRowOnColumn=> ultima_linha
+    Excel.WriteToExcel.WriteCell Instance: PAD Value: processo Column: $'''B''' Row: ultima_linha
+    Excel.WriteToExcel.WriteCell Instance: PAD Value: data_dia Column: $'''C''' Row: ultima_linha
+    Variables.IncreaseVariable Value: linha_indice IncrementValue: 1
+    Excel.ReadFromExcel.ReadCell Instance: planilha_processos StartColumn: $'''E''' StartRow: linha_indice GetCellContentsMode: Excel.GetCellContentsMode.FormattedTextValues CellValue=> etiqueta
+END
+Excel.SortCellsFromExcel.SortWorksheet Instance: PAD SortParameters: { ^['Column1', 'Column2'], [$'''C''', $'''desc'''] } FirstRowIsHeader: True
+Excel.SaveExcel.Save Instance: PAD
+WAIT 1
