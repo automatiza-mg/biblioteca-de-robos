@@ -18,7 +18,8 @@ WebAutomation.PressButton.PressButton BrowserInstance: sei Control: appmask['Web
 WAIT 5
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({F})Destinatário(s): @destinatarios_virgula_espaco@''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Escape}{Delete}Destinatário(s): Departamento de Contabilidade - FFP-MG(IPSEMG/DECONT-FFP-MG)''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Escape}{Delete}Destinatário(s): 
+Departamento de Execução da Despesa - Compensação Previdenciária (IPSEMG/DEED-COMPREV)''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({F})[Inserir texto do despacho].''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
 IF processo = $'''Valores a pagar''' THEN
     DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Escape}Prezados,
@@ -49,6 +50,7 @@ Informamos que o pagamento para o RPPS de Dep. de Central. Serv. de Inativos e P
 
 CNPJ: %CSVTable[linha][0]%
 Participante: %CSVTable[linha][1]%
+Competência: %mes_competencia%
 Vencimento: %vencimento%
 {Control}({B})Valor:%valor_decimal%{Control}({B})
 Banco: %CSVTable[linha][5]%
@@ -70,6 +72,7 @@ Informamos que o pagamento para o RPPS de Dep. de Central. Serv. de Inativos e P
 
 CNPJ: %CSVTable[linha][0]%
 Participante: %CSVTable[linha][1]%
+Competência: %mes_competencia%
 Vencimento: %vencimento%
 {Control}({B})Valor: %valor_decimal%{Control}({B})
 Banco: %CSVTable[linha][5]%
@@ -89,6 +92,7 @@ Seguem as informações de {Control}({B})%processo%{Control}({B})  referente à 
 
 CNPJ: %CSVTable[linha][0]%
 Participante: %CSVTable[linha][1]%
+Competência: %mes_competencia%
 Vencimento: %vencimento%
 {Control}({B})Valor: %valor_decimal%{Control}({B})
 Banco: %CSVTable[linha][5]%
@@ -129,6 +133,7 @@ CNPJ: %CSVTable[linha][0]%
 Participante: %CSVTable[linha][1]%
 {Control}({B})Vencimento: %vencimento%
 {Control}({B})
+Competência: %mes_competencia%
 Valor:%valor_decimal%
 
 Atenciosamente,
@@ -142,15 +147,21 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Alt}({F4})
 ''' DelayBetweenKeystrokes: 600 SendTextAsHardwareKeys: True
 WAIT 2
 **REGION inclui_bloco
+WAIT 1
 WebAutomation.Click.Click BrowserInstance: sei Control: appmask['Web Page \'h ... 52b070567c\'']['Image \'Incluir em Bloco de Assinatura\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
 WAIT 2
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sei Text: $'''Incluir em Bloco de Assinatura''')
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sei TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sei TextToSend: $'''{LShiftKey}({Tab})''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: False
 LABEL seleciona_bloco
-IF (WebAutomation.IfWebPageContains.WebPageDoesNotContainText BrowserInstance: sei Text: 6402164) THEN
+IF (WebAutomation.IfWebPageContains.WebPageDoesNotContainText BrowserInstance: sei Text: $'''6402164 - Financeiro da Compensação''') THEN
     MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sei TextToSend: $'''{Down}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
     WAIT 2
     GOTO seleciona_bloco
 END
 WebAutomation.Click.Click BrowserInstance: sei Control: appmask['Web Page \'h ... 9a3c385e66\'']['Button \'Incluir\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
+WAIT 1
 **ENDREGION
 WebAutomation.Click.Click BrowserInstance: sei Control: appmask['Web Page \'h ... a37674985a\'']['Image \'Controle de Processos\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
 
