@@ -2,7 +2,7 @@
 WebAutomation.LaunchChrome.AttachToChromeByUrl TabUrl: $'''https://comprev.dataprev.gov.br/''' AttachTimeout: 5 BrowserInstance=> comprev
 WAIT 3
 WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: comprev Url: $'''https://comprev.dataprev.gov.br/controledepagamentos/home/controle-pagamentos''' WaitForPageToLoadTimeout: 60
-WAIT 3
+WAIT 6
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: comprev TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}%mes_competencia%{Tab}''' DelayBetweenKeystrokes: 500 SendTextAsHardwareKeys: True
 WAIT 2
 IF processo = $'''Valores a pagar''' THEN
@@ -70,7 +70,7 @@ WAIT 3
 WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''Salvar como''' Class: $'''''' FocusWindow: False)
 **REGION config_download
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%mes_competencia%%processo%''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
-MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({L})C:\\Users\\x10382795\\Desktop\\comprev{Enter}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({L})P:\\DECOMP\\Robô de pagamento{Enter}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Enter}''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
 **ENDREGION
 WebAutomation.ExecuteJavascript BrowserInstance: comprev Javascript: $'''function ExecuteScript() { 
 detalhe=document.getElementsByClassName(\'ico-chat\')
