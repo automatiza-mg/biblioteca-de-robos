@@ -9,23 +9,26 @@ Valores a pagar''' IsTopMost: False AllowEmpty: False SelectedItem=> processo
 CALL extrai_dados_comprev
 CALL gera_listas
 CALL login_sei
-DISABLE EXIT Code: 0
 LOOP WHILE (linha) <= (CSVTable.RowsCount)
     SET linha_lista_cnpj TO 0
     DISABLE Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''atenção''' Message: CSVTable[linha][0] Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 4 ButtonPressed=> ButtonPressed
     LOOP WHILE (linha_lista_cnpj) <= (lista_cnpj.RowsCount)
         IF CSVTable[linha][0] = lista_cnpj[linha_lista_cnpj][2] THEN
-            DISABLE Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''atenção''' Message: $'''%CSVTable[linha][0]% é igual %lista_cnpj[linha_lista_cnpj][2]%''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 4 ButtonPressed=> ButtonPressed
             WebAutomation.Click.Click BrowserInstance: sei Control: appmask['Web Page \'h ... 031b05196b\'']['Input text \'txtPesquisaRapida\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
             MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sei TextToSend: $'''%lista_cnpj[linha_lista_cnpj][0]%{Enter}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
             WAIT 3
             CALL inclui_despacho
             EXIT LOOP
+        ELSE IF IsEmpty(CSVTable[linha][0]) THEN
+            WebAutomation.Click.Click BrowserInstance: sei Control: appmask['Web Page \'h ... 031b05196b\'']['Input text \'txtPesquisaRapida\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
+            MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sei TextToSend: $'''2010.01.0096625/2023-19{Enter}''' DelayBetweenKeystrokes: 80 SendTextAsHardwareKeys: False
+            WAIT 3
+            CALL inclui_despacho
+            EXIT LOOP
         ELSE
-            DISABLE Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''atenção''' Message: $'''%CSVTable[linha][0]% é diferente %lista_cnpj[linha_lista_cnpj][2]%''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 4 ButtonPressed=> ButtonPressed
             IF linha_lista_cnpj = (lista_cnpj.RowsCount - 1) THEN
-                DISABLE Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''atenção''' Message: $'''%CSVTable[linha][0]%  nao aparece''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 4
                 CALL novo_processo_sei
+                WAIT 3
                 CALL inclui_despacho
                 EXIT LOOP
             ELSE
