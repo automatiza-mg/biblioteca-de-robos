@@ -1,0 +1,25 @@
+# Esse subfluxo, de acordo com o tipo de atribuição selecionada pelo usuário, passa por um subfluxo independente que distribui conforme o critério pré-estabelecido.
+Variables.FilterDataTable DataTable: DataFromWebPage FilterParameters: { ^['RULE', 'COLUMN', 'OPERATOR', 'VALUE'], [$'''Or''', $'''atribuição''', $'''NotContains''', 1], [$'''And''', $'''atribuição''', $'''NotContains''', 0], [$'''And''', $'''atribuição''', $'''NotContains''', 2], [$'''And''', $'''atribuição''', $'''NotContains''', 3], [$'''And''', $'''atribuição''', $'''NotContains''', 4], [$'''And''', $'''atribuição''', $'''NotContains''', 5], [$'''And''', $'''atribuição''', $'''NotContains''', 6], [$'''And''', $'''atribuição''', $'''NotContains''', 7], [$'''And''', $'''atribuição''', $'''NotContains''', 8], [$'''And''', $'''atribuição''', $'''NotContains''', 9] } FilteredDataTable=> TabProcessosNAtribuidos
+Variables.AddColumnToDataTable.AppendColumnToDataTable DataTable: TabProcessosNAtribuidos ColumnName: $'''identificador'''
+Variables.AddColumnToDataTable.AppendColumnToDataTable DataTable: TabProcessosNAtribuidos ColumnName: $'''responsavel'''
+Variables.AddColumnToDataTable.AppendColumnToDataTable DataTable: TabProcessosNAtribuidos ColumnName: $'''ferias'''
+Variables.AddColumnToDataTable.AppendColumnToDataTable DataTable: TabProcessosNAtribuidos ColumnName: $'''cpf'''
+SET contador TO 0
+LOOP FOREACH LinhaProcesso IN TabProcessosNAtribuidos
+    LOOP WHILE (tipodeatribuicao) = ($'''Fila''')
+        **REGION Destribui por fila
+        CALL destribui_por_fila
+        GOTO Proximo
+        **ENDREGION
+    END
+    LOOP WHILE (tipodeatribuicao) = ($'''Aleatório''')
+        **REGION Destribui aleatoriamente
+        CALL destribui_aleatoriamente
+        GOTO Proximo
+        **ENDREGION
+    END
+    LABEL Proximo
+    Variables.IncreaseVariable Value: contador IncrementValue: 1
+END
+Variables.FilterDataTable DataTable: TabProcessosNAtribuidos FilterParameters: { ^['RULE', 'COLUMN', 'OPERATOR', 'VALUE'], [$'''Or''', $'''identificador''', $'''IsNotEmpty''', $''''''], [$'''And''', $'''ferias''', $'''NotEqual''', $'''S'''] } MatchCase: True FilteredDataTable=> atribuicaoautomatica
+Variables.FilterDataTable DataTable: TabProcessosNAtribuidos FilterParameters: { ^['RULE', 'COLUMN', 'OPERATOR', 'VALUE'], [$'''Or''', $'''identificador''', $'''IsEmpty''', $''''''], [$'''Or''', $'''ferias''', $'''Equal''', $'''S'''] } MatchCase: True FilteredDataTable=> atribuicaomanual

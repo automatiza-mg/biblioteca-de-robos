@@ -1,0 +1,10 @@
+/# Esse subfluxo faz a distribuição pela lógica de fila.
+
+Começa sempre por onde parou a útlima execução completa.#/
+IF proximaAtribuicao > TamanhodaFila THEN
+    SET proximaAtribuicao TO 1
+END
+Variables.ModifyDataTableItem DataTable: TabProcessosNAtribuidos ColumnNameOrIndex: $'''Identificador''' RowIndex: contador Value: proximaAtribuicao
+Variables.ModifyDataTableItem DataTable: TabProcessosNAtribuidos ColumnNameOrIndex: $'''responsavel''' RowIndex: contador Value: FilaDeAtribuicao[proximaAtribuicao - 1][1]
+Variables.ModifyDataTableItem DataTable: TabProcessosNAtribuidos ColumnNameOrIndex: $'''cpf''' RowIndex: contador Value: FilaDeAtribuicao[proximaAtribuicao - 1][2]
+Variables.IncreaseVariable Value: proximaAtribuicao IncrementValue: 1

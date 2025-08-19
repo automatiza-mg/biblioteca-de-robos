@@ -1,0 +1,12 @@
+/# Este subfluxo:
+
+- Registra a data e hora de execução em DataHoraExecucao.
+- Monta uma lista contendo exatamente duas opções: “Fila” e “Aleatório”.
+- Exibe um diálogo ao usuário para que ele escolha um desses os tipos de atribuição, armazenando tanto o texto selecionado quanto sua posição na lista para uso posterior no processo.#/
+**REGION Configurações do fluxo
+DateTime.GetCurrentDateTime.Windows DateTimeFormat: DateTime.DateTimeFormat.DateAndTime TimeZoneLocation: DateTime.TimeZoneLocation.ESouthAmericaStandardTime CurrentDateTime=> DataHoraExecucao
+Variables.CreateNewList List=> tiposdeatribuicao
+Variables.AddItemToList Item: $'''Fila''' List: tiposdeatribuicao
+Variables.AddItemToList Item: $'''Aleatório''' List: tiposdeatribuicao
+Display.SelectFromListDialog.SelectFromList Title: $'''Tipo de Atribuição''' Message: $'''Selecione o tipo de atribuição:''' List: tiposdeatribuicao IsTopMost: False AllowEmpty: False SelectedItem=> tipodeatribuicao SelectedIndex=> tipodeatribuicaoindex ButtonPressed=> botaotipodeatribuicao
+**ENDREGION

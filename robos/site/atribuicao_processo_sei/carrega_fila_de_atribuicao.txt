@@ -1,0 +1,11 @@
+# O fluxo localiza o primeiro arquivo Excel na pasta, identifica quantas linhas preenchidas existem (nas colunas 1 a 3), lê esses dados para uma lista (FilaDeAtribuicao), captura um detalhe específico em outra célula (DetalhesDaFila), fecha o Excel e calcula o tamanho da fila (em TamanhoddaFila) e armazena o próximo item a ser atribuído em proximaAtribuicao.
+**REGION Carregando os dados para atribuição
+Folder.GetFiles Folder: pastaDeTrabalho FileFilter: $'''*.xlsx''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> arquivosDaPastaDeTrabalho
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: arquivosDaPastaDeTrabalho[0] Visible: True ReadOnly: False UseMachineLocale: False Instance=> ExcelInstance
+Excel.GetFirstFreeRowOnColumn Instance: ExcelInstance Column: 1 FirstFreeRowOnColumn=> PrimeiraLinhaLivreFila
+Excel.ReadFromExcel.ReadCells Instance: ExcelInstance StartColumn: 1 StartRow: 1 EndColumn: 3 EndRow: PrimeiraLinhaLivreFila - 1 FirstLineIsHeader: True GetCellContentsMode: Excel.GetCellContentsMode.PlainText RangeValue=> FilaDeAtribuicao
+Excel.ReadFromExcel.ReadCell Instance: ExcelInstance StartColumn: 5 StartRow: 2 GetCellContentsMode: Excel.GetCellContentsMode.FormattedTextValues CellValue=> DetalhesDaFila
+Excel.CloseExcel.Close Instance: ExcelInstance
+SET TamanhodaFila TO PrimeiraLinhaLivreFila - 2
+SET proximaAtribuicao TO DetalhesdaFila
+**ENDREGION

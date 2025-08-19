@@ -1,0 +1,23 @@
+# Este subfluxo é responsável por salvar todas as informações geradas durante a execução do fluxo, atualizando o campo de próxima atribuição, além de criar o relatório de auditoria correspondente. O arquivo de auditória está localizado na pasta de execução do fluxo.
+DateTime.GetCurrentDateTime.Windows DateTimeFormat: DateTime.DateTimeFormat.DateAndTime TimeZoneLocation: DateTime.TimeZoneLocation.ESouthAmericaStandardTime CurrentDateTime=> DataHoraFinalizacao
+Text.SplitText.Split Text: DataHoraFinalizacao StandardDelimiter: Text.StandardDelimiter.Space DelimiterTimes: 1 Result=> ListaDataHora
+SET DataFinalizacao TO ListaDataHora[0]
+SET HoraFinalizacao TO ListaDataHora[1]
+Text.Replace Text: DataFinalizacao TextToFind: $'''/''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''_''' ActivateEscapeSequences: False Result=> DataFormatada
+Text.Replace Text: HoraFinalizacao TextToFind: $''':''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''-''' ActivateEscapeSequences: False Result=> HoraFormatada
+Folder.Create FolderPath: pastaDeTrabalho FolderName: $'''auditoriadoFluxo''' Folder=> pastaDeAuditoria
+Folder.GetFiles Folder: pastaDeTrabalho FileFilter: $'''*.xlsx''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> arquivosDaPastaDeTrabalho
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: arquivosDaPastaDeTrabalho[0] Visible: True ReadOnly: False UseMachineLocale: False Instance=> ExcelInstance
+Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: proximaAtribuicao Column: 5 Row: 2
+Excel.CloseExcel.CloseAndSave Instance: ExcelInstance
+Excel.LaunchExcel.LaunchUnderExistingProcess Visible: True UseMachineLocale: False Instance=> ExcelInstance
+Variables.ConvertDataTableToCSV.DataTableToCSVCustomSeparator DataTable: atribuicaoautomatica IncludeColumnNames: True CustomColumnsSeparator: $''';''' CSVText=> processosAtribuidosCSV
+Variables.GenerateDataTableFromCSV.ReadCustomSeparator CSVText: processosAtribuidosCSV TrimFields: True FirstLineContainsColumnNames: False ReadFieldsAsText: True CustomColumnsSeparator: $''';''' CSVTable=> processosAtribuidos
+Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: processosAtribuidos Column: 1 Row: 1
+Excel.GetFirstFreeRowOnColumn Instance: ExcelInstance Column: 1 FirstFreeRowOnColumn=> LinhaLivreDataHora
+Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Início da Execução:''' Column: 1 Row: LinhaLivreDataHora + 1
+Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Finalização da Execução:''' Column: 1 Row: LinhaLivreDataHora + 2
+Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: DataHoraExecucao Column: 2 Row: LinhaLivreDataHora + 1
+Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: DataHoraFinalizacao Column: 2 Row: LinhaLivreDataHora + 2
+Excel.CloseExcel.CloseAndSaveAs Instance: ExcelInstance DocumentFormat: Excel.ExcelFormat.OpenXmlWorkbook DocumentPath: $'''%pastaDeAuditoria%\\Relatorio_%DataFormatada%_%HoraFormatada%'''
+Display.ShowMessageDialog.ShowMessage Title: $'''Status de Execução''' Message: $'''Sucesso''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed

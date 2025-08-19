@@ -1,0 +1,5 @@
+# Esse subfluxo faz a distribuição aleatóriamente.
+Variables.GenerateRandomNumber.RandomNumber MinimumValue: 1 MaximumValue: TamanhodaFila RandomNumber=> proximaAtribuicao
+Variables.ModifyDataTableItem DataTable: TabProcessosNAtribuidos ColumnNameOrIndex: $'''Identificador''' RowIndex: contador Value: proximaAtribuicao
+Variables.ModifyDataTableItem DataTable: TabProcessosNAtribuidos ColumnNameOrIndex: $'''responsavel''' RowIndex: contador Value: FilaDeAtribuicao[proximaAtribuicao - 1][1]
+Variables.ModifyDataTableItem DataTable: TabProcessosNAtribuidos ColumnNameOrIndex: $'''cpf''' RowIndex: contador Value: FilaDeAtribuicao[proximaAtribuicao - 1][2]
