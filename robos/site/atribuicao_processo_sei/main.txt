@@ -1,0 +1,9 @@
+# Fluxo principal que vai "guiar" o caminho da execução.
+CALL configura_fluxo
+CALL carrega_fila_de_atribuicao
+CALL login_sei
+CALL troca_unidade
+CALL extrai_dados
+CALL distribui_processos
+CALL atribui_processos
+CALL salva_dados
