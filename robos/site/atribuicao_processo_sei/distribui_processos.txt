@@ -7,14 +7,14 @@ Variables.AddColumnToDataTable.AppendColumnToDataTable DataTable: TabProcessosNA
 SET contador TO 0
 LOOP FOREACH LinhaProcesso IN TabProcessosNAtribuidos
     LOOP WHILE (tipodeatribuicao) = ($'''Fila''')
-        **REGION Destribui por fila
-        CALL destribui_por_fila
+        **REGION Distribui por fila
+        CALL distribui_por_fila
         GOTO Proximo
         **ENDREGION
     END
     LOOP WHILE (tipodeatribuicao) = ($'''Aleatório''')
-        **REGION Destribui aleatoriamente
-        CALL destribui_aleatoriamente
+        **REGION Distribui aleatoriamente
+        CALL distribui_aleatoriamente
         GOTO Proximo
         **ENDREGION
     END
