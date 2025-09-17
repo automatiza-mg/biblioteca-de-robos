@@ -1,6 +1,36 @@
-# As ações desse subfluxo estão relacionadas com o login na Plataforma Digital.
-WebAutomation.LaunchEdge.LaunchEdge Url: $'''http://200.198.28.211/incentivo/usuarios/entrar''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> plataforma
-DISABLE WebAutomation.LaunchChrome.LaunchChrome Url: $'''http://200.198.28.211/incentivo/usuarios/entrar''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> plataforma
-WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: plataforma Text: $'''Esqueceu a senha?''')
-MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: plataforma TextToSend: $'''%cpf%{Tab}%senha_plataforma%{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
-WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: plataforma Text: $'''Seu acesso foi realizado com sucesso!''')
+# As seguintes ações obtêm a planilha disponível no OneDrive.
+Folder.GetFiles Folder: pasta_planilha FileFilter: $'''*.xlsx''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> planilha_excel
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: planilha_excel[0] Visible: True ReadOnly: False Instance=> excel
+WAIT 1
+Excel.CloseExcel.Close Instance: excel
+WAIT 1
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: planilha_excel[0] Visible: True ReadOnly: False Instance=> excel
+WAIT 1
+IF (OCR.IfTextOnScreen.TextOnScreenExistsWithWindowsOcr TextToFind: $'''Reabrir''' IsRegex: False WindowsOcrLanguage: OCR.WindowsOcrLanguage.Portuguese SearchForTextOn: OCR.SearchTarget.EntireScreen ImageWidthMultiplier: 1 ImageHeightMultiplier: 1) THEN
+    MouseAndKeyboard.MoveMouseToTextOnScreenWithOCR.WaitForTextToAppearAndMoveMouseToTextOnScreenWithWindowsOcr TextToFind: $'''Reabrir''' IsRegEx: False WindowsOcrLanguage: MouseAndKeyboard.WindowsOcrLanguage.Portuguese Occurence: 1 SearchForTextOn: MouseAndKeyboard.SearchTarget.EntireScreen ImageWidthMultiplier: 1 ImageHeightMultiplier: 1 MovementStyle: MouseAndKeyboard.MovementStyle.Instant Timeout: 5 PositionRelativeToText: MouseAndKeyboard.PositionOnImage.MiddleCenter OffsetX: 0 OffsetY: 0
+END
+Display.SelectFromListDialog.SelectFromList Title: $'''Página da Planilha''' Message: $'''Selecione a página que o robô irá trabalhar.''' List: $'''IFC 2025
+IFC 2024
+IFC 2023
+IFC 2022
+IFC 2021
+IFC 2020''' IsTopMost: False AllowEmpty: False SelectedItem=> pagina_planilha
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: excel Name: pagina_planilha
+/# Para as próximas ações, é necessário que algumas colunas estejam nomeadas da seguinte forma:
+
+NR DE PROTOCOLO
+Nº SEI - Processo
+ROBÔ - UPLOAD DE DI#/
+Excel.FindAndReplace.FindSingle Instance: excel TextToFind: $'''NR DE PROTOCOLO''' MatchCase: False MatchEntireCellContents: True SearchBy: Excel.SearchOrder.Columns FoundColumnIndex=> coluna_protocolo
+Excel.FindAndReplace.FindSingle Instance: excel TextToFind: $'''DATA HOMOLOGAÇÃO/SEF''' MatchCase: False MatchEntireCellContents: True SearchBy: Excel.SearchOrder.Columns FoundColumnIndex=> coluna_data_assinatura
+Excel.FindAndReplace.FindSingle Instance: excel TextToFind: $'''Nº SEI - Processo''' MatchCase: False MatchEntireCellContents: True SearchBy: Excel.SearchOrder.Columns FoundColumnIndex=> coluna_processo_sei
+Excel.FindAndReplace.FindSingle Instance: excel TextToFind: $'''Nº SEI - DI''' MatchCase: False MatchEntireCellContents: True SearchBy: Excel.SearchOrder.Columns FoundColumnIndex=> coluna_numero_di
+Excel.FindAndReplace.FindSingle Instance: excel TextToFind: $'''ROBÔ - UPLOAD DE DI''' MatchCase: False MatchEntireCellContents: False SearchBy: Excel.SearchOrder.Columns FoundColumnIndex=> coluna_robo
+Excel.FilterCellsFromExcel.FilterAdvancedWorksheet Instance: excel Column: coluna_robo AdvancedFilterFirstConditionOperator: Excel.FilterConditionOperator.Equal AdvancedFilterFirstConditionValue: $'''INSERIR DI NA PLATAFORMA''' AdvancedFilterSecondConditionOperator: Excel.FilterConditionOperator.None AdvancedFilterSecondConditionValue: $'''''' AdvancedFilterLogicalOperator: Excel.FilterLogicalOperator.IsOr
+WAIT 1
+Excel.GetFirstFreeColumnRow Instance: excel FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+**REGION localizar linhas
+Excel.ReadFromExcel.ReadAllCells Instance: excel ReadAsText: True FirstLineIsHeader: True RangeValue=> tabela_planilha
+Variables.FindOrReplaceInDataTable.FindItemInDataTableEverywhere DataTable: tabela_planilha AllMatches: True ValueToFind: $'''INSERIR DI NA PLATAFORMA''' MatchCase: True MatchEntireCellContents: True DataTableMatches=> lista_planilha
+Variables.RetrieveDataTableColumnIntoList DataTable: lista_planilha ColumnNameOrIndex: 0 ColumnAsList=> lista_planilha
+**ENDREGION
