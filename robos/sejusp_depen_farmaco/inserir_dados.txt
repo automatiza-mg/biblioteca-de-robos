@@ -1,0 +1,1097 @@
+@@statistics_Input_Text: '1'
+@@statistics_Input_ChoiceSet: '3'
+@@statistics_Input_Toggle: '1'
+@@statistics_Action_Submit: '1'
+Display.ShowCustomDialog CardTemplateJson: '''{
+  \"type\": \"AdaptiveCard\",
+  \"version\": \"1.4\",
+  \"id\": \"AdaptiveCard\",
+  \"body\": [
+    {
+      \"type\": \"Input.Text\",
+      \"id\": \"recebimento\",
+      \"isRequired\": true,
+      \"label\": \"${recebimento_Label}\"
+    },
+    {
+      \"type\": \"Input.ChoiceSet\",
+      \"id\": \"recebido\",
+      \"style\": \"compact\",
+      \"isMultiSelect\": false,
+      \"choices\": [
+        {
+          \"title\": \"Breno Miguel\",
+          \"value\": \"Breno Miguel\"
+        },
+        {
+          \"title\": \"Joseana Rolim\",
+          \"value\": \"Joseana Rolim\"
+        },
+        {
+          \"title\": \"Júlia Vitória\",
+          \"value\": \"Júlia Vitória\"
+        }
+      ],
+      \"isRequired\": true,
+      \"label\": \"${recebido_Label}\"
+    },
+    {
+      \"type\": \"Input.ChoiceSet\",
+      \"id\": \"trimestre\",
+      \"style\": \"compact\",
+      \"isMultiSelect\": false,
+      \"choices\": [
+        {
+          \"title\": \"1º Trimestral\",
+          \"value\": \"1º Trimestral\"
+        },
+        {
+          \"title\": \"2º Trimestral\",
+          \"value\": \"2º Trimestral\"
+        },
+        {
+          \"title\": \"3º Trimestral\",
+          \"value\": \"3º Trimestral\"
+        },
+        {
+          \"title\": \"4º Trimestral\",
+          \"value\": \"4º Trimestral\"
+        },
+        {
+          \"title\": \"1º Emergencial\",
+          \"value\": \"1º Emergencial\"
+        },
+        {
+          \"title\": \"2º Emergencial\",
+          \"value\": \"2º Emergencial\"
+        },
+        {
+          \"title\": \"3º Emergencial\",
+          \"value\": \"3º Emergencial\"
+        },
+        {
+          \"title\": \"4º Emergencial\",
+          \"value\": \"4º Emergencial\"
+        },
+        {
+          \"title\": \"5º Emergencial\",
+          \"value\": \"5º Emergencial\"
+        }
+      ],
+      \"isRequired\": true,
+      \"label\": \"${trimestre_Label}\"
+    },
+    {
+      \"type\": \"Input.ChoiceSet\",
+      \"id\": \"responsavel\",
+      \"style\": \"compact\",
+      \"isMultiSelect\": false,
+      \"choices\": [
+        {
+          \"title\": \"Breno Miguel\",
+          \"value\": \"Breno Miguel\"
+        },
+        {
+          \"title\": \"Joseana Rolim\",
+          \"value\": \"Joseana Rolim\"
+        },
+        {
+          \"title\": \"Júlia Vitória\",
+          \"value\": \"Júlia Vitória\"
+        }
+      ],
+      \"isRequired\": true,
+      \"label\": \"${responsavel_Label}\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"admissoes\",
+      \"title\": \"${admissoes_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    }
+  ],
+  \"actions\": [
+    {
+      \"type\": \"Action.Submit\",
+      \"id\": \"continuar\",
+      \"title\": \"${continuar_Title}\"
+    }
+  ],
+  \"verticalContentAlignment\": \"center\",
+  \"FormTitle\": \"${AdaptiveCard_FormTitle}\"
+}''' CustomFormData=> formulario ButtonPressed=> botao_formulario @AdaptiveCard_FormTitle: $'''FarmacIA''' @recebimento_Label: $'''Data do recebimento:''' @recebido_Label: $'''Recebido por:''' @trimestre_Label: $'''Selecione o trimestre:''' @responsavel_Label: $'''Selecione o responsável pela análise:''' @admissoes_Title: $'''Realizar consulta no SIGPRI''' @continuar_Title: $'''Continuar'''
+Variables.ConvertCustomObjectToJson CustomObject: formulario Json=> formulario
+Text.CropText.CropTextAfterFlag Text: formulario FromFlag: $'''{\"recebimento\":\"''' IgnoreCase: True CroppedText=> data_recebimento
+Text.CropText.CropTextBeforeFlag Text: data_recebimento ToFlag: $'''\"''' IgnoreCase: True CroppedText=> data_recebimento
+Text.Trim Text: data_recebimento TrimOption: Text.TrimOption.Both TrimmedText=> data_recebimento
+Text.CropText.CropTextAfterFlag Text: formulario FromFlag: $'''recebido\":\"''' IgnoreCase: True CroppedText=> responsavel_recebimento
+Text.CropText.CropTextBeforeFlag Text: responsavel_recebimento ToFlag: $'''\"''' IgnoreCase: True CroppedText=> responsavel_recebimento
+Text.Trim Text: responsavel_recebimento TrimOption: Text.TrimOption.Both TrimmedText=> responsavel_recebimento
+Text.CropText.CropTextAfterFlag Text: formulario FromFlag: $'''trimestre\":\"''' IgnoreCase: True CroppedText=> trimestral
+Text.CropText.CropTextBeforeFlag Text: trimestral ToFlag: $'''\"''' IgnoreCase: True CroppedText=> trimestral
+Text.Trim Text: trimestral TrimOption: Text.TrimOption.Both TrimmedText=> trimestral
+Text.CropText.CropTextBeforeFlag Text: trimestral ToFlag: $'''º''' IgnoreCase: False CroppedText=> numero_trimestral
+Text.Trim Text: numero_trimestral TrimOption: Text.TrimOption.Both TrimmedText=> numero_trimestral
+Text.CropText.CropTextAfterFlag Text: formulario FromFlag: $'''\"responsavel\":\"''' IgnoreCase: True CroppedText=> responsavel_analise
+Text.CropText.CropTextBeforeFlag Text: responsavel_analise ToFlag: $'''\"''' IgnoreCase: True CroppedText=> responsavel_analise
+Text.Trim Text: responsavel_analise TrimOption: Text.TrimOption.Both TrimmedText=> responsavel_analise
+Text.CropText.CropTextAfterFlag Text: formulario FromFlag: $'''admissoes\":\"''' IgnoreCase: True CroppedText=> consulta_admissoes
+Text.CropText.CropTextBeforeFlag Text: consulta_admissoes ToFlag: $'''\"''' IgnoreCase: True CroppedText=> consulta_admissoes
+Display.SelectFromListDialog.SelectFromList Title: $'''Selecione a RISP ''' Message: $'''Selecione a RISP''' List: $'''1ª
+2ª
+3ª
+4ª
+5ª
+6ª
+7ª
+8ª
+9ª
+10ª
+11ª
+12ª
+13ª
+14ª
+15ª
+16ª
+17ª
+18ª
+19ª''' IsTopMost: False AllowEmpty: False SelectedItem=> risp
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateOnly CurrentDateTime=> data
+Text.ConvertDateTimeToText.FromDateTime DateTime: data StandardFormat: Text.WellKnownDateTimeFormat.ShortDate Result=> data
+Text.ConvertDateTimeToText.FromDateTime DateTime: data StandardFormat: Text.WellKnownDateTimeFormat.SortableDateTime Result=> ano
+Text.CropText.CropTextBeforeFlag Text: ano ToFlag: $'''-''' IgnoreCase: False CroppedText=> ano
+Text.Trim Text: ano TrimOption: Text.TrimOption.Both TrimmedText=> ano
+IF risp = $'''1ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Casa do Albergado Presidente João Pessoa
+Centro de Remanejamento do Sistema Prisional - Betim
+Centro de Remanejamento do Sistema Prisional - Gameleira
+Complexo Penitenciário Feminino Estevão Pinto
+Penitenciária Professor Jason Soares Albergaria
+Presídio de São Joaquim de Bicas I
+Presídio de São Joaquim de Bicas II''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Casa do Albergado Presidente João Pessoa''' THEN
+        SET unidade_abrev TO $'''CAPJP'''
+        SET unidade_sigpri TO $'''CASA DO ALBERGADO PRESIDENTE JOÃO PESSOA'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Centro de Remanejamento do Sistema Prisional - Gameleira''' THEN
+        SET unidade_abrev TO $'''CERESP-Gameleira'''
+        SET unidade_sigpri TO $'''CERESP - GAMELEIRA - CENTRO DE REMANEJAMENTO DO SI'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Complexo Penitenciário Feminino Estevão Pinto''' THEN
+        SET unidade_abrev TO $'''CPFEP'''
+        SET unidade_sigpri TO $'''COMPLEXO PENITENCIÁRIO FEMININO ESTEVÃO PINTO'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Centro de Remanejamento do Sistema Prisional - Betim''' THEN
+        SET unidade_abrev TO $'''CERESP-Betim'''
+        SET unidade_sigpri TO $'''CERESP - BETIM - CENTRO DE REMANEJAMENTO DO SISTEM'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Penitenciária Professor Jason Soares Albergaria''' THEN
+        SET unidade_abrev TO $'''Pen-PJSA'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA PROFESSOR JASON SOARES ALBERGARIA'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de São Joaquim de Bicas I''' THEN
+        SET unidade_abrev TO $'''Pres-SJB-I'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SÃO JOAQUIM DE BICAS I'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de São Joaquim de Bicas II''' THEN
+        SET unidade_abrev TO $'''Pres-SJB-II'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SÃO JOAQUIM DE BICAS II'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''2ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Centro de Apoio Médico e Pericial
+Centro de Remanejamento do Sistema Prisional - Contagem
+Presídio José Abranches Gonçalves
+Complexo Público Privado – PPP I
+Complexo Público Privado – PPP II
+Complexo Público Privado – PPP III
+Complexo Penitenciário Nelson Hungria
+Penitenciária José Maria Alkimin
+Presídio de Juatuba
+Presídio Antônio Dutra Ladeira
+Presídio Inspetor José Martinho Drumond''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Centro de Apoio Médico e Pericial''' THEN
+        SET unidade_abrev TO $'''CAMP'''
+        SET unidade_sigpri TO $'''CENTRO DE APOIO MEDICO E PERICIAL'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Centro de Remanejamento do Sistema Prisional - Contagem''' THEN
+        SET unidade_abrev TO $'''CERESP-Contagem'''
+        SET unidade_sigpri TO $'''CERESP - CONTAGEM - CENTRO DE REMANEJAMENTO DO SIS'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio José Abranches Gonçalves''' THEN
+        SET unidade_abrev TO $'''Pres-JAG'''
+        SET unidade_sigpri TO $'''PRESÍDIO JOSÉ ABRANCHES GONÇALVES'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Complexo Público Privado I''' THEN
+        SET unidade_abrev TO $'''PPP I'''
+        SET unidade_sigpri TO $'''COMPLEXO PÚBLICO PRIVADO - PPP I'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Complexo Público Privado II''' THEN
+        SET unidade_abrev TO $'''PPP II'''
+        SET unidade_sigpri TO $'''COMPLEXO PÚBLICO PRIVADO - PPP II'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Complexo Público Privado III''' THEN
+        SET unidade_abrev TO $'''PPP III'''
+        SET unidade_sigpri TO $'''COMPLEXO PÚBLICO PRIVADO - PPP III'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Complexo Penitenciário Nelson Hungria''' THEN
+        SET unidade_abrev TO $'''CPNH'''
+        SET unidade_sigpri TO $'''COMPLEXO PENITENCIARIO NELSON HUNGRIA'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Penitenciária José Maria Alkimin''' THEN
+        SET unidade_abrev TO $'''Pen-JMA'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA JOSÉ MARIA ALKIMIN'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de Juatuba''' THEN
+        SET unidade_abrev TO $'''Pres-JUA'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE JUATUBA'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio Antônio Dutra Ladeira''' THEN
+        SET unidade_abrev TO $'''Pres-ADL'''
+        SET unidade_sigpri TO $'''PRESÍDIO ANTÔNIO DUTRA LADEIRA'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio Inspetor José Martinho Drumond''' THEN
+        SET unidade_abrev TO $'''Pres-IJMD'''
+        SET unidade_sigpri TO $'''PRESÍDIO INSPETOR JOSÉ MARTINHO DRUMOND'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''3ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Centro de Referência à Gestante Privada de Liberdade
+Presídio de Caeté
+Presídio de Jaboticatubas
+Presídio de Lagoa Santa
+Presídio de Mariana
+Presídio de Nova Lima
+Presídio de Ouro Preto
+Presídio de Santa Luzia
+Presídio de Vespasiano''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Centro de Referência à Gestante Privada de Liberdade''' THEN
+        SET unidade_abrev TO $'''CRGPL'''
+        SET unidade_sigpri TO $'''CENTRO DE REFERENC GESTANTES PRIVADA DE LIBERDADE'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de Caeté''' THEN
+        SET unidade_abrev TO $'''Pres-CET'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CAETÉ'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de Jaboticatubas''' THEN
+        SET unidade_abrev TO $'''Pres-JBU'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE JABOTICATUBAS'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de Lagoa Santa''' THEN
+        SET unidade_abrev TO $'''Pres-LGT'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE LAGOA SANTA'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de Mariana''' THEN
+        SET unidade_abrev TO $'''Pres-MNA'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE MARIANA'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de Nova Lima''' THEN
+        SET unidade_abrev TO $'''Pres-NLA'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE NOVA LIMA'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de Ouro Preto''' THEN
+        SET unidade_abrev TO $'''Pres-OPT'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE OURO PRETO'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de Santa Luzia''' THEN
+        SET unidade_abrev TO $'''Pres-SLU'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SANTA LUZIA'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de Vespasiano''' THEN
+        SET unidade_abrev TO $'''Pres-VPN'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE VESPASIANO'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''4ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Casa do Albergado José Alencar Rogedo
+Centro de Remanejamento do Sistema Prisional - Juiz de Fora
+Penitenciária José Edson Cavalieri
+Penitenciária Professor Ariosvaldo Campos Pires
+Penitenciária Doutor Manoel Martins Lisboa Junior
+Presídio de Além Paraíba
+Presídio de Bicas
+Presídio de Carangola
+Presídio de Cataguases
+Presídio de Ervália
+Presídio de Eugenópolis
+Presídio de Leopoldina
+Presídio de Muriaé
+Presídio de Rio Pomba
+Presídio de Ubá
+Presídio de Viçosa
+Presídio Visconde do Rio Branco''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Casa do Albergado José Alencar Rogedo''' THEN
+        SET unidade_abrev TO $'''CAJAR'''
+        SET unidade_sigpri TO $'''CAJAR-CASA DO ALBERGADO JOSÉ ALENCAR ROGEDO'''
+    END
+    IF unidade_analise = $'''Centro de Remanejamento do Sistema Prisional - Juiz de Fora''' THEN
+        SET unidade_abrev TO $'''CERESP-Juiz de Fora'''
+        SET unidade_sigpri TO $'''CERESP-JUIZ DE FORA-CENTRO DE REMANEJAMENTO DO SIS'''
+    END
+    IF unidade_analise = $'''Penitenciária José Edson Cavalieri''' THEN
+        SET unidade_abrev TO $'''Pen-JEC'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA JOSÉ EDSON CAVALIERI'''
+    END
+    IF unidade_analise = $'''Penitenciária Professor Ariosvaldo Campos Pires''' THEN
+        SET unidade_abrev TO $'''Pen-PACP'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA PROFESSOR ARIOSVALDO CAMPOS PIRES'''
+    END
+    IF unidade_analise = $'''Penitenciária Doutor Manoel Martins Lisboa Junior''' THEN
+        SET unidade_abrev TO $'''Pen-DMMLJ'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA DOUTOR MANOEL MARTINS LISBOA JUNIOR'''
+    END
+    IF unidade_analise = $'''Presídio de Além Paraíba''' THEN
+        SET unidade_abrev TO $'''Pres-APB'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ALÉM PARAÍBA'''
+    END
+    IF unidade_analise = $'''Presídio de Bicas''' THEN
+        SET unidade_abrev TO $'''Pres-BIC'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE BICAS'''
+    END
+    IF unidade_analise = $'''Presídio de Carangola''' THEN
+        SET unidade_abrev TO $'''Pres-CAR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CARANGOLA'''
+    END
+    IF unidade_analise = $'''Presídio de Cataguases''' THEN
+        SET unidade_abrev TO $'''Pres-CTS'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CATAGUASES'''
+    END
+    IF unidade_analise = $'''Presídio de Ervália''' THEN
+        SET unidade_abrev TO $'''Pres-ERV'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ERVÁLIA'''
+    END
+    IF unidade_analise = $'''Presídio de Eugenópolis''' THEN
+        SET unidade_abrev TO $'''Pres-EUG'''
+        SET unidade_sigpri TO $'''PRESIDIO DE EUGENOPOLIS'''
+    END
+    IF unidade_analise = $'''Presídio de Leopoldina''' THEN
+        SET unidade_abrev TO $'''Pres-LPD'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE LEOPOLDINA'''
+    END
+    IF unidade_analise = $'''Presídio de Muriaé''' THEN
+        SET unidade_abrev TO $'''Pres-MUR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE MURIAÉ'''
+    END
+    IF unidade_analise = $'''Presídio de Rio Pomba''' THEN
+        SET unidade_abrev TO $'''Pres-RPB'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE RIO POMBA'''
+    END
+    IF unidade_analise = $'''Presídio de Ubá''' THEN
+        SET unidade_abrev TO $'''Pres-UBA'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE UBÁ'''
+    END
+    IF unidade_analise = $'''Presídio de Viçosa''' THEN
+        SET unidade_abrev TO $'''Pres-VIÇ'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE VIÇOSA'''
+    END
+    IF unidade_analise = $'''Presídio Visconde do Rio Branco''' THEN
+        SET unidade_abrev TO $'''Pres-VRB'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE VISCONDE DO RIO BRANCO'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''5ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Penitenciária Prof. Aluízio Ignácio de Oliveira
+Presídio de Araxá
+Presídio de Frutal
+Presídio de Itapagipe
+Presídio de Iturama
+Presídio de Perdizes
+Presídio de Sacramento''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Penitenciária Prof. Aluízio Ignácio de Oliveira''' THEN
+        SET unidade_abrev TO $'''Pen-PAIO'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA PROF. ALUÍZIO IGNÁCIO DE OLIVEIRA'''
+    END
+    IF unidade_analise = $'''Presídio de Araxá''' THEN
+        SET unidade_abrev TO $'''Pres-ARX'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ARAXÁ'''
+    END
+    IF unidade_analise = $'''Presídio de Frutal''' THEN
+        SET unidade_abrev TO $'''Pres-FRU'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE FRUTAL'''
+    END
+    IF unidade_analise = $'''Presídio de Itapagipe''' THEN
+        SET unidade_abrev TO $'''Pres-ITP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ITAPAGIPE'''
+    END
+    IF unidade_analise = $'''Presídio de Iturama''' THEN
+        SET unidade_abrev TO $'''Pres-ITR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ITURAMA I'''
+    END
+    IF unidade_analise = $'''Presídio de Perdizes''' THEN
+        SET unidade_abrev TO $'''Pres-PDZ'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE PERDIZES'''
+    END
+    IF unidade_analise = $'''Presídio de Sacramento''' THEN
+        SET unidade_abrev TO $'''Pres-SCR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SACRAMENTO'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''6ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Penitenciária de Três Corações
+Presídio de Boa Esperança
+Presídio de Campo Belo
+Presídio de Lavras
+Presídio Doutor Nelson Pires
+Presídio de Três Pontas
+Presídio de Varginha''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Penitenciária de Três Corações''' THEN
+        SET unidade_abrev TO $'''Pen-TRC'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA DE TRÊS CORAÇÕES'''
+    END
+    IF unidade_analise = $'''Presídio de Boa Esperança''' THEN
+        SET unidade_abrev TO $'''Pres-BES'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE BOA ESPERANÇA'''
+    END
+    IF unidade_analise = $'''Presídio de Campo Belo''' THEN
+        SET unidade_abrev TO $'''Pres-CBE'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CAMPO BELO'''
+    END
+    IF unidade_analise = $'''Presídio de Lavras''' THEN
+        SET unidade_abrev TO $'''Pres-LAV'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE LAVRAS'''
+    END
+    IF unidade_analise = $'''Presídio Doutor Nelson Pires''' THEN
+        SET unidade_abrev TO $'''Pres-DNP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DOUTOR NELSON PIRES'''
+    END
+    IF unidade_analise = $'''Presídio de Três Pontas''' THEN
+        SET unidade_abrev TO $'''Pres-TRP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE TRÊS PONTAS'''
+    END
+    IF unidade_analise = $'''Presídio de Varginha''' THEN
+        SET unidade_abrev TO $'''Pres-VAR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE VARGINHA'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''7ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Penitenciária de Formiga
+Complexo Penitenciário Doutor Pio Canedo
+Presídio de Abaeté
+Presídio de Arcos
+Presídio de Bom Despacho
+Presídio de Floramar
+Presídio de Itaúna
+Presídio de Lagoa da Prata
+Presídio de Luz
+Presídio de Nova Serrana''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Penitenciária de Formiga''' THEN
+        SET unidade_abrev TO $'''Pen-FMG'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA DE FORMIGA'''
+    END
+    IF unidade_analise = $'''Complexo Penitenciário Doutor Pio Canedo''' THEN
+        SET unidade_abrev TO $'''CPDPC'''
+        SET unidade_sigpri TO $'''COMPLEXO PENITENCIÁRIO DOUTOR PIO CANEDO'''
+    END
+    IF unidade_analise = $'''Presídio de Abaeté''' THEN
+        SET unidade_abrev TO $'''Pres-ABT'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ABAETÉ'''
+    END
+    IF unidade_analise = $'''Presídio de Arcos''' THEN
+        SET unidade_abrev TO $'''Pres-ARC'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ARCOS'''
+    END
+    IF unidade_analise = $'''Presídio de Bom Despacho''' THEN
+        SET unidade_abrev TO $'''Pres-BDE'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE BOM DESPACHO'''
+    END
+    IF unidade_analise = $'''Presídio de Floramar''' THEN
+        SET unidade_abrev TO $'''Pres-FLR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE FLORAMAR'''
+    END
+    IF unidade_analise = $'''Presídio de Itaúna''' THEN
+        SET unidade_abrev TO $'''Pres-ITN'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ITAÚNA'''
+    END
+    IF unidade_analise = $'''Presídio de Lagoa da Prata''' THEN
+        SET unidade_abrev TO $'''Pres-LGP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE LAGOA DA PRATA'''
+    END
+    IF unidade_analise = $'''Presídio de Luz''' THEN
+        SET unidade_abrev TO $'''Pres-LUZ'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE LUZ'''
+    END
+    IF unidade_analise = $'''Presídio de Nova Serrana''' THEN
+        SET unidade_abrev TO $'''Pres-NSA'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE NOVA SERRANA'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''8ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Presídio de Governador Valadares
+Penitenciária Francisco Floriano de Paula
+Presídio de Aimorés
+Presídio de Conselheiro Pena
+Presídio de Guanhães
+Presídio de Mantena
+Presídio de Peçanha
+Presídio de São João Evangelista
+Presídio de Tarumirim''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Presídio de Governador Valadares''' THEN
+        SET unidade_abrev TO $'''Pres-GVR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE GOVERNADOR VALADARES'''
+    END
+    IF unidade_analise = $'''Penitenciária Francisco Floriano de Paula''' THEN
+        SET unidade_abrev TO $'''Pen-FFP'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA FRANCISCO FLORIANO DE PAULA'''
+    END
+    IF unidade_analise = $'''Presídio de Aimorés''' THEN
+        SET unidade_abrev TO $'''Pres-AMR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE AIMORÉS'''
+    END
+    IF unidade_analise = $'''Presídio de Conselheiro Pena''' THEN
+        SET unidade_abrev TO $'''Pres-CPE'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CONSELHEIRO PENA'''
+    END
+    IF unidade_analise = $'''Presídio de Guanhães''' THEN
+        SET unidade_abrev TO $'''Pres-GNH'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE GUANHÃES'''
+    END
+    IF unidade_analise = $'''Presídio de Mantena''' THEN
+        SET unidade_abrev TO $'''Pres-MTN'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE MANTENA'''
+    END
+    IF unidade_analise = $'''Presídio de Peçanha''' THEN
+        SET unidade_abrev TO $'''Pres-PÇN'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE PECANHA'''
+    END
+    IF unidade_analise = $'''Presídio de São João Evangelista''' THEN
+        SET unidade_abrev TO $'''Pres-SJE'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SÃO JOÃO EVANGELISTA'''
+    END
+    IF unidade_analise = $'''Presídio de Tarumirim''' THEN
+        SET unidade_abrev TO $'''Pres-TMM'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE TARUMIRIM'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''9ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Penitenciária Professor João Pimenta da Veiga
+Presídio de Araguari
+Presídio de Canápolis
+Presídio de Ituiutaba
+Presídio de Prata
+Presídio de Santa Vitória
+Presídio de Tupaciguara
+Presídio Professor Jacy de Assis''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Penitenciária Professor João Pimenta da Veiga''' THEN
+        SET unidade_abrev TO $'''Pen-PJPV'''
+        SET unidade_sigpri TO $'''PENITENCIARIA PROFESSOR JOAO PIMENTA DA VEIGA'''
+    END
+    IF unidade_analise = $'''Presídio de Araguari''' THEN
+        SET unidade_abrev TO $'''Pres-ARG'''
+        SET unidade_sigpri TO $'''PRESIDIO DE ARAGUARI'''
+    END
+    IF unidade_analise = $'''Presídio de Canápolis''' THEN
+        SET unidade_abrev TO $'''Pres-CNP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CANAPOLIS'''
+    END
+    IF unidade_analise = $'''Presídio de Ituiutaba''' THEN
+        SET unidade_abrev TO $'''Pres-ITT'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ITUIUTABA'''
+    END
+    IF unidade_analise = $'''Presídio de Prata''' THEN
+        SET unidade_abrev TO $'''Pres-PRT'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE PRATA'''
+    END
+    IF unidade_analise = $'''Presídio de Santa Vitória''' THEN
+        SET unidade_abrev TO $'''Pres-SVT'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SANTA VITÓRIA'''
+    END
+    IF unidade_analise = $'''Presídio de Tupaciguara''' THEN
+        SET unidade_abrev TO $'''Pres-TUP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE TUPACIGUARA'''
+    END
+    IF unidade_analise = $'''Presídio Professor Jacy de Assis''' THEN
+        SET unidade_abrev TO $'''Pres-PJA'''
+        SET unidade_sigpri TO $'''PRESÍDIO PROFESSOR JACY DE ASSIS'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''10ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Complexo Penitenciário Nossa Senhora do Carmo
+Penitenciária Dep. Expedito de Faria Tavares
+Presídio Sargento Jorge
+Presídio de Monte Carmelo
+Presídio de Sebastião Satiro
+Presídio de Presidente Olegário''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Complexo Penitenciário Nossa Senhora do Carmo''' THEN
+        SET unidade_abrev TO $'''CPNSC'''
+        SET unidade_sigpri TO $'''COMPLEXO PENITENCIÁRIO NOSSA SENHORA DO CARMO'''
+    END
+    IF unidade_analise = $'''Penitenciária Dep. Expedito de Faria Tavares''' THEN
+        SET unidade_abrev TO $'''Pen-DEFT'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA DEP. EXPEDITO DE FARIA TAVARES'''
+    END
+    IF unidade_analise = $'''Presídio Sargento Jorge''' THEN
+        SET unidade_abrev TO $'''Pres-SJ'''
+        SET unidade_sigpri TO $'''PRESÍDIO SARGENTO JORGE'''
+    END
+    IF unidade_analise = $'''Presídio de Monte Carmelo''' THEN
+        SET unidade_abrev TO $'''Pres-MCR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE MONTE CARMELO'''
+    END
+    IF unidade_analise = $'''Presídio de Sebastião Satiro''' THEN
+        SET unidade_abrev TO $'''Pres-SST'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SEBASTIÃO SATIRO'''
+    END
+    IF unidade_analise = $'''Presídio de Presidente Olegário''' THEN
+        SET unidade_abrev TO $'''Pres-POL'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE PRESIDENTE OLEGÁRIO'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''11ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Penitenciária de Francisco Sá
+Presídio de Bocaiuva
+Presídio de Itacarambi
+Presídio de Janaúba
+Presídio de Januária
+Presídio de Manga
+Presídio de Monte Azul
+Presídio Alvorada
+Presídio de Porteirinha
+Presídio de Salinas
+Presídio de São Francisco
+Presídio de São João da Ponte
+Presídio de Taiobeiras
+Presídio Regional de Montes Claros''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Penitenciária de Francisco Sá''' THEN
+        SET unidade_abrev TO $'''Pen-FRS'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA DE FRANCISCO SÁ'''
+    END
+    IF unidade_analise = $'''Presídio de Bocaiuva''' THEN
+        SET unidade_abrev TO $'''Pres-BOC'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE BOCAIUVA'''
+    END
+    IF unidade_analise = $'''Presídio de Itacarambi''' THEN
+        SET unidade_abrev TO $'''Pres-IBI'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ITACARAMBI'''
+    END
+    IF unidade_analise = $'''Presídio de Janaúba''' THEN
+        SET unidade_abrev TO $'''Pres-JNB'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE JANAÚBA'''
+    END
+    IF unidade_analise = $'''Presídio de Januária''' THEN
+        SET unidade_abrev TO $'''Pres-JNR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE JANUÁRIA'''
+    END
+    IF unidade_analise = $'''Presídio de Manga''' THEN
+        SET unidade_abrev TO $'''Pres-MNG'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE MANGA'''
+    END
+    IF unidade_analise = $'''Presídio de Monte Azul''' THEN
+        SET unidade_abrev TO $'''Pres-MAZ'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE MONTE AZUL'''
+    END
+    IF unidade_analise = $'''Presídio Alvorada''' THEN
+        SET unidade_abrev TO $'''Pres-ALV'''
+        SET unidade_sigpri TO $'''PRESÍDIO ALVORADA'''
+    END
+    IF unidade_analise = $'''Presídio de Porteirinha''' THEN
+        SET unidade_abrev TO $'''Pres-POR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE PORTEIRINHA'''
+    END
+    IF unidade_analise = $'''Presídio de Salinas''' THEN
+        SET unidade_abrev TO $'''Pres-SAL'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SALINAS'''
+    END
+    IF unidade_analise = $'''Presídio de São Francisco''' THEN
+        SET unidade_abrev TO $'''Pres-SFR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SÃO FRANCISCO'''
+    END
+    IF unidade_analise = $'''Presídio de São João da Ponte''' THEN
+        SET unidade_abrev TO $'''Pres-SJP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SÃO JOÃO DA PONTE'''
+    END
+    IF unidade_analise = $'''Presídio de Taiobeiras''' THEN
+        SET unidade_abrev TO $'''Pres-TAI'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE TAIOBEIRAS'''
+    END
+    IF unidade_analise = $'''Presídio Regional de Montes Claros''' THEN
+        SET unidade_abrev TO $'''Pres-MOC'''
+        SET unidade_sigpri TO $'''PRESÍDIO REGIONAL DE MONTES CLAROS'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''12ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Centro de Remanejamento do Sistema Prisional - Ipatinga
+Penitenciária Dênio Moreira de Carvalho
+Complexo Penitenciário de Ponte Nova
+Presídio de Abre Campo
+Presídio de Açucena
+Presídio de Barão de Cocais
+Presídio de Caratinga
+Presídio de Coronel Fabriciano
+Presídio de Inhapim
+Presídio de João Monlevade
+Presídio de Manhuaçu
+Presídio de Manhumirim
+Presídio de Nova Era
+Presídio de Timóteo''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Centro de Remanejamento do Sistema Prisional - Ipatinga''' THEN
+        SET unidade_abrev TO $'''CERESP-Ipatinga'''
+        SET unidade_sigpri TO $'''CERESP - IPATINGA - CENTRO DE REMANEJAMENTO DO SIS'''
+    END
+    IF unidade_analise = $'''Penitenciária Dênio Moreira de Carvalho''' THEN
+        SET unidade_abrev TO $'''Pen-DMC'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA DÊNIO MOREIRA DE CARVALHO'''
+    END
+    IF unidade_analise = $'''Complexo Penitenciário de Ponte Nova''' THEN
+        SET unidade_abrev TO $'''CPPN'''
+        SET unidade_sigpri TO $'''COMPLEXO PENITENCIÁRIO DE PONTE NOVA'''
+    END
+    IF unidade_analise = $'''Presídio de Abre Campo''' THEN
+        SET unidade_abrev TO $'''Pres-ACP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ABRE CAMPO'''
+    END
+    IF unidade_analise = $'''Presídio de Açucena''' THEN
+        SET unidade_abrev TO $'''Pres-AÇN'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE AÇUCENA'''
+    END
+    IF unidade_analise = $'''Presídio de Barão de Cocais''' THEN
+        SET unidade_abrev TO $'''Pres-BCO'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE BARÃO DE COCAIS'''
+    END
+    IF unidade_analise = $'''Presídio de Caratinga''' THEN
+        SET unidade_abrev TO $'''Pres-CRT'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CARATINGA'''
+    END
+    IF unidade_analise = $'''Presídio de Coronel Fabriciano''' THEN
+        SET unidade_abrev TO $'''Pres-CFB'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CORONEL FABRICIANO'''
+    END
+    IF unidade_analise = $'''Presídio de Inhapim''' THEN
+        SET unidade_abrev TO $'''Pres-INP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE INHAPIM'''
+    END
+    IF unidade_analise = $'''Presídio de João Monlevade''' THEN
+        SET unidade_abrev TO $'''Pres-JMO'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE JOÃO MONLEVADE'''
+    END
+    IF unidade_analise = $'''Presídio de Manhuaçu''' THEN
+        SET unidade_abrev TO $'''Pres-MÇU'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE MANHUAÇU'''
+    END
+    IF unidade_analise = $'''Presídio de Manhumirim''' THEN
+        SET unidade_abrev TO $'''Pres-MMR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE MANHUMIRIM'''
+    END
+    IF unidade_analise = $'''Presídio de Nova Era''' THEN
+        SET unidade_abrev TO $'''Pres-NER'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE NOVA ERA'''
+    END
+    IF unidade_analise = $'''Presídio de Timóteo''' THEN
+        SET unidade_abrev TO $'''Pres-TIM'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE TIMÓTEO'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''13ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Hospital Psiquiátrico e Judiciário Jorge Vaz
+Presídio de Barbacena
+Presídio de Congonhas
+Presídio de Conselheiro Lafaiete
+Presídio de Resende Costa
+Presídio de Santos Dumont
+Presídio de São João Del Rei''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Hospital Psiquiátrico e Judiciário Jorge Vaz''' THEN
+        SET unidade_abrev TO $'''HPJJV'''
+        SET unidade_sigpri TO $'''HOSPITAL PSIQUIATRICO E JUDICIARIO JORGE VAZ'''
+    END
+    IF unidade_analise = $'''Presídio de Barbacena''' THEN
+        SET unidade_abrev TO $'''Pres-BBC'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE BARBACENA'''
+    END
+    IF unidade_analise = $'''Presídio de Congonhas''' THEN
+        SET unidade_abrev TO $'''Pres-CGN'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CONGONHAS'''
+    END
+    IF unidade_analise = $'''Presídio de Conselheiro Lafaiete''' THEN
+        SET unidade_abrev TO $'''Pres-CLF'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CONSELHEIRO LAFAIETE'''
+    END
+    IF unidade_analise = $'''Presídio de Resende Costa''' THEN
+        SET unidade_abrev TO $'''Pres-REC'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE RESENDE COSTA'''
+    END
+    IF unidade_analise = $'''Presídio de Santos Dumont''' THEN
+        SET unidade_abrev TO $'''Pres-SDU'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SANTOS DUMONT'''
+    END
+    IF unidade_analise = $'''Presídio de São João Del Rei''' THEN
+        SET unidade_abrev TO $'''Pres-SJR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SÃO JOÃO DEL REI'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''14ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Presídio de Capelinha
+Presídio de Corinto
+Presídio de Curvelo
+Presídio de Diamantina
+Presídio de Itamarandiba
+Presídio de Pirapora
+Presídio de Serro
+Presídio de Três Marias
+Presídio de Turmalina
+Presídio de Várzea da Palma''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Presídio de Capelinha''' THEN
+        SET unidade_abrev TO $'''Pres-CAP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CAPELINHA'''
+    END
+    IF unidade_analise = $'''Presídio de Corinto''' THEN
+        SET unidade_abrev TO $'''Pres-CTO'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CORINTO'''
+    END
+    IF unidade_analise = $'''Presídio de Curvelo''' THEN
+        SET unidade_abrev TO $'''Pres-CUR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CURVELO'''
+    END
+    IF unidade_analise = $'''Presídio de Diamantina''' THEN
+        SET unidade_abrev TO $'''Pres-DIA'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE DIAMANTINA'''
+    END
+    IF unidade_analise = $'''Presídio de Itamarandiba''' THEN
+        SET unidade_abrev TO $'''Pres-ITM'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ITAMARANDIBA'''
+    END
+    IF unidade_analise = $'''Presídio de Pirapora''' THEN
+        SET unidade_abrev TO $'''Pres-PRP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE PIRAPORA'''
+    END
+    IF unidade_analise = $'''Presídio de Serro''' THEN
+        SET unidade_abrev TO $'''Pres-SER'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SERRO'''
+    END
+    IF unidade_analise = $'''Presídio de Três Marias''' THEN
+        SET unidade_abrev TO $'''Pres-TRM'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE TRÊS MARIAS'''
+    END
+    IF unidade_analise = $'''Presídio de Turmalina''' THEN
+        SET unidade_abrev TO $'''Pres-TUR'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE TURMALINA'''
+    END
+    IF unidade_analise = $'''Presídio de Várzea da Palma''' THEN
+        SET unidade_abrev TO $'''Pres-VZP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE VÁRZEA DA PALMA'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''15ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Penitenciária de Teófilo Otoni
+Presídio de Águas Formosas
+Presídio de Almenara
+Presídio Dr. Carlos Vitoriano
+Presídio de Carlos Chagas
+Presídio de Itambacuri
+Presídio de Itaobim
+Presídio de Jacinto
+Presídio de Jequitinhonha
+Presídio de Malacacheta
+Presídio de Nanuque
+Presídio de Novo Cruzeiro
+Presídio de Pedra Azul
+Presídio de Teófilo Otoni''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Penitenciária de Teófilo Otoni''' THEN
+        SET unidade_abrev TO $'''Pen-TFL'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA DE TEÓFILO OTONI'''
+    END
+    IF unidade_analise = $'''Presídio de Águas Formosas''' THEN
+        SET unidade_abrev TO $'''Pres-AGF'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ÁGUAS FORMOSAS'''
+    END
+    IF unidade_analise = $'''Presídio de Almenara''' THEN
+        SET unidade_abrev TO $'''Pres-ALM'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ALMENARA'''
+    END
+    IF unidade_analise = $'''Presídio Dr. Carlos Vitoriano''' THEN
+        SET unidade_abrev TO $'''Pres-DCV'''
+        SET unidade_sigpri TO $'''PRESÍDIO DR. CARLOS VITORIANO'''
+    END
+    IF unidade_analise = $'''Presídio de Carlos Chagas''' THEN
+        SET unidade_abrev TO $'''Pres-CAC'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CARLOS CHAGAS'''
+    END
+    IF unidade_analise = $'''Presídio de Itambacuri''' THEN
+        SET unidade_abrev TO $'''Pres-IBC'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ITAMBACURI'''
+    END
+    IF unidade_analise = $'''Presídio de Itaobim''' THEN
+        SET unidade_abrev TO $'''Pres-IBM'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ITAOBIM'''
+    END
+    IF unidade_analise = $'''Presídio de Jacinto''' THEN
+        SET unidade_abrev TO $'''Pres-JAC'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE JACINTO'''
+    END
+    IF unidade_analise = $'''Presídio de Jequitinhonha''' THEN
+        SET unidade_abrev TO $'''Pres-JEQ'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE JEQUITINHONHA'''
+    END
+    IF unidade_analise = $'''Presídio de Malacacheta''' THEN
+        SET unidade_abrev TO $'''Pres-MCT'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE MALACACHETA'''
+    END
+    IF unidade_analise = $'''Presídio de Nanuque''' THEN
+        SET unidade_abrev TO $'''Pres-NNQ'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE NANUQUE'''
+    END
+    IF unidade_analise = $'''Presídio de Novo Cruzeiro''' THEN
+        SET unidade_abrev TO $'''Pres-NOC'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE NOVO CRUZEIRO'''
+    END
+    IF unidade_analise = $'''Presídio de Pedra Azul''' THEN
+        SET unidade_abrev TO $'''Pres-PAZ'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE PEDRA AZUL'''
+    END
+    IF unidade_analise = $'''Presídio de Teófilo Otoni''' THEN
+        SET unidade_abrev TO $'''Pres-TFL'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE TEÓFILO OTONI'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''16ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Penitenciária Agostinho de Oliveira Junior
+Presídio de Buritis
+Presídio de João Pinheiro
+Presídio de Paracatu
+Presídio de Unaí''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Penitenciária Agostinho de Oliveira Junior''' THEN
+        SET unidade_abrev TO $'''Pen-AOJ'''
+        SET unidade_sigpri TO $'''PENITENCIÁRIA AGOSTINHO DE OLIVEIRA JUNIOR'''
+    END
+    IF unidade_analise = $'''Presídio de Buritis''' THEN
+        SET unidade_abrev TO $'''Pres-BII'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE BURITIS'''
+    END
+    IF unidade_analise = $'''Presídio de João Pinheiro''' THEN
+        SET unidade_abrev TO $'''Pres-JOP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE JOÃO PINHEIRO'''
+    END
+    IF unidade_analise = $'''Presídio de Paracatu''' THEN
+        SET unidade_abrev TO $'''Pres-PRC'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE PARACATU'''
+    END
+    IF unidade_analise = $'''Presídio de Unaí''' THEN
+        SET unidade_abrev TO $'''Pres-UNI'''
+        SET unidade_sigpri TO $'''PRESIDIO DE UNAI'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''17ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Presídio de Extrema
+Presídio de Itajubá
+Presídio de Pouso Alegre
+Presídio de Santa Rita do Sapucaí
+Presídio de São Lourenço''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Presídio de Extrema''' THEN
+        SET unidade_abrev TO $'''Pres-EXT'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE EXTREMA'''
+    END
+    IF unidade_analise = $'''Presídio de Itajubá''' THEN
+        SET unidade_abrev TO $'''Pres-ITJ'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ITAJUBÁ'''
+    END
+    IF unidade_analise = $'''Presídio de Pouso Alegre''' THEN
+        SET unidade_abrev TO $'''Pres-POA'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE POUSO ALEGRE'''
+    END
+    IF unidade_analise = $'''Presídio de Santa Rita do Sapucaí''' THEN
+        SET unidade_abrev TO $'''Pres-SRS'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SANTA RITA DO SAPUCAÍ'''
+    END
+    IF unidade_analise = $'''Presídio de São Lourenço''' THEN
+        SET unidade_abrev TO $'''Pres-SLO'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SÃO LOURENÇO'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''18ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Presídio de Alfenas
+Presídio de Andradas
+Presídio de Campos Gerais
+Presídio de Guaranésia/Guaxupé
+Presídio de Machado
+Presídio de Monte Santo de Minas
+Presídio de Passos
+Presídio de Piumhi
+Presídio de Poços de Caldas
+Presídio de São Sebastião do Paraíso''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Presídio de Alfenas''' THEN
+        SET unidade_abrev TO $'''Pres-ALF'''
+        SET unidade_sigpri TO $'''PRESIDIO DE ALFENAS'''
+    END
+    IF unidade_analise = $'''Presídio de Andradas''' THEN
+        SET unidade_abrev TO $'''Pres-ADD'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE ANDRADAS'''
+    END
+    IF unidade_analise = $'''Presídio de Campos Gerais''' THEN
+        SET unidade_abrev TO $'''Pres-CGE'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE CAMPOS GERAIS'''
+    END
+    IF unidade_analise = $'''Presídio de Guaranésia/Guaxupé''' THEN
+        SET unidade_abrev TO $'''Pres-GGP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE GUARANÉSIA/GUAXUPÉ'''
+    END
+    IF unidade_analise = $'''Presídio de Machado''' THEN
+        SET unidade_abrev TO $'''Pres-MHC'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE MACHADO'''
+    END
+    IF unidade_analise = $'''Presídio de Monte Santo de Minas''' THEN
+        SET unidade_abrev TO $'''Pres-MSM'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE MONTE SANTO DE MINAS'''
+    END
+    IF unidade_analise = $'''Presídio de Passos''' THEN
+        SET unidade_abrev TO $'''Pres-PAS'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE PASSOS'''
+    END
+    IF unidade_analise = $'''Presídio de Piumhi''' THEN
+        SET unidade_abrev TO $'''Pres-PIU'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE PIUMHI'''
+    END
+    IF unidade_analise = $'''Presídio de Poços de Caldas''' THEN
+        SET unidade_abrev TO $'''Pres-PCD'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE POÇOS DE CALDAS'''
+    END
+    IF unidade_analise = $'''Presídio de São Sebastião do Paraíso''' THEN
+        SET unidade_abrev TO $'''Pres-SSP'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE SÃO SEBASTIÃO DO PARAÍSO'''
+    END
+    EXIT FUNCTION
+ELSE IF risp = $'''19ª''' THEN
+    Display.SelectFromListDialog.SelectFromList Title: $'''Unidade Prisional''' Message: $'''Selecione a Unidade Prisional''' List: $'''Casa de Custódia do Policial Penal e do Agente de Segurança Socioeducativo
+Presídio de Pedro Leopoldo
+Presídio Promotor José Costa''' IsTopMost: False AllowEmpty: False SelectedItem=> unidade_analise
+    IF unidade_analise = $'''Casa de Custódia do Policial Penal e do Agente de Segurança Socioeducativo''' THEN
+        SET unidade_abrev TO $'''Pres-CCPPASE'''
+        SET unidade_sigpri TO $'''CASA DE CUSTODIA DO POLICIAL PENAL E DO AGENTEDE S'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio de Pedro Leopoldo''' THEN
+        SET unidade_abrev TO $'''Pres-PLO'''
+        SET unidade_sigpri TO $'''PRESÍDIO DE PEDRO LEOPOLDO'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+    IF unidade_analise = $'''Presídio Promotor José Costa''' THEN
+        SET unidade_abrev TO $'''Pres-PJC'''
+        SET unidade_sigpri TO $'''PRESÍDIO PROMOTOR JOSÉ COSTA'''
+        SET unidade_sigpri TO $'''NUCLEO DE GESTAO DE ESCOLTA HOSPITALAR/DSE'''
+    END
+END

@@ -1,0 +1,30 @@
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: excel Name: $'''Análise das Prescrições'''
+Excel.GetFirstFreeColumnRow Instance: excel FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.SelectCellsFromExcel.SelectCells Instance: excel StartColumn: $'''A''' StartRow: 1 EndColumn: coluna_livre - 1 EndRow: linha_livre - 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+WAIT 2
+Excel.SelectCellsFromExcel.SelectCells Instance: excel StartColumn: $'''A''' StartRow: 1 EndColumn: coluna_livre - 1 EndRow: linha_livre - 1
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel TextToSend: $'''{Alt}CVA''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+WAIT 2
+Excel.RenameWorksheet.RenameWorksheetWithName Instance: excel Name: $'''Resultado da Análise''' NewName: $'''%unidade_abrev% - %numero_trimestral%° Trim %ano%'''
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: excel Name: $'''%unidade_abrev% - %numero_trimestral%° Trim %ano%'''
+Excel.GetFirstFreeColumnRow Instance: excel FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.SelectCellsFromExcel.SelectCells Instance: excel StartColumn: $'''A''' StartRow: 1 EndColumn: coluna_livre - 1 EndRow: linha_livre - 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel TextToSend: $'''{LControlKey}({C})''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+Excel.SelectCellsFromExcel.SelectCells Instance: excel StartColumn: $'''A''' StartRow: 1 EndColumn: coluna_livre - 1 EndRow: linha_livre - 1
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: excel TextToSend: $'''{Alt}CVA''' DelayBetweenKeystrokes: 200 SendTextAsHardwareKeys: False
+WAIT 2
+Excel.SaveExcel.Save Instance: excel
+Excel.DeleteWorksheet.DeleteWorksheetByName Instance: excel Name: $'''Robô'''
+Excel.DeleteWorksheet.DeleteWorksheetByName Instance: excel Name: $'''Análise das Prescrições'''
+Excel.SaveExcel.SaveAs Instance: excel DocumentFormat: Excel.ExcelFormat.FromExtension DocumentPath: $'''%pasta_download%\\Resultado na Análise\\Resultado Análise - %unidade_analise% - %trimestral%.%ano%.xlsx'''
+Excel.CloseExcel.Close Instance: excel
+WAIT 2
+Folder.GetFiles Folder: $'''%pasta_download%\\NÃO EDITAR - Arquivos Robô\\Robô - Arquivos''' FileFilter: $'''*.xlsx''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.LastModified SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> arquivos_lista
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: arquivos_lista[0] Visible: True ReadOnly: False UseMachineLocale: False Instance=> excel
+Excel.DeleteWorksheet.DeleteWorksheetByName Instance: excel Name: $'''Robô'''
+Excel.DeleteWorksheet.DeleteWorksheetByName Instance: excel Name: $'''%unidade_abrev% - %numero_trimestral%° Trim %ano%'''
+Excel.SaveExcel.SaveAs Instance: excel DocumentFormat: Excel.ExcelFormat.FromExtension DocumentPath: $'''%pasta_download%\\Análise das Prescrições\\Análise - %unidade_analise% - %trimestral%.%ano%.xlsx'''
+Excel.CloseExcel.Close Instance: excel

@@ -1,0 +1,78 @@
+SET linha_infopen TO 2
+Excel.GetFirstFreeColumnRow Instance: excel FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.GetFirstFreeRowOnColumn Instance: excel Column: $'''F''' FirstFreeRowOnColumn=> linha_livre_coluna_f
+LOOP WHILE (linha_infopen) <= (linha_livre_coluna_f - 1)
+    Excel.ReadFromExcel.ReadCell Instance: excel StartColumn: $'''C''' StartRow: linha_infopen GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> medicamento
+    Excel.ReadFromExcel.ReadCell Instance: excel StartColumn: $'''F''' StartRow: linha_infopen GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> infopen
+    Excel.ReadFromExcel.ReadCell Instance: excel StartColumn: $'''F''' StartRow: linha_infopen - 1 GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> infopen_anterior
+    IF IsNotEmpty(medicamento) THEN
+        IF IsNotEmpty(linha_infopen) THEN
+            IF Contains(infopen, $'''NÃO IDENTIFICADO''', False) THEN
+                GOTO 'final da pesquisa'
+            ELSE IF IsEmpty(infopen) THEN
+                GOTO 'final da pesquisa'
+            ELSE IF infopen > 0 THEN
+                IF infopen <> infopen_anterior THEN
+                    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sigpri Text: $'''Bem-vindo!''') THEN
+                        WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''function ExecuteScript() { 
+const generateTxtLink = document.querySelector(\'#frmMenuSuperior\\\\:barraMenuSuperior\\\\:dropDowMenuIndividuo\\\\:item2\');
+
+// Verifique se o elemento foi encontrado
+if (generateTxtLink) {
+    // Simula um clique no link
+    generateTxtLink.click();
+}
+}'''
+                    END
+                    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sigpri Text: $'''Por favor, aguarde...''') THEN
+                        WAIT (WebAutomation.WaitForWebPageContent.WebPageToNotContainText BrowserInstance: sigpri Text: $'''Por favor, aguarde...''')
+                    END
+                    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sigpri Text: $'''Nº Infopen''')
+                    WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''function ExecuteScript() {
+    document.querySelector(\'[name*=\"longField:input\"]\').focus();
+}'''
+                    WAIT 1
+                    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: infopen DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+                    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: $'''{Tab: 9}{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+                    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sigpri Text: $'''Por favor, aguarde...''') THEN
+                        WAIT (WebAutomation.WaitForWebPageContent.WebPageToNotContainText BrowserInstance: sigpri Text: $'''Por favor, aguarde...''')
+                    END
+                    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sigpri Text: $'''INFOPEN inexistente.''') THEN
+                        Excel.WriteToExcel.WriteCell Instance: excel Value: $'''INFOPEN INEXISTENTE''' Column: $'''G''' Row: linha_infopen
+                        MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: $'''{Tab: 10}{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+                        IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sigpri Text: $'''Por favor, aguarde...''') THEN
+                            WAIT (WebAutomation.WaitForWebPageContent.WebPageToNotContainText BrowserInstance: sigpri Text: $'''Por favor, aguarde...''')
+                        END
+                        GOTO 'final da pesquisa'
+                    END
+                    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sigpri Text: $'''Acervo SIP''')
+                    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: $'''{Tab: 4}{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+                    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sigpri Text: $'''Por favor, aguarde...''') THEN
+                        WAIT (WebAutomation.WaitForWebPageContent.WebPageToNotContainText BrowserInstance: sigpri Text: $'''Por favor, aguarde...''')
+                    END
+                    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sigpri Text: $'''Nome do pai''')
+                    WebAutomation.ExtractData.ExtractSingleValue BrowserInstance: sigpri ExtractionParameters: {[$'''html > body > div:eq(1) > div:eq(1) > div > div > div > div > span > div:eq(0) > div > div:eq(1) > div:eq(1) > div:eq(0) > div:eq(2) > div:eq(0) > fieldset > span''', $'''Own Text''', $''''''] } TimeoutInSeconds: 60 ExtractedData=> unidade_admissao
+                    IF unidade_admissao[0][0] <> unidade_sigpri THEN
+                        Excel.WriteToExcel.WriteCell Instance: excel Value: $'''IPL ADMITIDO EM OUTRA UNIDADE PRISIONAL''' Column: $'''G''' Row: linha_infopen
+                    END
+                    IF unidade_admissao[0][0] = $'''PRESO DESLIGADO DO SISTEMA PRISIONAL''' THEN
+                        Excel.WriteToExcel.WriteCell Instance: excel Value: $'''IPL DESLIGADO''' Column: $'''G''' Row: linha_infopen
+                    END
+                    IF unidade_admissao[0][0] = unidade_sigpri THEN
+                        Excel.WriteToExcel.WriteCell Instance: excel Value: $'''IPL ADMITIDO''' Column: $'''G''' Row: linha_infopen
+                    END
+                END
+            ELSE IF infopen = infopen_anterior THEN
+                GOTO 'final da pesquisa'
+            END
+            MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: $'''{Tab: 7}{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+            IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sigpri Text: $'''Por favor, aguarde...''') THEN
+                WAIT (WebAutomation.WaitForWebPageContent.WebPageToNotContainText BrowserInstance: sigpri Text: $'''Por favor, aguarde...''')
+            END
+            WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sigpri Text: $'''Nome do indivíduo:''')
+            LABEL 'final da pesquisa'
+            Variables.IncreaseVariable Value: linha_infopen IncrementValue: 1
+        END
+    END
+END
+WebAutomation.CloseWebBrowser BrowserInstance: sigpri

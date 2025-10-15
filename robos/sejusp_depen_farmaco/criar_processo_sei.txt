@@ -1,0 +1,51 @@
+# Este robô possui como pré-requisito o login no sei e a seleção da unidade correta.
+# Clica para iniciar o processo.
+WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { 
+document.querySelector(\'a[link=\"procedimento_escolher_tipo\"]\').click()
+}'''
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sei Text: $'''Escolha o Tipo do Processo:''')
+# Digita o nome do tipo do processo e seleciona.
+Clipboard.SetText Text: tipo_processo
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sei TextToSend: $'''{Control}{V}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sei TextToSend: $'''{Down}{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+# Aguarda o carregamento da página.
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sei Text: $'''Interessados:''')
+# Insere a Especificação.
+SET assunto_memo TO $'''Resultado de Análise das prescrições'''
+Clipboard.SetText Text: assunto_memo
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sei TextToSend: $'''{Control}{V}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sei TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+# Seleciona o processo (restrito).
+# Clica em restrito e insere a hipótese legal.
+WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { 
+opcao = document.getElementById(
+\"lblRestrito\"
+)
+opcao.click()
+}'''
+WAIT 2
+WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() {
+    const select = document.getElementById(\"selHipoteseLegal\");
+    if (select) {
+        select.value = \"1\";
+
+        // Dispara os eventos como se o usuário tivesse interagido
+        select.dispatchEvent(new Event(\"input\", { bubbles: true }));
+        select.dispatchEvent(new Event(\"change\", { bubbles: true }));
+    } else {
+        console.error(\"Elemento com ID \'selHipoteseLegal\' não encontrado.\");
+    }
+}'''
+WAIT 2
+WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() {
+    const botaoSalvar = document.getElementById(\"btnSalvar\");
+    if (botaoSalvar) {
+        botaoSalvar.click();
+    } else {
+        console.error(\"Botão com ID \'btnSalvar\' não encontrado.\");
+    }
+}
+'''
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sei Text: $'''Consultar Andamento''')
