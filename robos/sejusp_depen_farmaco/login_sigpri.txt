@@ -1,0 +1,88 @@
+DISABLE WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://sigpri.mg.gov.br''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> sigpri
+WebAutomation.LaunchEdge.LaunchEdge Url: $'''https://sigpri.mg.gov.br''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> sigpri
+IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: sigpri Text: $'''Bem-vindo!''') THEN
+    EXIT FUNCTION
+END
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sigpri Text: $'''Esqueceu sua senha?''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: $'''%login_sigpri%{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: senha_sigpri DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: sigpri TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sigpri Text: $'''UNIDADE SEAP ADM INTERNO''')
+WAIT 1
+WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''async function ExecuteScript() {
+  // Função para encontrar e clicar em um elemento pelo seu texto
+  function findElementByTextAndClick(selector, text, timeout = 5000) {
+    return new Promise((resolve, reject) => {
+      const startTime = Date.now();
+      const interval = setInterval(() => {
+        const elements = document.querySelectorAll(selector);
+        for (const el of elements) {
+          // Verifica se o texto do elemento contém o texto desejado
+          if (el.textContent.trim().includes(text)) {
+            clearInterval(interval);
+            el.click(); // Clica no elemento
+            return resolve(\"Elemento encontrado e clicado com sucesso.\");
+          }
+        }
+        // Se o tempo limite for atingido, rejeita a promessa
+        if (Date.now() - startTime > timeout) {
+          clearInterval(interval);
+          reject(new Error(`Erro: Elemento com o texto \'${text}\' não foi encontrado após ${timeout}ms.`));
+        }
+      }, 100); // Tenta a cada 100ms
+    });
+  }
+
+  try {
+    // Chame a função passando o seletor da classe e o texto do elemento
+    const result = await findElementByTextAndClick(\'.rf-edt-c-cnt\', \'00040241 - UNIDADE SEAP ADM INTERNO\');
+    
+    // Retorna a mensagem de sucesso
+    return result;
+  } catch (error) {
+    // Em caso de erro, retorna a mensagem
+    return error.message;
+  }
+}'''
+WAIT 1
+WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''async function ExecuteScript() {
+  function waitForElementAndClick(selector, timeout = 5000) {
+    return new Promise((resolve, reject) => {
+      const startTime = Date.now();
+      const interval = setInterval(() => {
+        const element = document.querySelector(selector);
+        if (element) {
+          clearInterval(interval);
+          element.click();
+          resolve(\"Elemento encontrado e clicado com sucesso.\");
+        } else if (Date.now() - startTime > timeout) {
+          clearInterval(interval);
+          reject(`Erro: Elemento com o seletor \'${selector}\' não foi encontrado após ${timeout}ms.`);
+        }
+      }, 100);
+    });
+  }
+
+  try {
+    // A melhor opção: usar o atributo \'value\' que é estático.
+    await waitForElementAndClick(\'input[value=\"Selecionar\"]\');
+    return \"Botão \'Selecionar\' clicado com sucesso.\";
+  } catch (error) {
+    return \"Erro ao executar o script: \" + error.message;
+  }
+}'''
+WAIT 1
+WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''function ExecuteScript() { 
+fechar=document.getElementById(\"fechar:button\")
+fechar.click()
+}'''
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: sigpri Text: $'''Bem-vindo!''')
+WebAutomation.ExecuteJavascript BrowserInstance: sigpri Javascript: $'''function ExecuteScript() { 
+const generateTxtLink = document.querySelector(\'#frmMenuSuperior\\\\:barraMenuSuperior\\\\:dropDowMenuIndividuo\\\\:item2\');
+
+// Verifique se o elemento foi encontrado
+if (generateTxtLink) {
+    // Simula um clique no link
+    generateTxtLink.click();
+}
+}'''

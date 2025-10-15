@@ -1,0 +1,20 @@
+CALL inserir_dados
+WebAutomation.LaunchEdge.LaunchEdge Url: pasta_prescricoes WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> pasta_prescricoes
+DISABLE WebAutomation.LaunchChrome.LaunchChrome Url: pasta_prescricoes WindowState: WebAutomation.BrowserWindowState.Normal ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> pasta_prescricoes
+LOOP LoopIndex FROM 1 TO 1000 STEP 1
+    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: pasta_prescricoes Text: $'''Esta pasta está vazia''') THEN
+        SET leitura TO $'''OK'''
+    END
+    IF leitura = $'''OK''' THEN
+        WebAutomation.CloseWebBrowser BrowserInstance: pasta_prescricoes
+        EXIT LOOP
+    END
+END
+CALL editar_planilha_modelo
+CALL salvar_planilhas
+CALL atualizar_planilha_controle
+CALL login_sei
+CALL trocar_unidade_sei
+CALL criar_processo_sei
+CALL criar_memorando_sei
+CALL inserir_anexo
