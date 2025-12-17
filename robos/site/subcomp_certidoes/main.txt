@@ -1,0 +1,395 @@
+/# Para a variável %pasta%, é importante verificar se:
+1. o nome da pasta contém caracteres especiais e se eles serão reconhecidos pelo robô ao salvar as certidões;
+2. existe algum arquivo com o mesmo nome da pasta, isso pode gerar um 'autocompletar' em vez da ação de salvar a certidão no computador#/
+**REGION Checklist
+@@statistics_Image: '1'
+@@statistics_TextBlock: '1'
+@@statistics_Input_Toggle: '12'
+@@statistics_Action_Submit: '2'
+DISABLE Display.ShowCustomDialog CardTemplateJson: '''{
+  \"type\": \"AdaptiveCard\",
+  \"version\": \"1.4\",
+  \"id\": \"AdaptiveCard\",
+  \"body\": [
+    {
+      \"id\": \"Image2\",
+      \"type\": \"Image\",
+      \"size\": \"large\",
+      \"url\": \"${Image2_Url}\",
+      \"horizontalAlignment\": \"center\",
+      \"spacing\": \"padding\",
+      \"height\": \"250px\"
+    },
+    {
+      \"type\": \"TextBlock\",
+      \"id\": \"Text block\",
+      \"size\": \"medium\",
+      \"color\": \"attention\",
+      \"text\": \"${Text_block_Text}\",
+      \"horizontalAlignment\": \"center\",
+      \"spacing\": \"none\",
+      \"separator\": true
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"bloco\",
+      \"title\": \"${bloco_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cafimp\",
+      \"title\": \"${cafimp_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cadin\",
+      \"title\": \"${cadin_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cdt\",
+      \"title\": \"${cdt_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cnia\",
+      \"title\": \"${cnia_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cnd federal\",
+      \"title\": \"${cnd_federal_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cnd pbh\",
+      \"title\": \"${cnd_pbh_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cndt\",
+      \"title\": \"${cndt_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"fgts\",
+      \"title\": \"${fgts_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"crc\",
+      \"title\": \"${crc_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\",
+      \"value\": \"\",
+      \"label\": \"\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"tcu\",
+      \"title\": \"${tcu_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cnpj\",
+      \"title\": \"${cnpj_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\",
+      \"label\": \"\"
+    }
+  ],
+  \"actions\": [
+    {
+      \"type\": \"Action.Submit\",
+      \"id\": \"continuar\",
+      \"title\": \"${continuar_Title}\"
+    },
+    {
+      \"type\": \"Action.Submit\",
+      \"id\": \"cancelar\",
+      \"title\": \"${cancelar_Title}\"
+    }
+  ],
+  \"FormTitle\": \"${AdaptiveCard_FormTitle}\"
+}''' CustomFormData=> checklist ButtonPressed=> botao_formulario @AdaptiveCard_FormTitle: $'''Certi-Bot''' @Image2_Url: $'''https://i.postimg.cc/XqRfTkXn/Gemini-Generated-Image-524w9i524w9i524w.png''' @Text_block_Text: $'''Selecione as certidões a serem emitidas''' @bloco_Title: $'''Emitir todas as certidões abaixo''' @cafimp_Title: $'''Cadastro de Fornecedores Impedidos - CAFIMP''' @cadin_Title: $'''Cadastro Informativo de Inadimplência em relação à Administração - CADIN-MG''' @cdt_Title: $'''Certidão de Débitos Tributários - CDT''' @cnia_Title: $'''Certidão de Improbidade e Inelegibilidade - CNIA''' @cnd_federal_Title: $'''Certidão de Regularidade Fiscal - CND''' @cnd_pbh_Title: $'''Certidão Negativa de Débito - CND PBH''' @cndt_Title: $'''Certidão Negativa de Débitos Trabalhistas - CNDT''' @fgts_Title: $'''Certificado de Regularidade do FGTS - CRF''' @crc_Title: $'''Certificado de Registro Cadastral - CRC''' @tcu_Title: $'''Consulta Consolidada de Pessoa Jurídica do TCU''' @cnpj_Title: $'''Comprovante de Inscrição e de Situação Cadastral - CNPJ''' @continuar_Title: $'''Continuar''' @cancelar_Title: $'''Cancelar'''
+@@statistics_TextBlock: '1'
+@@statistics_Input_Toggle: '12'
+@@statistics_Action_Submit: '2'
+Display.ShowCustomDialog CardTemplateJson: '''{
+  \"type\": \"AdaptiveCard\",
+  \"version\": \"1.4\",
+  \"id\": \"AdaptiveCard\",
+  \"body\": [
+    {
+      \"type\": \"TextBlock\",
+      \"id\": \"Text block\",
+      \"size\": \"medium\",
+      \"color\": \"attention\",
+      \"text\": \"${Text_block_Text}\",
+      \"horizontalAlignment\": \"center\",
+      \"spacing\": \"none\",
+      \"separator\": true
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"bloco\",
+      \"title\": \"${bloco_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cafimp\",
+      \"title\": \"${cafimp_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cadin\",
+      \"title\": \"${cadin_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cdt\",
+      \"title\": \"${cdt_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cnia\",
+      \"title\": \"${cnia_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cnd federal\",
+      \"title\": \"${cnd_federal_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cnd pbh\",
+      \"title\": \"${cnd_pbh_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cndt\",
+      \"title\": \"${cndt_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"fgts\",
+      \"title\": \"${fgts_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"crc\",
+      \"title\": \"${crc_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\",
+      \"value\": \"\",
+      \"label\": \"\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"tcu\",
+      \"title\": \"${tcu_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\"
+    },
+    {
+      \"type\": \"Input.Toggle\",
+      \"id\": \"cnpj\",
+      \"title\": \"${cnpj_Title}\",
+      \"valueOn\": \"True\",
+      \"valueOff\": \"False\",
+      \"label\": \"\"
+    }
+  ],
+  \"actions\": [
+    {
+      \"type\": \"Action.Submit\",
+      \"id\": \"continuar\",
+      \"title\": \"${continuar_Title}\"
+    },
+    {
+      \"type\": \"Action.Submit\",
+      \"id\": \"cancelar\",
+      \"title\": \"${cancelar_Title}\"
+    }
+  ],
+  \"FormTitle\": \"${AdaptiveCard_FormTitle}\"
+}''' CustomFormData=> checklist ButtonPressed=> botao_formulario @AdaptiveCard_FormTitle: $'''Certi-Bot''' @Text_block_Text: $'''Selecione as certidões a serem emitidas''' @bloco_Title: $'''Emitir todas as certidões abaixo''' @cafimp_Title: $'''Cadastro de Fornecedores Impedidos - CAFIMP''' @cadin_Title: $'''Cadastro Informativo de Inadimplência em relação à Administração - CADIN-MG''' @cdt_Title: $'''Certidão de Débitos Tributários - CDT''' @cnia_Title: $'''Certidão de Improbidade e Inelegibilidade - CNIA''' @cnd_federal_Title: $'''Certidão de Regularidade Fiscal - CND''' @cnd_pbh_Title: $'''Certidão Negativa de Débito - CND PBH''' @cndt_Title: $'''Certidão Negativa de Débitos Trabalhistas - CNDT''' @fgts_Title: $'''Certificado de Regularidade do FGTS - CRF''' @crc_Title: $'''Certificado de Registro Cadastral - CRC''' @tcu_Title: $'''Consulta Consolidada de Pessoa Jurídica do TCU''' @cnpj_Title: $'''Comprovante de Inscrição e de Situação Cadastral - CNPJ''' @continuar_Title: $'''Continuar''' @cancelar_Title: $'''Cancelar'''
+IF botao_formulario = $'''cancelar''' THEN
+    EXIT Code: 0 ErrorMessage: $'''Você interrompeu a execução do robô.'''
+END
+Variables.GenerateDataTableFromCSV.ReadCustomSeparator CSVText: checklist TrimFields: True FirstLineContainsColumnNames: False ReadFieldsAsText: True CustomColumnsSeparator: $''',''' CSVTable=> CSVTable
+Variables.FindOrReplaceInDataTable.FindItemInDataTableEverywhere DataTable: CSVTable AllMatches: True ValueToFind: $'''True''' MatchCase: False MatchEntireCellContents: False DataTableMatches=> DataTableMatches
+Variables.RetrieveDataTableColumnIntoList DataTable: DataTableMatches ColumnNameOrIndex: 1 ColumnAsList=> lista_coluna
+Variables.CreateNewList List=> lista_certidoes
+LOOP FOREACH linha IN lista_coluna
+    Text.ToNumber Text: linha Number=> TextAsNumber
+    Text.CropText.CropTextBetweenFlags Text: CSVTable[0][TextAsNumber] FromFlag: $'''\'''' ToFlag: $'''\'''' IgnoreCase: False CroppedText=> check_certidao
+    Variables.AddItemToList Item: check_certidao List: lista_certidoes
+END
+**ENDREGION
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_hora
+Workstation.SetDefaultPrinter PrinterName: $'''Microsoft Print to PDF'''
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: planilha Visible: True ReadOnly: False Instance=> fornecedores
+Excel.GetFirstFreeColumnRow Instance: fornecedores FirstFreeRow=> qtde_a_conferir
+Excel.ReadFromExcel.ReadAllCells Instance: fornecedores GetCellContentsMode: Excel.GetCellContentsMode.TypedValues FirstLineIsHeader: True RangeValue=> planilha_excel
+SET linhaatual TO 2
+WebAutomation.LaunchChrome.LaunchChromeCloseDialog Url: $'''www.google.com''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> navegador
+LOOP WHILE (linhaatual) < (qtde_a_conferir)
+    Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''A''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> cnpjatual
+    Text.Replace Text: cnpjatual TextToFind: $'''\\D''' IsRegEx: True IgnoreCase: False ReplaceWith: vazio ActivateEscapeSequences: False Result=> cnpjatual_formatado
+    Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''B''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> cpf1
+    Text.Replace Text: cpf1 TextToFind: $'''\\D''' IsRegEx: True IgnoreCase: False ReplaceWith: vazio ActivateEscapeSequences: False Result=> cpf1
+    Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''C''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> cpf2
+    Text.Replace Text: cpf2 TextToFind: $'''\\D''' IsRegEx: True IgnoreCase: False ReplaceWith: vazio ActivateEscapeSequences: False Result=> cpf2
+    Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''D''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> empresa
+    Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''E''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> cep
+    Text.Replace Text: cep TextToFind: $'''\\D''' IsRegEx: True IgnoreCase: False ReplaceWith: vazio ActivateEscapeSequences: False Result=> cep
+    Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''F''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> município
+    Excel.ReadFromExcel.ReadCell Instance: fornecedores StartColumn: $'''G''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> estado
+    LOOP FOREACH tipo IN lista_certidoes
+        IF tipo = $'''cafimp''' THEN
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://www.cagef.mg.gov.br/fornecedor-web/br/gov/prodemge/seplag/fornecedor/publico/index.zul''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cafimp
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cafimp State: UIAutomation.WindowState.Maximized
+            CALL cafimp
+        END
+        IF tipo = $'''cadin''' THEN
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''http://consultapublica.fazenda.mg.gov.br/ConsultaPublicaCADIN/consultaSituacaoPublica.do;''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cadin
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cadin State: UIAutomation.WindowState.Maximized
+            CALL cadin
+        END
+        IF tipo = $'''cdt''' THEN
+            IF estado = $'''MG''' THEN
+                WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://www2.fazenda.mg.gov.br/sol/ctrl/SOL/CDT/SERVICO_829?ACAO=INICIAR''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_siare
+                UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_siare State: UIAutomation.WindowState.Maximized
+                CALL cdt
+            ELSE
+                Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Pesquisar CND no estado da sede da empresa''' Column: $'''I''' Row: linhaatual
+            END
+        END
+        IF tipo = $'''cnd federal''' THEN
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://servicos.receitafederal.gov.br/servico/certidoes/#/home/cnpj''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cnd_federal
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cnd_federal State: UIAutomation.WindowState.Maximized
+            CALL cnd_federal
+        END
+        IF tipo = $'''cnd pbh''' THEN
+            IF município = $'''BH''' THEN
+                WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://cnd.pbh.gov.br/CNDOnline/''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cnd_pbh
+                UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cnd_pbh State: UIAutomation.WindowState.Maximized
+                CALL cnd_pbh
+            ELSE
+                Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Pesquisar CND no município da sede da empresa''' Column: $'''J''' Row: linhaatual
+            END
+        END
+        IF tipo = $'''cndt''' THEN
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://cndt-certidao.tst.jus.br/inicio.faces''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_jus_trab
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_jus_trab State: UIAutomation.WindowState.Maximized
+            CALL justica_trabalho
+        END
+        IF tipo = $'''fgts''' THEN
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_fgts
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_fgts State: UIAutomation.WindowState.Maximized
+            CALL fgts
+        END
+        IF tipo = $'''crc''' THEN
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://www.cagef.mg.gov.br/fornecedor-web/br/gov/prodemge/seplag/fornecedor/publico/index.zul''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cagef
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cagef State: UIAutomation.WindowState.Maximized
+            CALL crc
+        END
+        IF tipo = $'''cnia''' THEN
+            CALL cnia
+        END
+        IF tipo = $'''tcu''' THEN
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://certidoes-apf.apps.tcu.gov.br/''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_tcu
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_tcu State: UIAutomation.WindowState.Maximized
+            CALL tcu
+        END
+        IF tipo = $'''cnpj''' THEN
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://solucoes.receita.fazenda.gov.br/Servicos/cnpjreva/Cnpjreva_Solicitacao.asp''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cnpj
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cnpj State: UIAutomation.WindowState.Maximized
+            CALL cnpj
+        END
+        IF tipo = $'''bloco''' THEN
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://www.cagef.mg.gov.br/fornecedor-web/br/gov/prodemge/seplag/fornecedor/publico/index.zul''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cafimp
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cafimp State: UIAutomation.WindowState.Maximized
+            CALL cafimp
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''http://consultapublica.fazenda.mg.gov.br/ConsultaPublicaCADIN/consultaSituacaoPublica.do;''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cadin
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cadin State: UIAutomation.WindowState.Maximized
+            CALL cadin
+            IF estado = $'''MG''' THEN
+                WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://www2.fazenda.mg.gov.br/sol/ctrl/SOL/CDT/SERVICO_829?ACAO=INICIAR''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_siare
+                UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_siare State: UIAutomation.WindowState.Maximized
+                CALL cdt
+            ELSE
+                Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Pesquisar CND no estado da sede da empresa''' Column: $'''I''' Row: linhaatual
+            END
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://servicos.receitafederal.gov.br/servico/certidoes/#/home/cnpj''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cnd_federal
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cnd_federal State: UIAutomation.WindowState.Maximized
+            CALL cnd_federal
+            IF município = $'''BH''' THEN
+                WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://cnd.pbh.gov.br/CNDOnline/''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cnd_pbh
+                UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cnd_pbh State: UIAutomation.WindowState.Maximized
+                CALL cnd_pbh
+            ELSE
+                Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Pesquisar CND no município da sede da empresa''' Column: $'''J''' Row: linhaatual
+            END
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://cndt-certidao.tst.jus.br/inicio.faces''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_jus_trab
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_jus_trab State: UIAutomation.WindowState.Maximized
+            CALL justica_trabalho
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_fgts
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_fgts State: UIAutomation.WindowState.Maximized
+            CALL fgts
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://www.cagef.mg.gov.br/fornecedor-web/br/gov/prodemge/seplag/fornecedor/publico/index.zul''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cagef
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cagef State: UIAutomation.WindowState.Maximized
+            CALL crc
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://certidoes-apf.apps.tcu.gov.br/''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_tcu
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_tcu State: UIAutomation.WindowState.Maximized
+            CALL tcu
+            WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://solucoes.receita.fazenda.gov.br/Servicos/cnpjreva/Cnpjreva_Solicitacao.asp''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_cnpj
+            UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_cnpj State: UIAutomation.WindowState.Maximized
+            CALL cnpj
+            CALL cnia
+        END
+    END
+    Excel.WriteToExcel.WriteCell Instance: fornecedores Value: data_hora Column: $'''S''' Row: linhaatual
+    Variables.IncreaseVariable Value: linhaatual IncrementValue: 1
+END
+WebAutomation.CloseWebBrowser BrowserInstance: navegador
+Display.ShowMessageDialog.ShowMessage Title: $'''Processo concluído!''' Message: $'''O Certi-Bot emitiu as certidões com sucesso!''' Icon: Display.Icon.Warning Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
