@@ -1,0 +1,84 @@
+WebAutomation.ExecuteJavascript BrowserInstance: site_cagef Javascript: $'''function ExecuteScript() { // Seleciona o elemento que tem as classes \'menuicon\' E \'ibars\'.
+const elemento = document.querySelector(\'.menuicon.ibars\');
+
+// Verifica se o elemento foi encontrado antes de tentar clicar.
+if (elemento) {
+  elemento.click();
+  console.log(\'O elemento foi clicado com sucesso!\');
+} else {
+  console.error(\'O elemento com as classes \"menuicon\" e \"ibars\" não foi encontrado.\');
+} }'''
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cagef Text: $'''Consultas''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 3}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cagef Text: $'''Consultar Fornecedores''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 2}{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cagef Text: $'''Tipo Pessoa:''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 3}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: cnpjatual DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 11}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT 2
+WebAutomation.ExecuteJavascript BrowserInstance: site_cagef Javascript: $'''function ExecuteScript() { 
+document.querySelector(\'div.text-right.z-div .btn.btn-danger.z-button\').click()
+}''' Result=> Result
+WAIT 2
+IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_cagef Text: $'''Ativo''') THEN
+    Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Ativo''' Column: $'''Q''' Row: linhaatual
+    WebAutomation.ExecuteJavascript BrowserInstance: site_cagef Javascript: $'''function ExecuteScript() {
+const xpath = `//div[contains(text(), \'Ativo\')]`;
+const targetElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+
+if (targetElement) {
+    targetElement.click();
+    console.log(\"Clicked using XPath\");
+} else {
+    console.error(\"Element not found using XPath\");
+}
+
+}''' Result=> Result2
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: site_cagef Javascript: $'''function ExecuteScript() {
+    let buttons = document.querySelectorAll(\"button.btn.btn-grey.z-button\");
+    buttons.forEach(button => {
+        if (button.textContent.trim() === \"Emitir CRC do Fornecedor\") {
+            button.click();
+        }
+    });
+}''' Result=> Result2
+    WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''Salvar como''' Class: $'''#32770''' FocusWindow: True)
+    Clipboard.SetText Text: $'''%empresa%_CRC'''
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT 2
+    Clipboard.SetText Text: pasta
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({L})''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 8}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+ELSE
+    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_cagef Text: $'''Vencido''') THEN
+        Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Vencido''' Column: $'''Q''' Row: linhaatual
+        WebAutomation.ExecuteJavascript BrowserInstance: site_cagef Javascript: $'''function ExecuteScript() {
+    let buttons = document.querySelectorAll(\"button.btn.btn-grey.z-button\");
+    buttons.forEach(button => {
+        if (button.textContent.trim() === \"Emitir CRC do Fornecedor\") {
+            button.click();
+        }
+    });
+}''' Result=> Result2
+        WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''Salvar como''' Class: $'''#32770''' FocusWindow: True)
+        Clipboard.SetText Text: $'''%empresa%_CRC'''
+        WAIT 2
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+        WAIT 2
+        Clipboard.SetText Text: pasta
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({L})''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: True
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+        WAIT 1
+        MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 8}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    END
+END
+IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_cagef Text: $'''Nenhum registro encontrado''') THEN
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Nenhum registro encontrado''' Column: $'''Q''' Row: linhaatual
+END
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_cagef TextToSend: $'''{Control}({W})''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True

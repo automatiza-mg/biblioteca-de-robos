@@ -1,0 +1,37 @@
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cafimp Text: $'''CAGEF''')
+WebAutomation.ExecuteJavascript BrowserInstance: site_cafimp Javascript: $'''function ExecuteScript() { document.querySelector(\".menuicon.ibars.z-div\").click();
+ }'''
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cafimp Text: $'''Representante''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_cafimp TextToSend: $'''{Tab: 3}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cafimp Text: $'''Consultar Autenticidade''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_cafimp TextToSend: $'''{Tab: 3}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cafimp Text: $'''CNPJ do Fornecedor''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_cafimp TextToSend: $'''{Tab: 2}%cnpjatual%''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_cafimp TextToSend: $'''{Tab: 2}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cafimp Text: $'''O fornecedor''')
+IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_cafimp Text: $'''NÃO SE ENCONTRA INSCRITO''') THEN
+    Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Não se encontra inscrito''' Column: $'''I''' Row: linhaatual
+ELSE
+    Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Inscrito''' Column: $'''I''' Row: linhaatual
+END
+WebAutomation.ExecuteJavascript BrowserInstance: site_cafimp Javascript: $'''function ExecuteScript() {
+    let buttons = document.querySelectorAll(\".btn.btn-grey.z-button\");
+
+    buttons.forEach(button => {
+        if (button.textContent.trim() === \"Emitir Certidão do CAFIMP\") {
+            button.click();
+        }
+    });
+}'''
+WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''Salvar como''' Class: $'''#32770''' FocusWindow: True)
+Clipboard.SetText Text: $'''%empresa%_CAFIMP'''
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+WAIT 2
+Clipboard.SetText Text: pasta
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({L})''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 8}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_cafimp TextToSend: $'''{Control}({W})''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True

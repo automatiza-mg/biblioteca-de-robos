@@ -1,0 +1,53 @@
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cnpj Text: $'''Emissão de Comprovante de Inscrição e de Situação Cadastral''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 3}%cnpjatual%{Tab}{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: False
+WAIT 2
+WebAutomation.ExecuteJavascript BrowserInstance: site_cnpj Javascript: $'''function ExecuteScript() {
+const button = document.querySelector(\'#frmConsulta button\');
+if (button) {
+    button.click();
+    console.log(\"Button clicked successfully using querySelector!\");
+} else {
+    console.error(\"Button not found using querySelector.\");
+}
+
+}''' Result=> Result3
+IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_cnpj Text: $'''Erro na Consulta - Esclarecimentos adicionais''') THEN
+    Display.ShowMessageDialog.ShowMessage Title: $'''Validar o hCaptcha''' Message: $'''Favor marcar o botão à esquerda do texto \'Sou humano\'. 
+Em seguida, pressione o botão \'CONSULTAR\'.
+''' Icon: Display.Icon.Warning Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+END
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_cnpj Text: $'''Confira os dados de Identificação da Pessoa Jurídica''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Next}''' DelayBetweenKeystrokes: 80 SendTextAsHardwareKeys: True
+IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_cnpj Text: $'''ATIVA''') THEN
+    Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Ativo''' Column: $'''N''' Row: linhaatual
+ELSE
+    Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Verificar Cadastro CNPJ''' Column: $'''N''' Row: linhaatual
+END
+WebAutomation.ExecuteJavascript BrowserInstance: site_cnpj Javascript: $'''function ExecuteScript() {
+// Select the <i> element inside the element with id \'print\'
+const printIcon = document.querySelector(\'#print > i\');
+
+// Check if the element exists before attempting to click
+if (printIcon) {
+    printIcon.click();
+    console.log(\"Print icon clicked successfully using querySelector!\");
+} else {
+    console.error(\"Print icon not found using querySelector.\");
+}
+
+}''' Result=> Result3
+WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''about:blank - Google Chrome''' Class: $'''''' FocusWindow: True)
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''about:blank - Google Chrome''' Class: $'''''' TextToSend: $'''{Control}({P})''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByTitleClass Title: $'''about:blank - Google Chrome''' Class: $'''''' TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
+WAIT 2
+Clipboard.SetText Text: $'''%empresa%_CNPJ'''
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+WAIT 2
+Clipboard.SetText Text: pasta
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({L})''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 8}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+UIAutomation.CloseWindow.CloseByTitleClass Title: $'''about:blank - Google Chrome''' Class: $''''''
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_cnpj TextToSend: $'''{Control}({W})''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True

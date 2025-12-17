@@ -1,0 +1,48 @@
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_fgts Text: $'''Critérios de Pesquisa''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 5}%cnpjatual_formatado%''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: True
+WAIT 5
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 2}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''Inserir Captcha''' Message: $'''Favor digitar as letras e números presentes na imagem.
+
+Ao finalizar, pressione \'Consultar\'.''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 5
+WAIT 4
+LABEL 'ERRO CAPTCHA'
+IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_fgts Text: $'''Código Captcha Inválido''') THEN
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 8}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 7}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''ERRO''' Message: $'''Favor digitar as letras e números presentes na imagem.
+
+Ao finalizar, pressione \'Consultar\'.''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 5
+    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_fgts Text: $'''Código Captcha Inválido''') THEN
+        GOTO 'ERRO CAPTCHA'
+    END
+END
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_fgts Text: $'''Resultado da consulta''') FOR 60
+IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_fgts Text: $'''Empregador não cadastrado''') THEN
+    WebAutomation.CloseWebBrowser BrowserInstance: site_fgts
+    Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''não cadastrado''' Column: $'''O''' Row: linhaatual
+    EXIT FUNCTION
+END
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({C})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+Clipboard.GetText Text=> situacap_fgts
+Text.CropText.CropTextBetweenFlags Text: situacap_fgts FromFlag: $'''A EMPRESA abaixo identificada está''' ToFlag: $''':''' IgnoreCase: True CroppedText=> certidao IsFlagFound=> IsFlagFound
+Excel.WriteToExcel.WriteCell Instance: fornecedores Value: certidao Column: $'''O''' Row: linhaatual
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 4}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_fgts Text: $'''Visualizar''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 4}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_fgts Text: $'''Imprimir''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 2}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''Salvar como''' Class: $'''#32770''' FocusWindow: False)
+Clipboard.SetText Text: $'''%empresa%_FGTS'''
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+WAIT 2
+Clipboard.SetText Text: pasta
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({L})''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+WAIT 1
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 8}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_fgts TextToSend: $'''{Control}({W})''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True

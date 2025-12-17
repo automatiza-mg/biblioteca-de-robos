@@ -1,0 +1,227 @@
+SET verificacao_cpf TO 0
+IF IsNotEmpty(cpf1) THEN
+    WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://www.cnj.jus.br/improbidade_adm/consultar_requerido.php''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_socio_majoritario
+    UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_socio_majoritario State: UIAutomation.WindowState.Maximized
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_socio_majoritario Text: $'''Nome da Pessoa:''')
+    WAIT 1
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { // Encontra o elemento que tem o nome \'tipoPessoa\' e o valor \'F\'
+const radioElement = document.querySelector(\'input[name=\"tipoPessoa\"][value=\"F\"]\');
+
+// Simula o clique
+if (radioElement) {
+    radioElement.click();
+} }'''
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { 
+// 1. Encontra o elemento pelo seu ID
+const inputElement = document.getElementById(\'num_cpf_cnpj\');
+
+// 2. Foca no campo de texto (coloca o cursor nele)
+if (inputElement) {
+    inputElement.focus();
+    
+    // Opcional: Para simular um \"clique\" (útil em alguns frameworks),
+    // você pode tentar a função .click() também, embora \'focus()\'
+    // seja o mais adequado para campos de texto.
+    // inputElement.click(); 
+}
+}'''
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%cpf1%{Tab: 2}{Space}''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: True
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { 
+// 1. Encontra o elemento pelo seu ID único
+const botaoPesquisar = document.getElementById(\'btnPesquisarRequerido\');
+
+// 2. Simula o clique no botão
+// Isso dispara o evento de clique e executa o código dentro do \'onclick\'.
+if (botaoPesquisar) {
+    botaoPesquisar.click();
+}
+}'''
+    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_socio_majoritario Text: $'''Selecione''') THEN
+        Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''Validar o Captcha''' Message: $'''Favor selecionar as imagens e clicar no botão pesquisar.''' Icon: Display.Icon.Warning Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 5
+    END
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_socio_majoritario Text: $'''Nome Pessoa''')
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { 
+// 1. Encontra o elemento pelo seu ID
+const botaoCertidao = document.getElementById(\'btnCertidaoNegativa\');
+
+// 2. Simula o clique no botão
+// Isso dispara o evento e executa a função onclick=\"gerarCertidao(\'N\')\".
+if (botaoCertidao) {
+    botaoCertidao.click();
+}
+}'''
+    WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''Salvar como''' Class: $'''#32770''' FocusWindow: True)
+    Clipboard.SetText Text: $'''%empresa%_CNIA_CPF_%cpf1%'''
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT 2
+    Clipboard.SetText Text: pasta
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({L})''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 8}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT (File.WaitForFile.Created File: $'''%pasta%\\%empresa%_CNIA_CPF_%cpf1%.pdf''')
+    Pdf.ExtractTextFromPDF.ExtractTextFromPage PDFFile: $'''%pasta%\\%empresa%_CNIA_CPF_%cpf1%.pdf''' PageNumber: 1 DetectLayout: False ExtractedText=> ExtractedPDFText
+    Text.ParseText.ParseForFirstOccurrence Text: ExtractedPDFText TextToFind: $'''Certidão Negativa''' StartingPosition: 0 IgnoreCase: True OccurrencePosition=> Position
+    IF Position >= 0 THEN
+        Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Certidão Negativa''' Column: $'''M''' Row: linhaatual
+    ELSE
+        Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Certidão Positiva''' Column: $'''M''' Row: linhaatual
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_socio_majoritario TextToSend: $'''{Control}({W})''' DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: True
+    WAIT 1
+    SET verificacao_cpf TO 1
+END
+IF IsNotEmpty(cpf2) THEN
+    WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://www.cnj.jus.br/improbidade_adm/consultar_requerido.php''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_socio_majoritario
+    UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_socio_majoritario State: UIAutomation.WindowState.Maximized
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_socio_majoritario Text: $'''Nome da Pessoa:''')
+    WAIT 1
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { // Encontra o elemento que tem o nome \'tipoPessoa\' e o valor \'F\'
+const radioElement = document.querySelector(\'input[name=\"tipoPessoa\"][value=\"F\"]\');
+
+// Simula o clique
+if (radioElement) {
+    radioElement.click();
+} }'''
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { 
+// 1. Encontra o elemento pelo seu ID
+const inputElement = document.getElementById(\'num_cpf_cnpj\');
+
+// 2. Foca no campo de texto (coloca o cursor nele)
+if (inputElement) {
+    inputElement.focus();
+    
+    // Opcional: Para simular um \"clique\" (útil em alguns frameworks),
+    // você pode tentar a função .click() também, embora \'focus()\'
+    // seja o mais adequado para campos de texto.
+    // inputElement.click(); 
+}
+}'''
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%cpf2%{Tab: 2}{Space}''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: True
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { 
+// 1. Encontra o elemento pelo seu ID único
+const botaoPesquisar = document.getElementById(\'btnPesquisarRequerido\');
+
+// 2. Simula o clique no botão
+// Isso dispara o evento de clique e executa o código dentro do \'onclick\'.
+if (botaoPesquisar) {
+    botaoPesquisar.click();
+}
+}'''
+    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_socio_majoritario Text: $'''Selecione''') THEN
+        Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''Validar o Captcha''' Message: $'''Favor selecionar as imagens e clicar no botão pesquisar.''' Icon: Display.Icon.Warning Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 5
+    END
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_socio_majoritario Text: $'''Nome Pessoa''')
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { 
+// 1. Encontra o elemento pelo seu ID
+const botaoCertidao = document.getElementById(\'btnCertidaoNegativa\');
+
+// 2. Simula o clique no botão
+// Isso dispara o evento e executa a função onclick=\"gerarCertidao(\'N\')\".
+if (botaoCertidao) {
+    botaoCertidao.click();
+}
+}'''
+    WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''Salvar como''' Class: $'''#32770''' FocusWindow: True)
+    Clipboard.SetText Text: $'''%empresa%_CNIA_CPF_%cpf2%'''
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT 2
+    Clipboard.SetText Text: pasta
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}({L})''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 8}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT (File.WaitForFile.Created File: $'''%pasta%\\%empresa%_CNIA_CPF_%cpf2%.pdf''')
+    Pdf.ExtractTextFromPDF.ExtractTextFromPage PDFFile: $'''%pasta%\\%empresa%_CNIA_CPF_%cpf2%.pdf''' PageNumber: 1 DetectLayout: False ExtractedText=> ExtractedPDFText
+    Text.ParseText.ParseForFirstOccurrence Text: ExtractedPDFText TextToFind: $'''Certidão Negativa''' StartingPosition: 0 IgnoreCase: True OccurrencePosition=> Position
+    IF Position >= 0 THEN
+        Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Certidão Negativa''' Column: $'''M''' Row: linhaatual
+    ELSE
+        Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Certidão Positiva''' Column: $'''M''' Row: linhaatual
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_socio_majoritario TextToSend: $'''{Control}({W})''' DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: True
+    WAIT 1
+    SET verificacao_cpf TO 1
+END
+IF verificacao_cpf = 0 THEN
+    WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: navegador Url: $'''https://www.cnj.jus.br/improbidade_adm/consultar_requerido.php''' WaitForPageToLoadTimeout: 60 NewBrowserInstance=> site_socio_majoritario
+    UIAutomation.SetWindowState.SetStateByInstanceOrHandle WindowInstance: site_socio_majoritario State: UIAutomation.WindowState.Maximized
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_socio_majoritario Text: $'''Nome da Pessoa:''')
+    WAIT 1
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { // Encontra o elemento que tem o nome \'tipoPessoa\' e o valor \'F\'
+const radioElement = document.querySelector(\'input[name=\"tipoPessoa\"][value=\"J\"]\');
+
+// Simula o clique
+if (radioElement) {
+    radioElement.click();
+} }'''
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { 
+// 1. Encontra o elemento pelo seu ID
+const inputElement = document.getElementById(\'num_cpf_cnpj\');
+
+// 2. Foca no campo de texto (coloca o cursor nele)
+if (inputElement) {
+    inputElement.focus();
+    
+    // Opcional: Para simular um \"clique\" (útil em alguns frameworks),
+    // você pode tentar a função .click() também, embora \'focus()\'
+    // seja o mais adequado para campos de texto.
+    // inputElement.click(); 
+}
+}'''
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%cnpjatual_formatado%{Tab: 2}{Space}''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: True
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { 
+// 1. Encontra o elemento pelo seu ID único
+const botaoPesquisar = document.getElementById(\'btnPesquisarRequerido\');
+
+// 2. Simula o clique no botão
+// Isso dispara o evento de clique e executa o código dentro do \'onclick\'.
+if (botaoPesquisar) {
+    botaoPesquisar.click();
+}
+}'''
+    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: site_socio_majoritario Text: $'''Selecione''') THEN
+        Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''Validar o Captcha''' Message: $'''Favor selecionar as imagens e clicar no botão pesquisar.''' Icon: Display.Icon.Warning Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Timeout: 5
+    END
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: site_socio_majoritario Text: $'''Nome Pessoa''')
+    WebAutomation.ExecuteJavascript BrowserInstance: site_socio_majoritario Javascript: $'''function ExecuteScript() { 
+// 1. Encontra o elemento pelo seu ID
+const botaoCertidao = document.getElementById(\'btnCertidaoNegativa\');
+
+// 2. Simula o clique no botão
+// Isso dispara o evento e executa a função onclick=\"gerarCertidao(\'N\')\".
+if (botaoCertidao) {
+    botaoCertidao.click();
+}
+}'''
+    WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''Salvar como''' Class: $'''#32770''' FocusWindow: True)
+    Clipboard.SetText Text: $'''%empresa%_CNIA_CNPJ'''
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT 2
+    Clipboard.SetText Text: pasta
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({l})''' DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: True
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}{V}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab: 8}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: True
+    WAIT (File.WaitForFile.Created File: $'''%pasta%\\%empresa%_CNIA_CNPJ.pdf''')
+    Pdf.ExtractTextFromPDF.ExtractTextFromPage PDFFile: $'''%pasta%\\%empresa%_CNIA_CNPJ.pdf''' PageNumber: 1 DetectLayout: False ExtractedText=> ExtractedPDFText
+    Text.ParseText.ParseForFirstOccurrence Text: ExtractedPDFText TextToFind: $'''Certidão Negativa''' StartingPosition: 0 IgnoreCase: True OccurrencePosition=> Position
+    IF Position >= 0 THEN
+        Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Certidão Negativa''' Column: $'''M''' Row: linhaatual
+    ELSE
+        Excel.WriteToExcel.WriteCell Instance: fornecedores Value: $'''Certidão Positiva''' Column: $'''M''' Row: linhaatual
+    END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: site_socio_majoritario TextToSend: $'''{Control}({W})''' DelayBetweenKeystrokes: 20 SendTextAsHardwareKeys: True
+END
