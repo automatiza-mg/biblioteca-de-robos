@@ -1,0 +1,36 @@
+IF ERRO = $'''SIM''' THEN
+    GOTO Erros
+END
+Excel.ReadFromExcel.ReadCell Instance: planilha_base StartColumn: $'''F''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> especificacao_total
+Text.Replace Text: especificacao_total TextToFind: $'''[\\n\\r]''' IsRegEx: True IgnoreCase: False ReplaceWith: vazio ActivateEscapeSequences: False Result=> especificacao_total
+Text.Replace Text: especificacao_total TextToFind: $'''\\''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''\\\\''' ActivateEscapeSequences: False Result=> especificacao_total
+Text.Replace Text: especificacao_total TextToFind: $'''\"''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''\\\"''' ActivateEscapeSequences: False Result=> especificacao_total
+Clipboard.SetText Text: especificacao_total
+**REGION API ChatGPT
+WAIT 1
+Web.InvokeSoapService.InvokeSoapService Endpoint: $'''exemplo''' CustomHeaders: $'''exemplo''' RequestBody: $'''exemplo''' ConnectionTimeout: 30 FollowRedirection: True ClearCookies: False FailOnErrorStatus: False UserAgent: $'''Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6''' Encoding: Web.Encoding.utf_8 AcceptUntrustedCertificates: True TrimRequestBody: True Response=> respostaAPI
+Variables.ConvertJsonToCustomObject Json: respostaAPI CustomObject=> ObjetoRespostaAPI
+SET JSON_final TO ObjetorespostaAPI.choices[0].message.content
+Variables.ConvertJsonToCustomObject Json: JSON_final CustomObject=> resultado_cap
+SET resultado_cap TO resultado_cap.Status
+IF resultado_cap = $'''Presente no CAP''' THEN
+    SET buscacap TO $'''SIM'''
+END
+IF resultado_cap = $'''Ausente no CAP''' THEN
+    SET buscacap TO $'''NAO'''
+END
+**ENDREGION
+Excel.ReadFromExcel.ReadCell Instance: planilha_base StartColumn: $'''J''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> judicial
+IF NotContains(judicial, $'''SIM''', True) THEN
+    IF buscacap = $'''SIM''' THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''SIM''' Column: $'''X''' Row: linhaatual
+        Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''PMVG''' Column: $'''y''' Row: linhaatual
+    ELSE
+        Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''NÃO''' Column: $'''X''' Row: linhaatual
+        Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''PF''' Column: $'''Y''' Row: linhaatual
+    END
+ELSE
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''SIM''' Column: $'''X''' Row: linhaatual
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''PMVG''' Column: $'''y''' Row: linhaatual
+END
+LABEL Erros

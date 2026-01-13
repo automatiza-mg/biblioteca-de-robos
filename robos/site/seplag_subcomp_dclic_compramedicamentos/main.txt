@@ -1,0 +1,2 @@
+CALL baixar_inf
+CALL dados_planilha

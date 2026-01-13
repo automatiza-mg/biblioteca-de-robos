@@ -1,0 +1,17 @@
+**REGION Acessar informações da CMED
+SET ConnectionString TO $'''Provider=Microsoft.ACE.OLEDB.12.0;Data Source=%movercmed[0].FullName%;Extended Properties=\"Excel 12.0 Xml;HDR=NO\";Persist Security Info=False'''
+Database.Connect ConnectionString: ConnectionString Connection=> SQLConnection
+@@copilotScriptingAction: 'True'
+Database.ExecuteSqlStatement.ConnectAndExecute ConnectionString: SQLConnection Statement: $'''SELECT * FROM [Planilha1$] WHERE [F5] = \'%RMS%\'''' Timeout: 30 Result=> QueryResult
+IF IsEmpty(QueryResult) THEN
+    SET ERRO TO $'''SIM'''
+    EXIT FUNCTION
+END
+Variables.CreateNewDatatable InputTable: { ^['SUBSTANCIA', 'TIPO', 'APRESENTAÇÃO', 'CAP', 'LABORATÓRIO', 'PF S/', 'PF 0', 'PF 12', 'PF 18', 'PMVG S/', 'PMVG 0', 'PMVG 12', 'PMVG 18'], [QueryResult[0][0], QueryResult[0][11], QueryResult[0][9], QueryResult[0][66], QueryResult[0][2], QueryResult[0][13], QueryResult[0][14], QueryResult[0][15], QueryResult[0][21], QueryResult[0][39], QueryResult[0][40], QueryResult[0][41], QueryResult[0][47]] } DataTable=> cmedresultado
+Variables.FindOrReplaceInDataTable.ReplaceItemInDataTableEverywhere DataTable: cmedresultado AllMatches: True ValueToFind: $'''*''' MatchCase: False MatchEntireCellContents: False TextToReplaceWith: vazio DataTableMatches=> cmedresultado
+**ENDREGION
+Excel.WriteToExcel.WriteCell Instance: planilha_base Value: cmedresultado[0][1] Column: $'''Z''' Row: linhaatual
+Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''%cmedresultado[0][0]% %cmedresultado[0][2]%''' Column: $'''AA''' Row: linhaatual
+Excel.WriteToExcel.WriteCell Instance: planilha_base Value: cmedresultado[0][4] Column: $'''AB''' Row: linhaatual
+Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''PF 0: %cmedresultado[0][6]%/ PF 12: %cmedresultado[0][7]%/ PF 18:  %cmedresultado[0][8]%''' Column: $'''AC''' Row: linhaatual
+Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''PMVG 0:  %cmedresultado[0][10]%/ PMVG 12: %cmedresultado[0][11]%/PMVG 18: %cmedresultado[0][12]%''' Column: $'''AD''' Row: linhaatual

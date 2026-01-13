@@ -1,0 +1,19 @@
+SET substancia TO cmedresultado[0][0]
+IF Contains(texto_confaz1002, substancia, True) THEN
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''10/02''' Column: $'''W''' Row: linhaatual
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''SIM''' Column: $'''V''' Row: linhaatual
+ELSE IF Contains(texto_confaz8702, substancia, True) THEN
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''87/02''' Column: $'''W''' Row: linhaatual
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''SIM''' Column: $'''V''' Row: linhaatual
+ELSE IF Contains(texto_confaz16294, substancia, True) THEN
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''162_94''' Column: $'''W''' Row: linhaatual
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''SIM''' Column: $'''V''' Row: linhaatual
+ELSE IF Contains(texto_confaz14001, substancia, True) THEN
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''140/01''' Column: $'''W''' Row: linhaatual
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''SIM''' Column: $'''V''' Row: linhaatual
+ELSE IF Contains(texto_confaz10021, substancia, True) THEN
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''100/21''' Column: $'''W''' Row: linhaatual
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''SIM''' Column: $'''V''' Row: linhaatual
+ELSE
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''NÃO''' Column: $'''V''' Row: linhaatual
+END

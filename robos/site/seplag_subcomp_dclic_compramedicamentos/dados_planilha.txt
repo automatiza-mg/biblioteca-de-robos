@@ -1,0 +1,37 @@
+**REGION Acessar planilha
+WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://www.google.com/''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> Browser
+WebAutomation.CreateNewTab.CreateNewTab BrowserInstance: Browser Url: caminho_excel WaitForPageToLoadTimeout: 60 NewBrowserInstance=> Browser2
+WAIT 2
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: Browser TextToSend: $'''{Left}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT 15
+Excel.Attach DocumentName: $'''Análise CMED - Modelo Robô.xlsx''' Instance=> planilha_base
+WebAutomation.CloseWebBrowser BrowserInstance: Browser
+**ENDREGION
+Excel.GetFirstFreeColumnRow Instance: planilha_base FirstFreeColumn=> ultimacoluna FirstFreeRow=> ultima_linha
+Excel.ReadFromExcel.ReadCells Instance: planilha_base StartColumn: $'''A''' StartRow: 2 EndColumn: $'''R''' EndRow: ultima_linha - 1 GetCellContentsMode: Excel.GetCellContentsMode.PlainText FirstLineIsHeader: True RangeValue=> basedados
+Excel.GetFirstFreeRowOnColumn Instance: planilha_base Column: $'''R''' FirstFreeRowOnColumn=> linha_inicial
+SET linha_inicial TO 3
+SET linhaatual TO linha_inicial
+LOOP FOREACH linha IN basedados
+    SET RMS TO basedados[linhaatual - 3]['RMS (Registro Ministério da Saúde)']
+    SET cnpj TO basedados[linhaatual - 3]['CNPJ']
+    IF IsEmpty(cnpj) THEN
+        EXIT FUNCTION
+    ELSE IF cnpj = $'''-''' THEN
+        GOTO final
+    END
+    **REGION Consultas Externas
+    CALL situacao_cadastral
+    DISABLE CALL simples_nacional
+    CALL cmed
+    CALL analise_confaz
+    CALL cap
+    **ENDREGION
+    **REGION Analisando Informações
+    CALL analisar_informacoes
+    **ENDREGION
+    LABEL final
+    SET ERRO TO 0
+    Variables.IncreaseVariable Value: linhaatual IncrementValue: 1
+END
+EXIT FUNCTION

@@ -1,0 +1,51 @@
+IF ERRO = $'''SIM''' THEN
+    GOTO Erros
+END
+Excel.ReadFromExcel.ReadCells Instance: planilha_base StartColumn: $'''R''' StartRow: linhaatual EndColumn: $'''ac''' EndRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues FirstLineIsHeader: False RangeValue=> analisar
+# Verificar se é mineiro
+IF analisar[0][1] = $'''SIM''' THEN
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: 0 Column: $'''AF''' Row: linhaatual
+    # Verificar se tem convênio
+    IF analisar[0][4] = $'''SIM''' THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_base Value: 0 Column: $'''AE''' Row: linhaatual
+    ELSE
+        # Verificar se é genérico
+        IF analisar[0][8] = $'''Genérico''' THEN
+            Excel.WriteToExcel.WriteCell Instance: planilha_base Value: 12 Column: $'''AE''' Row: linhaatual
+        ELSE
+            Excel.WriteToExcel.WriteCell Instance: planilha_base Value: 18 Column: $'''AE''' Row: linhaatual
+        END
+    END
+ELSE
+    # NÃO É  mineiro, verifica CONFAZ
+    IF analisar[0][4] = $'''SIM''' THEN
+        # Se tem confaz zera as duas colunas
+        Excel.WriteToExcel.WriteCell Instance: planilha_base Value: 0 Column: $'''AF''' Row: linhaatual
+        Excel.WriteToExcel.WriteCell Instance: planilha_base Value: 0 Column: $'''AE''' Row: linhaatual
+    ELSE
+        # Verificar se é genérico
+        IF analisar[0][8] = $'''Genérico''' THEN
+            Excel.WriteToExcel.WriteCell Instance: planilha_base Value: 12 Column: $'''AE''' Row: linhaatual
+            Excel.WriteToExcel.WriteCell Instance: planilha_base Value: 12 Column: $'''AF''' Row: linhaatual
+        ELSE
+            Excel.WriteToExcel.WriteCell Instance: planilha_base Value: 18 Column: $'''AE''' Row: linhaatual
+            Excel.WriteToExcel.WriteCell Instance: planilha_base Value: 18 Column: $'''AF''' Row: linhaatual
+        END
+    END
+END
+**REGION Verificar Taxa CMED Município
+Excel.ReadFromExcel.ReadCell Instance: planilha_base StartColumn: $'''ae''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> taxa_mun
+Excel.ReadFromExcel.ReadCell Instance: planilha_base StartColumn: $'''Y''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> TIPO
+SET CABECALHO1 TO $'''%TIPO% %taxa_mun%'''
+SET cmed_mun TO cmedresultado[0][CABECALHO1]
+Text.Replace Text: cmedresultado[0][CABECALHO1] TextToFind: $''',''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''.''' ActivateEscapeSequences: False Result=> teste1
+Excel.WriteToExcel.WriteCell Instance: planilha_base Value: teste1 Column: $'''AG''' Row: linhaatual
+**ENDREGION
+**REGION Verificar Taxa CMED Estado
+Excel.ReadFromExcel.ReadCell Instance: planilha_base StartColumn: $'''AF''' StartRow: linhaatual GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> taxaest
+SET CABECALHO2 TO $'''%TIPO% %taxaest%'''
+SET FINAL TO cmedresultado[0][CABECALHO2]
+Text.Replace Text: cmedresultado[0][CABECALHO2] TextToFind: $''',''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''.''' ActivateEscapeSequences: False Result=> teste2
+Excel.WriteToExcel.WriteCell Instance: planilha_base Value: teste2 Column: $'''ah''' Row: linhaatual
+**ENDREGION
+LABEL Erros
