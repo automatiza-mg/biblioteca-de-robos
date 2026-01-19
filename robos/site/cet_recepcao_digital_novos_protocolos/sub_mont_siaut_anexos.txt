@@ -4,7 +4,6 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''%n_defesa%{Return}'''
 WAIT 2
 SET z TO 0
 IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: siaut Text: $'''Não há arquivos(s) disponíveis para prosseguir !!''') THEN
-    DISABLE Display.ShowMessageDialog.ShowMessage Title: $'''Mira''' Message: $'''N tem doc''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
     CALL Mont_Siaut_SemAnexo
     EXIT FUNCTION
 ELSE
@@ -28,4 +27,3 @@ ELSE
         Variables.IncreaseVariable Value: z IncrementValue: 1
     END
 END
-DISABLE EXIT Code: 0
