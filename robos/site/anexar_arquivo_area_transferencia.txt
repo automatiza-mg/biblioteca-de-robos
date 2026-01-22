@@ -1,0 +1,28 @@
+WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://outlook.office.com/mail/''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"}}''' BrowserInstance=> Browser
+WAIT 6
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''N''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: False
+Clipboard.Clear _
+@@copilotGeneratedAction: 'False'
+Scripting.RunPowershellScript.RunPowershellScript Script: $'''Add-Type -AssemblyName System.Windows.Forms
+
+# Define o diretório onde os arquivos estão localizados
+$directoryPath = \"%caminho_planilha%\"
+
+# Define o padrão do nome dos arquivos (sem os números)
+$fileNamePattern = \"%parte_nome%\"
+
+# Busca os arquivos que contêm o padrão do nome
+$filePaths = Get-ChildItem -Path $directoryPath -Filter \"$fileNamePattern*.xls\" | Select-Object -ExpandProperty FullName
+
+# Cria uma StringCollection para armazenar os caminhos dos arquivos
+$files = New-Object System.Collections.Specialized.StringCollection
+
+# Adiciona cada caminho de arquivo à coleção
+foreach ($filePath in $filePaths) {
+    $files.Add($filePath)
+}
+
+# Define os arquivos na área de transferência
+[System.Windows.Forms.Clipboard]::SetFileDropList($files)''' ScriptOutput=> PowershellOutput
+WAIT 4
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Control}({V})''' DelayBetweenKeystrokes: 40 SendTextAsHardwareKeys: True
