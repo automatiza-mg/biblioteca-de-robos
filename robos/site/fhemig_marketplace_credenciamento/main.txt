@@ -1,0 +1,3 @@
+CALL 'Login e leitura da planilha'
+CALL 'busca do credenciamento'
+CALL 'loop'

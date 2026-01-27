@@ -1,0 +1,7 @@
+WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://homologacompras.mg.gov.br/n/login''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> portal_compras
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: portal_compras Text: $'''Acessar área pública''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab:5}%masp%{Tab}%unidade_portal%{Tab}%senha_portal%{Tab}{Return}''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: True
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: portal_compras Text: $'''Acesso à tela de tarefas pendentes''')
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\breno\\Downloads\\Planilha modelo - Credenciamento (1).xlsx''' Visible: True ReadOnly: False UseMachineLocale: False Instance=> planilha_base
+Excel.GetFirstFreeColumnRow Instance: planilha_base FirstFreeColumn=> FirstFreeColumn FirstFreeRow=> FirstFreeRow
+Excel.ReadFromExcel.ReadCells Instance: planilha_base StartColumn: $'''a''' StartRow: 1 EndColumn: FirstFreeColumn - 1 EndRow: FirstFreeRow - 1 GetCellContentsMode: Excel.GetCellContentsMode.PlainText FirstLineIsHeader: True RangeValue=> tabela_base
