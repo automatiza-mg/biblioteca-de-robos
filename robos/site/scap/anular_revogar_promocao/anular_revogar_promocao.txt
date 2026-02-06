@@ -87,3 +87,11 @@ DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAn
 DateTime.Subtract FromDate: data_e_hora_final SubstractDate: data_e_hora_inicio TimeUnit: DateTime.DifferenceTimeUnit.Minutes TimeDifference=> tempogasto
 WAIT 2
 Display.ShowMessageDialog.ShowMessage Message: $'''REGISTROS INCLUÍDOS EM %tempogasto% MINUTOS. VERIFICAR COLUNA DE STATUS.
+
+
+
+
+Desenvolvido por: Erik Morais
+E-mail: erik.morais@planejamento.mg.gov.br''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({Q})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\m753077\\Desktop\\Power Automate 12_11_2024\\Promoção - OK\\Anular_Revogar Promoção\\Layout Anular_Revogar PROMOÇÃO - todas as carreiras - Copia.xlsx''' Visible: True ReadOnly: False Instance=> ExcelInstance
