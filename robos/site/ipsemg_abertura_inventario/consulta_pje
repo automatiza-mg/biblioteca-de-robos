@@ -1,0 +1,27 @@
+LOOP FOREACH cpf IN coluna_cpfs
+    WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://pje-consulta-publica.tjmg.jus.br/''' WindowState: WebAutomation.BrowserWindowState.Normal ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> pje
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: pje Javascript: $'''function ExecuteScript() {
+    document.querySelector(\'input[name=\"tipoMascaraDocumento\"][onclick*=\"CPF\"]\').click();
+ }
+}
+''' Result=> Result
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab:10}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: cpf DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 2
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab:4}{Enter}''' DelayBetweenKeystrokes: 30 SendTextAsHardwareKeys: False
+    Excel.FindAndReplace.FindSingle Instance: planilha_base TextToFind: cpf MatchCase: False MatchEntireCellContents: False SearchBy: Excel.SearchOrder.Rows FoundRowIndex=> linha_encontrada
+    UIAutomation.FocusWindow.FocusByInstanceOrHandle WindowInstance: planilha_base
+    IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: pje Text: $'''inventário''') THEN
+        Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''Encontrado''' Column: 6 Row: linha_encontrada
+    ELSE
+        IF (WebAutomation.IfWebPageContains.WebPageContainsText BrowserInstance: pje Text: $'''partilha''') THEN
+            Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''Encontrado''' Column: 6 Row: linha_encontrada
+        ELSE
+            Excel.WriteToExcel.WriteCell Instance: planilha_base Value: $'''Nenhum ato foi encontrado na pesquisa.''' Column: 6 Row: linha_encontrada
+        END
+    END
+    UIAutomation.FocusWindow.FocusByInstanceOrHandle WindowInstance: pje
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{LControlKey}(b)''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
+    UIAutomation.CloseWindow.CloseByInstanceOrHandle WindowInstance: pje
+END

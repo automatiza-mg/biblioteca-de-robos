@@ -1,0 +1,6 @@
+Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''C:\\Users\\M7533391\\Downloads\\Relatorio_de_debito_de_pensionistas_GAP (1).xls''' Visible: True ReadOnly: False UseMachineLocale: False Instance=> planilha_base
+Excel.GetFirstFreeColumnRow Instance: planilha_base FirstFreeColumn=> FirstFreeColumn FirstFreeRow=> FirstFreeRow
+Excel.ReadFromExcel.ReadCells Instance: planilha_base StartColumn: 1 StartRow: 1 EndColumn: FirstFreeColumn - 1 EndRow: FirstFreeRow - 1 GetCellContentsMode: Excel.GetCellContentsMode.TypedValues FirstLineIsHeader: True RangeValue=> tabela_base
+Variables.RetrieveDataTableColumnIntoList DataTable: tabela_base ColumnNameOrIndex: 4 ColumnAsList=> coluna_cpfs
+CALL pje
+CALL censec
