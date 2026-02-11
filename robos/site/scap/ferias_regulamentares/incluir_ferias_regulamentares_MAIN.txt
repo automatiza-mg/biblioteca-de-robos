@@ -1,6 +1,6 @@
-# Para não sobrecarregar o Sisap, sugerimos rodar o robô antes das 09:00 e depois das 16:00
-# Primeiro, criar as variáveis de Entrada usuario e senha, citadas na linha 7, com os dados de acesso ao Sisap (masp e senha do Sisap)
-# Ao lado do fluxo principal "Main" criar dois subfluxos: Ferias_Periodo_Integral e Ferias_Parceladas através da opção Subfluxos, Novo subfluxo e colar o txt: subfluxo Ferias_Período_Integral e o txt: subfluxo Ferias_Parceladas 
+# Para nÃ£o sobrecarregar o Sisap, sugerimos rodar o robÃ´ antes das 09:00 e depois das 16:00
+# Primeiro, criar as variÃ¡veis de Entrada usuario e senha, citadas na linha 7, com os dados de acesso ao Sisap (masp e senha do Sisap)
+# Ao lado do fluxo principal "Main" criar dois subfluxos: Ferias_Periodo_Integral e Ferias_Parceladas atravÃ©s da opÃ§Ã£o Subfluxos, Novo subfluxo e colar o txt: subfluxo Ferias_PerÃ­odo_Integral e o txt: subfluxo Ferias_Parceladas 
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> data_e_hora_inicio
 System.RunApplication.RunApplication ApplicationPath: $'''C:\\Program Files (x86)\\pw3270\\pw3270.exe''' WindowStyle: System.ProcessWindowStyle.Maximized ProcessId=> terminal
 WAIT 2
@@ -12,7 +12,7 @@ IF Contains(TELA_SISAP, $'''Senha incorreta. Digite novamente''', True) THEN
     EXIT Code: 0 ErrorMessage: $'''Senha incorreta na Variavel de Entrada \"Senha\". Verificar'''
 END
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''siap{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
-/# Deverá ser inserido mais quantidades de TAB no envio de teclas na linha 16 quando o usuário possuir mais de uma opção para seleção na lista de restrição no Sisap:
+/# DeverÃ¡ ser inserido mais quantidades de TAB no envio de teclas na linha 16 quando o usuÃ¡rio possuir mais de uma opÃ§Ã£o para seleÃ§Ã£o na lista de restriÃ§Ã£o no Sisap:
 
  VISHC000                                                              PRODEMGE
  NISHC000        SISAP-MG - ADMINISTRACAO DE PESSOAL DO ESTADO       17/12/2024
@@ -22,7 +22,7 @@ MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''siap{Return}''' Delay
             _  1981-00000099 SUP.CENTRAL DE GESTAO DE RECURSOS HUMANOS
             X  1501-00000099 SECRETARIA DE PLANEJAMENTO E GESTAO 
 
-Caso o usuario não tenha lista de restrições. desabilitar a linha 16 clicando com o botão direito do mouse em cima da respectiva linha e selecionar "Desablitar Ação"#/
+Caso o usuario nÃ£o tenha lista de restriÃ§Ãµes. desabilitar a linha 16 clicando com o botÃ£o direito do mouse em cima da respectiva linha e selecionar "Desablitar AÃ§Ã£o"#/
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}X{Return}{F3}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''FERIAS REGULAMENTARES{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''01{Return}''' DelayBetweenKeystrokes: 100 SendTextAsHardwareKeys: True
@@ -76,7 +76,7 @@ LOOP WHILE (tamanhoplanilha) > (linhalivre)
         GOTO 'Proximo Masp'
     END
     IF Contains(TELA_SISAP, $'''*** Comando invalido''', True) THEN
-        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Comando inválido. Verificar inclusão manual''' Column: $'''L''' Row: linhalivre
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Comando invÃ¡lido. Verificar inclusÃ£o manual''' Column: $'''L''' Row: linhalivre
         MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
         GOTO 'Proximo Masp'
     END
@@ -89,7 +89,7 @@ LOOP WHILE (tamanhoplanilha) > (linhalivre)
         GOTO 'Proximo Masp'
     END
     IF Contains(TELA_SISAP, $'''*** Comando invalido''', True) THEN
-        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Comando inválido. Verificar inclusão manual''' Column: $'''L''' Row: linhalivre
+        Excel.WriteToExcel.WriteCell Instance: planilha_inclusao_ferias_reg Value: $'''Comando invÃ¡lido. Verificar inclusÃ£o manual''' Column: $'''L''' Row: linhalivre
         MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{F2}01{Return}''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
         GOTO 'Proximo Masp'
     END
@@ -110,6 +110,6 @@ Display.ShowMessageDialog.ShowMessage Message: $'''REGISTROS EFETUADOS EM %tempo
 
 
 Desenvolvido por: Erik Morais / Geziel Soares
-Dúvidas e suporte através do E-mail: erik.morais@planejamento.mg.gov.br  /geziel.soares@planejamento.mg.gov.br''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed
+DÃºvidas e suporte atravÃ©s do E-mail: erik.morais@planejamento.mg.gov.br  /geziel.soares@planejamento.mg.gov.br''' Icon: Display.Icon.None Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({Q})''' DelayBetweenKeystrokes: 150 SendTextAsHardwareKeys: True
 Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: `` Visible: True ReadOnly: False Instance=> ExcelInstance
