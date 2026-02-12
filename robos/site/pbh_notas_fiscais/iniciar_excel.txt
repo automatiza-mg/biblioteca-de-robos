@@ -1,0 +1,66 @@
+**REGION iniciar excel do online para local
+Clipboard.SetText Text: $'''ms-excel:ofe|u|%caminho_excel%'''
+WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://www.google.com.br/?hl=pt-BR''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> navegador_excel
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: navegador_excel Text: $'''Google''')
+MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: navegador_excel TextToSend: $'''{Alt}({D}){LControlKey}({V}){Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT 3
+MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Return}''' DelayBetweenKeystrokes: 60 SendTextAsHardwareKeys: False
+WAIT (UIAutomation.WaitForWindow.ToOpenByTitleClass Title: $'''teste luciano - Excel''' Class: $'''''' FocusWindow: True)
+WAIT 5
+Excel.Attach DocumentName: $'''teste luciano.xlsx''' Instance=> planilha_base
+**ENDREGION
+**REGION variaveis excel criação OEE
+Excel.GetFirstFreeRowOnColumn Instance: planilha_base Column: $'''C''' FirstFreeRowOnColumn=> linha_livre_C
+SET linha_livre_base TO linha_livre_C - 1
+Excel.GetFirstFreeColumnRow Instance: planilha_base FirstFreeColumn=> coluna_livre FirstFreeRow=> linha_livre
+Excel.ReadFromExcel.ReadCells Instance: planilha_base StartColumn: $'''A''' StartRow: 1 EndColumn: $'''N''' EndRow: linha_livre_base GetCellContentsMode: Excel.GetCellContentsMode.TypedValues FirstLineIsHeader: True RangeValue=> ler_excel_base
+Excel.GetFirstFreeRowOnColumn Instance: planilha_base Column: $'''M''' FirstFreeRowOnColumn=> linha_livre_M
+Excel.GetFirstFreeRowOnColumn Instance: planilha_base Column: $'''N''' FirstFreeRowOnColumn=> linha_livre_N
+SET LinhaExcelAtual_M TO 2
+SET LinhaExcelAtual_NF TO 2
+WebAutomation.CloseWebBrowser BrowserInstance: navegador_excel
+**ENDREGION
+**REGION Variaveis data/mes do processo. Tratamento do excel
+Excel.ReadFromExcel.ReadCell Instance: planilha_base StartColumn: $'''L''' StartRow: 2 GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> ExcelDatames
+Text.SplitText.SplitWithDelimiter Text: ExcelDatames CustomDelimiter: $'''/''' IsRegEx: False Result=> PartesMesAno
+Text.ChangeCase Text: PartesMesAno[0] NewCase: Text.CaseOption.LowerCase Result=> MesTxt
+SET AnoCompleto TO PartesMesAno[1]
+SWITCH MesTxt
+    CASE = $'''jan'''
+        SET MesNum TO $'''01
+'''
+    CASE = $'''fev'''
+        SET MesNum TO $'''02
+'''
+    CASE = $'''mar'''
+        SET MesNum TO $'''03
+'''
+    CASE = $'''abr'''
+        SET MesNum TO $'''04'''
+    CASE = $'''mai'''
+        SET MesNum TO $'''05
+'''
+    CASE = $'''jun'''
+        SET MesNum TO $'''06'''
+    CASE = $'''jul'''
+        SET MesNum TO $'''07'''
+    CASE = $'''ago'''
+        SET MesNum TO $'''08'''
+    CASE = $'''set'''
+        SET MesNum TO $'''09
+
+'''
+    CASE = $'''out'''
+        SET MesNum TO 10
+    CASE = $'''nov'''
+        SET MesNum TO 11
+    CASE = $'''dez'''
+        SET MesNum TO 12
+    DEFAULT
+        SET MesNum TO $'''01'''
+END
+SET DataIniTexto TO $'''01/%MesNum%/%AnoCompleto%'''
+SET DataFimTexto TO $'''30/%MesNum%/%AnoCompleto%'''
+SET pDataIni TO DataIniTexto
+SET pDataFim TO DataFimTexto
+**ENDREGION

@@ -1,0 +1,1277 @@
+**REGION caminho até OEE
+WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''// workspace
+function ExecuteScript() { 
+botao= document.getElementById(\'span_HOMEMODULESSDT__OPTIONTITLE_0004\') 
+botao.click()
+}'''
+WAIT 4
+WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//clica em criar OEE
+function ExecuteScript() {
+  // 1) garante que o menu lateral existe
+  const sidebar = document.querySelector(\'#sidebar_ul\');
+  if (!sidebar) return \'ERRO: sidebar_ul ainda não carregou\';
+
+  // 2) encontra o link exatamente pelo href (mais confiável do que id/texto)
+  const link = sidebar.querySelector(\"a[href=\'app.contrato.wmordemexecemp\']\");
+  if (!link) return \"ERRO: link wmordemexecemp não encontrado\";
+
+  // 3) rola e clica
+  link.scrollIntoView({ block: \'center\' });
+  link.click();
+
+  // 4) fallback: se algum framework bloquear click, navega pela URL
+  if (location.href.indexOf(\'wmordemexecemp\') === -1) {
+    location.assign(link.getAttribute(\'href\'));
+  }
+
+  return \'OK\';
+}
+'''
+WAIT 3
+**ENDREGION
+LOOP FOREACH linha_loop IN ler_excel_base
+    **REGION Criação OEE-Elaboração
+    SET ValorExcel_D TO linha_loop['Valor']
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//clica no botão inserir
+function ExecuteScript() { 
+nome = document.getElementById(\'BTNINSERT\') 
+nome.click()
+}'''
+    WAIT 1
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''CONTRATO''')
+    WAIT 1
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//seleciona a opção contrato
+function ExecuteScript() {
+  // tenta por até ~3 segundos (30 tentativas x 100ms)
+  let tries = 0;
+
+  function tryClick() {
+    const titleSpan = document.getElementById(\'span_vOPTIONTITLE_0001\');
+    const cardDiv = document.getElementById(\'TABLEOPTIONICONANDTITLE_0001\');
+
+    // se ainda não existe, tenta de novo
+    if (!titleSpan && !cardDiv) {
+      tries++;
+      if (tries >= 30) return \"ERRO: card CONTRATO não apareceu no DOM\";
+      setTimeout(tryClick, 100);
+      return;
+    }
+
+    // escolhe o melhor alvo: primeiro o SPAN, se não tiver usa o DIV
+    const el = titleSpan || cardDiv;
+
+    // garante que está visível
+    el.scrollIntoView({ block: \'center\' });
+
+    // dispara clique \"de verdade\" (mouse events)
+    el.dispatchEvent(new MouseEvent(\'mousedown\', { bubbles: true }));
+    el.dispatchEvent(new MouseEvent(\'mouseup\', { bubbles: true }));
+    el.dispatchEvent(new MouseEvent(\'click\', { bubbles: true }));
+
+    return \"OK\";
+  }
+
+  return tryClick();
+}
+'''
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''Informações da Ordem de Execução de Empenho''')
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//n° contrato
+
+function ExecuteScript() {
+  const id = \"vORDEMFORNECCONTRATONUMERO\";
+  const valor = \"%Contrato%\";   // <-- seu contrato
+  const blurCode = 52;              // do seu F12: gx.evt.onblur(this,52)
+
+  const el = document.getElementById(id);
+  if (!el) return \"ERRO: campo \" + id + \" não encontrado\";
+
+  // 1) Foco (e onfocus do GeneXus, se existir)
+  el.focus();
+  if (window.gx && gx.evt && typeof gx.evt.onfocus === \"function\") {
+    try { gx.evt.onfocus(el, blurCode, \'\', false, \'\', 0); } catch (e) {}
+  }
+
+  // 2) Setar valor de forma mais compatível (alguns controles reagem melhor assim)
+  //    (usa o setter nativo do input)
+  const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, \"value\")?.set;
+  if (setter) setter.call(el, valor);
+  else el.value = valor;
+
+  // 3) Disparar eventos (browser + GeneXus onchange)
+  el.dispatchEvent(new Event(\"input\",  { bubbles: true }));
+  el.dispatchEvent(new Event(\"change\", { bubbles: true }));
+
+  if (window.gx && gx.evt && typeof gx.evt.onchange === \"function\") {
+    try { gx.evt.onchange(el, new Event(\"change\")); } catch (e) {}
+  }
+
+  // 4) BLUR (com pequeno delay para o GX processar o change antes)
+  setTimeout(() => {
+    try {
+      el.blur();
+      el.dispatchEvent(new Event(\"blur\", { bubbles: true }));
+
+      if (window.gx && gx.evt && typeof gx.evt.onblur === \"function\") {
+        try { gx.evt.onblur(el, blurCode); } catch (e) {}
+      }
+    } catch (e) {}
+  }, 150);
+
+  return \"OK: contrato preenchido + blur agendado | value=\" + el.value;
+}
+``'''
+    WAIT 5
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''CEMIG DISTRIBUICAO S.A''')
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//UO-0013
+function ExecuteScript() { 
+nome = document.getElementById(\'vORGNCODIGO\') 
+nome.value = \"0013\"
+}'''
+    WAIT 3
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Down}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''SECRETARIA MUNICIPAL DE OBRAS E INFRAESTRUTURA''')
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}''' DelayBetweenKeystrokes: 300 SendTextAsHardwareKeys: False
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''Serviço''')
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//texto_desc_entrega
+function ExecuteScript() { 
+nome = document.getElementById(\'vORDEMFORNECENTREGA\') 
+nome.value = \"Conforme contrato.\"
+}'''
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//lançamento de datas inicio e fim
+function ExecuteScript() {
+  const ini = \"%pDataIni%\";
+  const fim = \"%pDataFim%\";
+
+  function setGXDate(id, val) {
+    const el = document.getElementById(id);
+    if (!el) return \"ERRO: não achei \" + id;
+
+    el.focus();
+    el.value = val;
+
+    // Eventos padrão
+    el.dispatchEvent(new Event(\'input\',  { bubbles: true }));
+    el.dispatchEvent(new Event(\'change\', { bubbles: true }));
+
+    // Força validação no blur (GeneXus geralmente valida aqui)
+    el.blur();
+    el.dispatchEvent(new Event(\'blur\', { bubbles: true }));
+
+    // Extra GeneXus (se disponível)
+    if (window.gx && gx.evt) {
+      try { gx.evt.onchange(el, new Event(\'change\')); } catch (e) {}
+      try { gx.evt.onblur(el); } catch (e) {}
+    }
+    return \"OK \" + id + \"=\" + val;
+  }
+
+  const r1 = setGXDate(\"vORDEMFORNECINFOPRESTSERVDTINI\", ini);
+  const r2 = setGXDate(\"vORDEMFORNECINFOPRESTSERVDTFIM\", fim);
+
+  return r1 + \" | \" + r2;
+}
+'''
+    WAIT 1
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//clicar no botão
+function ExecuteScript() {
+  const btn = document.getElementById(\'BTNBTNCONFIRMAR\');
+  if (!btn) return \"ERRO: botão BTNBTNCONFIRMAR não encontrado\";
+
+  // garante foco (ajuda o GeneXus)
+  btn.focus();
+
+  // Se o GeneXus estiver disponível, chama o mesmo evento do onclick
+  if (window.gx && gx.evt && typeof gx.evt.execEvt === \"function\") {
+    try {
+      // mesmo comando do onclick, só em JS
+      gx.evt.execEvt(\'\', false, \"E\'DOBTNCONFIRMAR\'.\", btn);
+    
+    } catch (e) {
+      // fallback
+      btn.click();
+      return \"WARN: execEvt falhou, usei click(). Erro: \" + e.message;
+    }
+  }
+
+  // fallback se gx não existir
+  btn.click();
+
+}
+'''
+    WAIT 5
+    **ENDREGION
+    **REGION numero OEE
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//captar numero OEE
+function ExecuteScript() {
+  // 1) tenta pegar do span visível (preferencial)
+  var sp = document.getElementById(\"span_vORDEMFORNECNUMANO\");
+  if (sp) {
+    var t = sp.innerText || sp.textContent || \"\";
+    t = t.replace(/^\\s+|\\s+$/g, \"\"); // trim
+    if (t) return t;
+  }
+
+  // 2) fallback: pega do input escondido (tem espaços)
+  var inp = document.getElementById(\"vORDEMFORNECNUMANO\");
+  if (inp) {
+    var v = inp.value || \"\";
+    v = v.replace(/^\\s+|\\s+$/g, \"\");
+    return v;
+  }
+
+  return \"\";
+} ''' Result=> oee_nu_gerado
+    WAIT 2
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: oee_nu_gerado Column: $'''M''' Row: LinhaExcelAtual_M
+    Variables.IncreaseVariable Value: LinhaExcelAtual_M IncrementValue: 1
+    Text.SplitText.SplitWithDelimiter Text: oee_nu_gerado CustomDelimiter: $'''/''' IsRegEx: False Result=> PartesOeenume
+    SET oee_numero TO PartesOeenume[0]
+    **ENDREGION
+    **REGION Criação OEE-Item
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//seleção aba item
+function ExecuteScript() { 
+aba_item = document.getElementById(\'Tab_GXUITABSPANEL_TABContainerpanel2\') 
+aba_item.click()
+}'''
+    WAIT 1
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//gerar itens
+function ExecuteScript() {
+  const btn = document.getElementById(\'W0267BTNGERARITENS\');
+  if (!btn) return \"ERRO: botão W0267BTNGERARITENS não encontrado\";
+
+  // 1) Coloca o foco no botão (como se você tivesse clicado nele)
+  btn.focus();
+
+  // 2) Tenta disparar o evento do GeneXus (mais confiável do que click puro)
+  //    Isso replica o onclick do HTML:
+  //    gx.evt.execEvt(\'W0267\',false,\"W0267E\'DOGERARITENS\'.\",this)
+  let acionouGX = false;
+
+  if (window.gx && gx.evt && typeof gx.evt.execEvt === \"function\") {
+    try {
+      // Alguns ambientes exigem jsEvent() retornar true
+      if (!gx.evt.jsEvent || gx.evt.jsEvent(btn)) {
+        gx.evt.execEvt(\'W0267\', false, \"W0267E\'DOGERARITENS\'.\", btn);
+        acionouGX = true;
+      }
+    } catch (e) {
+      // ignora e tenta fallback
+    }
+  }
+
+  // 3) Fallback: dispara click normal também (ajuda quando GX não pega de primeira)
+  //    (muitas vezes não precisa, mas aumenta a taxa de sucesso)
+  try {
+    btn.dispatchEvent(new MouseEvent(\'mousedown\', { bubbles: true }));
+    btn.dispatchEvent(new MouseEvent(\'mouseup\',   { bubbles: true }));
+    btn.dispatchEvent(new MouseEvent(\'click\',     { bubbles: true }));
+  } catch (e) {
+    try { btn.click(); } catch (e2) {}
+  }
+
+  // 4) BLUR: tira o foco do botão (como se você clicasse fora / apertasse TAB)
+  //    Ajuda em telas que só “seguem” quando o foco sai do controle
+  setTimeout(() => {
+    try {
+      btn.blur();
+      btn.dispatchEvent(new Event(\'blur\', { bubbles: true }));
+    } catch (e) {}
+  }, 150);
+
+  return acionouGX
+    ? \"OK: Gerar Itens acionado via GeneXus (execEvt) + blur\"
+    : \"OK: Gerar Itens via click + blur (GX não acionado)\";
+}
+'''
+    WAIT 5
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//checkboxClick
+function ExecuteScript() {
+  const ifr = document.getElementById(\"gxp0_ifrm\");
+  if (!ifr) return \"ERRO: iframe gxp0_ifrm não encontrado\";
+
+  const w = ifr.contentWindow;
+  const d = ifr.contentDocument || w.document;
+
+  const checkboxId = \"SDTGERARORDEMEXECEMPITEMS__ISSELECTED_0001\"; // COLE AQUI se mudar
+  const gxCtrlId = 77; // do seu onclick: checkboxClick(77,...)
+
+  // espera o checkbox aparecer
+  const start = Date.now();
+  let cb = null;
+  while (Date.now() - start < 8000) {
+    cb = d.getElementById(checkboxId);
+    if (cb && cb.offsetParent !== null && !cb.disabled) break;
+    cb = null;
+  }
+  if (!cb) return \"ERRO: checkbox não ficou disponível no iframe: \" + checkboxId;
+
+  cb.scrollIntoView({block:\"center\", inline:\"center\"});
+  cb.focus();
+
+  // marca
+  if (!cb.checked) cb.checked = true;
+
+  // chama o GeneXus do iframe (IMPORTANTE: w.gx, não window.gx)
+  if (w.gx && w.gx.fn && typeof w.gx.fn.checkboxClick === \"function\") {
+    try { w.gx.fn.checkboxClick(gxCtrlId, cb, \"true\", \"false\"); } catch (e) {}
+  }
+
+  cb.dispatchEvent(new Event(\"change\", { bubbles:true }));
+
+  if (w.gx && w.gx.evt && typeof w.gx.evt.onchange === \"function\") {
+    try { w.gx.evt.onchange(cb, new Event(\"change\")); } catch (e) {}
+  }
+
+  // blur
+  setTimeout(() => {
+    try { cb.blur(); cb.dispatchEvent(new Event(\"blur\", {bubbles:true})); } catch(e) {}
+  }, 150);
+
+  return \"OK: checkbox marcado no iframe | checked=\" + cb.checked;
+}
+'''
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//quantidade
+function ExecuteScript() {
+  const ifr = document.getElementById(\"gxp0_ifrm\");
+  if (!ifr) return \"ERRO: iframe gxp0_ifrm não encontrado\";
+
+  const w = ifr.contentWindow;
+  const d = ifr.contentDocument || w.document;
+
+  const idCampo = \"vDISTRIBUIRQUANTIDADE\";
+  const gxCtrlId = 57;
+  const valorTexto = \"1,0000\"; // COLE AQUI
+
+  // espera campo
+  const start = Date.now();
+  let el = null;
+  while (Date.now() - start < 8000) {
+    el = d.getElementById(idCampo);
+    if (el && el.offsetParent !== null && !el.disabled) break;
+    el = null;
+  }
+  if (!el) return \"ERRO: campo não ficou disponível no iframe: \" + idCampo;
+
+  el.scrollIntoView({block:\"center\"});
+  el.focus();
+
+  const setter = Object.getOwnPropertyDescriptor(w.HTMLInputElement.prototype, \"value\")?.set;
+  if (setter) setter.call(el, valorTexto);
+  else el.value = valorTexto;
+
+  el.dispatchEvent(new Event(\"input\",  { bubbles:true }));
+  el.dispatchEvent(new Event(\"change\", { bubbles:true }));
+
+  // validação decimal do GeneXus (no iframe!)
+  if (w.gx && w.gx.num && typeof w.gx.num.valid_decimal === \"function\") {
+    try { w.gx.num.valid_decimal(el, \".\", \",\", \"4\"); } catch(e) {}
+  }
+  if (w.gx && w.gx.evt && typeof w.gx.evt.onchange === \"function\") {
+    try { w.gx.evt.onchange(el, new Event(\"change\")); } catch(e) {}
+  }
+
+  // blur
+  setTimeout(() => {
+    try {
+      el.blur();
+      el.dispatchEvent(new Event(\"blur\", {bubbles:true}));
+      if (w.gx && w.gx.evt && typeof w.gx.evt.onblur === \"function\") {
+        try { w.gx.evt.onblur(el, gxCtrlId); } catch(e) {}
+      }
+    } catch(e) {}
+  }, 150);
+
+  return \"OK: quantidade preenchida no iframe = \" + el.value;
+}
+'''
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//valor
+function ExecuteScript() {
+  const ifr = document.getElementById(\"gxp0_ifrm\");
+  if (!ifr) return \"ERRO: iframe gxp0_ifrm não encontrado\";
+
+  const w = ifr.contentWindow;
+  const d = ifr.contentDocument || w.document;
+
+  const idCampo = \"SDTGERARORDEMEXECEMPITEMS__VALORSOLICITADO_0001\";
+  const gxCtrlId = 92;
+
+  // ✅ PAD substitui aqui
+  const valorBruto = \"%ValorExcel_D%\"; // COLE AQUI a variável do PAD
+
+  function normalizarBR4(v) {
+    v = String(v ?? \"\").trim().replace(\"R$\", \"\").trim();
+    if (v.indexOf(\",\") >= 0) v = v.replace(/\\./g, \"\"); // remove milhar quando usa vírgula
+    v = v.replace(\".\", \",\");
+    if (v === \"\") v = \"0\";
+    if (v.indexOf(\",\") < 0) v = v + \",0000\";
+    const p = v.split(\",\");
+    const inteiro = p[0] === \"\" ? \"0\" : p[0];
+    let dec = (p[1] || \"\");
+    dec = (dec + \"0000\").slice(0, 4);
+    return inteiro + \",\" + dec;
+  }
+
+  const valorTexto = normalizarBR4(valorBruto);
+
+  // espera campo
+  const start = Date.now();
+  let el = null;
+  while (Date.now() - start < 8000) {
+    el = d.getElementById(idCampo);
+    if (el && el.offsetParent !== null && !el.disabled) break;
+    el = null;
+  }
+  if (!el) return \"ERRO: campo não ficou disponível no iframe: \" + idCampo;
+
+  el.scrollIntoView({block:\"center\"});
+  el.focus();
+
+  const setter = Object.getOwnPropertyDescriptor(w.HTMLInputElement.prototype, \"value\")?.set;
+  if (setter) setter.call(el, valorTexto);
+  else el.value = valorTexto;
+
+  el.dispatchEvent(new Event(\"input\",  { bubbles:true }));
+  el.dispatchEvent(new Event(\"change\", { bubbles:true }));
+
+  if (w.gx && w.gx.num && typeof w.gx.num.valid_decimal === \"function\") {
+    try { w.gx.num.valid_decimal(el, \".\", \",\", \"4\"); } catch(e) {}
+  }
+  if (w.gx && w.gx.evt && typeof w.gx.evt.onchange === \"function\") {
+    try { w.gx.evt.onchange(el, new Event(\"change\")); } catch(e) {}
+  }
+
+  // blur
+  setTimeout(() => {
+    try {
+      el.blur();
+      el.dispatchEvent(new Event(\"blur\", {bubbles:true}));
+      if (w.gx && w.gx.evt && typeof w.gx.evt.onblur === \"function\") {
+        try { w.gx.evt.onblur(el, gxCtrlId); } catch(e) {}
+      }
+    } catch(e) {}
+  }, 150);
+
+  return \"OK: valor preenchido no iframe = \" + el.value;
+}
+'''
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//botao
+function ExecuteScript() {
+  // 0) Localiza o iframe do popup
+  const ifr = document.getElementById(\"gxp0_ifrm\");
+  if (!ifr) return \"ERRO: iframe do popup (gxp0_ifrm) não encontrado\";
+
+  const w = ifr.contentWindow;
+  const d = ifr.contentDocument || (w ? w.document : null);
+  if (!d) return \"ERRO: não consegui acessar o documento do iframe\";
+
+  // 1) Espera o botão Confirmar existir e estar clicável
+  const btnId = \"BTNCONFIRMAR\";
+  const timeoutMs = 8000;
+  const start = Date.now();
+  let btn = null;
+
+  while (Date.now() - start < timeoutMs) {
+    btn = d.getElementById(btnId) || (d.getElementsByName(\"BTNCONFIRMAR\")[0] || null);
+    if (btn && btn.offsetParent !== null && !btn.disabled) break;
+    btn = null;
+  }
+
+  if (!btn) return \"ERRO: botão Confirmar (BTNCONFIRMAR) não ficou disponível no iframe\";
+
+  // 2) Foco (ajuda o GeneXus)
+  btn.scrollIntoView({ block: \"center\", inline: \"center\" });
+  btn.focus();
+
+  // 3) Dispara exatamente o onclick do GeneXus (setGridEvt + execEvt)
+  let acionouGX = false;
+
+  if (w.gx && w.gx.evt && typeof w.gx.evt.execEvt === \"function\") {
+    try {
+      // Replica: if(gx.evt.jsEvent(this)) ...
+      if (!w.gx.evt.jsEvent || w.gx.evt.jsEvent(btn)) {
+        // MUITO importante: setGridEvt(76,null) (igual no HTML)
+        if (typeof w.gx.evt.setGridEvt === \"function\") {
+          w.gx.evt.setGridEvt(76, null);
+        }
+        // Evento do botão (igual no HTML)
+        w.gx.evt.execEvt(\"\", false, \"E\'DOCONFIRMAR\'.\", btn);
+        acionouGX = true;
+      }
+    } catch (e) {
+      // cai no fallback abaixo
+    }
+  }
+
+  // 4) Fallback: clique \"forte\" (mouse events + click)
+  // (às vezes ajuda quando o evento do GX não dispara por algum motivo)
+  try {
+    btn.dispatchEvent(new MouseEvent(\"mousedown\", { bubbles: true }));
+    btn.dispatchEvent(new MouseEvent(\"mouseup\", { bubbles: true }));
+    btn.dispatchEvent(new MouseEvent(\"click\", { bubbles: true }));
+  } catch (e) {}
+  try { btn.click(); } catch (e) {}
+
+  // 5) Blur (tira o foco do botão — ajuda a “concluir” ações em algumas telas)
+  setTimeout(() => {
+    try {
+      btn.blur();
+      btn.dispatchEvent(new Event(\"blur\", { bubbles: true }));
+    } catch (e) {}
+  }, 150);
+
+  return acionouGX
+    ? \"OK: Confirmar acionado via GeneXus (setGridEvt + execEvt) + blur\"
+    : \"OK: tentei Confirmar via click + blur (GX não foi acionado)\";
+}
+'''
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//espera popup ferchar
+
+function ExecuteScript() {
+  const p = document.getElementById(\"gxp0_b\");
+  if (!p) return \"FECHADO\";
+  const vis = (p.style.visibility || \"\").toLowerCase();
+  // alguns casos: o GX remove do DOM ou esconde
+  return (vis === \"hidden\" || p.offsetParent === null) ? \"FECHADO\" : \"ABERTO\";
+}
+'''
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''Registro salvo com sucesso.''')
+    **ENDREGION
+    **REGION Empenho
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//seleção aba item
+function ExecuteScript() { 
+aba_item = document.getElementById(\'Tab_GXUITABSPANEL_TABContainerpanel4\') 
+aba_item.click()
+}'''
+    WAIT 1
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//selecionar lupa
+function ExecuteScript() {
+detalhes = document.getElementById(\'W0283BTN_PROMPTEMP\')
+detalhes.click()
+}'''
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''ESTIMATIVO''')
+    WAIT 5
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//nume_contrato
+
+function ExecuteScript() {
+
+  var CAMPO_ID   = \"vVW_CONTRATOEMPEMPNUM1\";
+  var CTRL_ID    = 39;
+  var VALOR      = \"%Empenho%\";  // variável do PAD
+  var TIMEOUT_MS = 10000;
+
+  function fireEvent(doc, element, type) {
+    var ev;
+    try {
+      if (doc.defaultView && typeof doc.defaultView.Event === \"function\") {
+        ev = new doc.defaultView.Event(type, { bubbles: true });
+      } else {
+        ev = doc.createEvent(\"Event\");
+        ev.initEvent(type, true, true);
+      }
+      element.dispatchEvent(ev);
+    } catch (e) {}
+  }
+
+  // 1) tenta achar o campo no documento principal (às vezes o popup não é iframe)
+  var el = document.getElementById(CAMPO_ID);
+  if (el) {
+    try { el.focus(); } catch (e) {}
+    el.value = VALOR;
+    fireEvent(document, el, \"input\");
+    fireEvent(document, el, \"change\");
+    try { if (window.gx && gx.evt && typeof gx.evt.onchange === \"function\") gx.evt.onchange(el, null); } catch (e) {}
+    setTimeout(function () {
+      try { el.blur(); } catch (e) {}
+      fireEvent(document, el, \"blur\");
+      try { if (window.gx && gx.evt && typeof gx.evt.onblur === \"function\") gx.evt.onblur(el, CTRL_ID); } catch (e) {}
+    }, 150);
+    return \"OK: campo preenchido no documento principal\";
+  }
+
+  // 2) se não está no principal, procura em iframes (popup-document geralmente está em iframe)
+  var start = new Date().getTime();
+  var found = null;
+
+  while (new Date().getTime() - start < TIMEOUT_MS && !found) {
+    var iframes = document.getElementsByTagName(\"iframe\");
+    var i;
+
+    for (i = 0; i < iframes.length; i++) {
+      var fr = iframes[i];
+      var w, d;
+
+      try {
+        w = fr.contentWindow;
+        d = fr.contentDocument || (w ? w.document : null);
+      } catch (e) {
+        d = null; // sem acesso (cross-domain), pula
+      }
+
+      if (d) {
+        var candidate = d.getElementById(CAMPO_ID);
+        if (candidate) {
+          found = { win: w, doc: d, el: candidate, iframe: fr };
+          break;
+        }
+      }
+    }
+  }
+
+  if (!found) return \"ERRO: não encontrei o campo \" + CAMPO_ID + \" dentro do popup/iframe\";
+
+  // 3) preenche dentro do iframe encontrado
+  try { found.el.scrollIntoView(true); } catch (e) {}
+  try { found.el.focus(); } catch (e) {}
+
+  // setter nativo (quando possível)
+  try {
+    var desc = Object.getOwnPropertyDescriptor(found.win.HTMLInputElement.prototype, \"value\");
+    if (desc && typeof desc.set === \"function\") {
+      desc.set.call(found.el, String(VALOR));
+    } else {
+      found.el.value = String(VALOR);
+    }
+  } catch (e) {
+    found.el.value = String(VALOR);
+  }
+
+  fireEvent(found.doc, found.el, \"input\");
+  fireEvent(found.doc, found.el, \"change\");
+
+  // onchange do GeneXus do iframe (IMPORTANTE: usar found.win.gx)
+  try {
+    if (found.win.gx && found.win.gx.evt && typeof found.win.gx.evt.onchange === \"function\") {
+      found.win.gx.evt.onchange(found.el, null);
+    }
+  } catch (e) {}
+
+  // blur com delay
+  setTimeout(function () {
+    try { found.el.blur(); } catch (e) {}
+    fireEvent(found.doc, found.el, \"blur\");
+
+    try {
+      if (found.win.gx && found.win.gx.evt && typeof found.win.gx.evt.onblur === \"function\") {
+        found.win.gx.evt.onblur(found.el, CTRL_ID);
+      }
+    } catch (e) {}
+  }, 150);
+
+  return \"OK: campo preenchido no popup (iframe encontrado) | value=\" + found.el.value;
+}
+``'''
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''function ExecuteScript() {
+
+  var TARGET_ID = \"vSELECT_0001\";
+  var TIMEOUT_MS = 10000;
+
+  function fireEvent(doc, element, type) {
+    var ev;
+    try {
+      if (doc.defaultView && typeof doc.defaultView.Event === \"function\") {
+        ev = new doc.defaultView.Event(type, { bubbles: true });
+      } else {
+        ev = doc.createEvent(\"Event\");
+        ev.initEvent(type, true, true);
+      }
+      element.dispatchEvent(ev);
+    } catch (e) {}
+  }
+
+  function strongClick(doc, element) {
+    try {
+      element.dispatchEvent(new doc.defaultView.MouseEvent(\"mousedown\", { bubbles: true }));
+      element.dispatchEvent(new doc.defaultView.MouseEvent(\"mouseup\",   { bubbles: true }));
+      element.dispatchEvent(new doc.defaultView.MouseEvent(\"click\",     { bubbles: true }));
+    } catch (e) {
+      try { element.click(); } catch (e2) {}
+    }
+  }
+
+  // Procura no documento principal
+  var elMain = document.getElementById(TARGET_ID);
+  if (elMain) {
+    try { elMain.scrollIntoView(true); } catch (e) {}
+    try { elMain.focus(); } catch (e) {}
+    try { if (window.gx && gx.evt && typeof gx.evt.onfocus === \"function\") gx.evt.onfocus(elMain, 201, \"\", false, \"\", 200); } catch (e) {}
+    strongClick(document, elMain);
+    setTimeout(function () { try { elMain.blur(); } catch (e) {}; fireEvent(document, elMain, \"blur\"); }, 150);
+    return \"OK: clique vSELECT_0001 (main)\";
+  }
+
+  // Procura em iframes (popup)
+  var start = new Date().getTime();
+  var found = null;
+
+  while ((new Date().getTime() - start) < TIMEOUT_MS && !found) {
+    var iframes = document.getElementsByTagName(\"iframe\");
+    var i;
+    for (i = 0; i < iframes.length; i++) {
+      var fr = iframes[i], w, d;
+      try { w = fr.contentWindow; d = fr.contentDocument || (w ? w.document : null); } catch (e) { d = null; }
+      if (d) {
+        var candidate = d.getElementById(TARGET_ID);
+        if (candidate) { found = { win: w, doc: d, el: candidate, iframe: fr }; break; }
+      }
+    }
+  }
+
+  if (!found) return \"ERRO: não encontrei vSELECT_0001 no popup/iframe\";
+
+  try { found.el.scrollIntoView(true); } catch (e) {}
+  try { found.el.focus(); } catch (e) {}
+  try { if (found.win.gx && found.win.gx.evt && typeof found.win.gx.evt.onfocus === \"function\") found.win.gx.evt.onfocus(found.el, 201, \"\", false, \"\", 200); } catch (e) {}
+  strongClick(found.doc, found.el);
+
+  setTimeout(function () {
+    try { found.el.blur(); } catch (e) {}
+    fireEvent(found.doc, found.el, \"blur\");
+  }, 150);
+
+  return \"OK: clique vSELECT_0001 (popup/iframe)\";
+}
+'''
+    WAIT 4
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''SECRETARIA MUNICIPAL DE OBRAS E INFRAESTRUTURA''')
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//valor empenho
+
+function ExecuteScript() {
+  var id = \"W0283vORDEMFORNECEMPVALOR\";
+  var valorBruto = \"%ValorExcel_D%\";   // ✅ mesma variável do PAD usada no popup
+  var el = document.getElementById(id);
+
+  if (!el) return \"ERRO: campo \" + id + \" não encontrado\";
+
+  // helper: dispara evento de forma compatível
+  function fireEvent(element, type) {
+    var ev;
+    try {
+      if (typeof Event === \"function\") {
+        ev = new Event(type, { bubbles: true });
+      } else {
+        ev = document.createEvent(\"Event\");
+        ev.initEvent(type, true, true);
+      }
+      element.dispatchEvent(ev);
+    } catch (e) {}
+  }
+
+  // normaliza para BR com 2 casas: 1.234,50 / 1234.5 / 1234,5 / R$ 1234,5 -> 1234,50
+  function normalizarBR2(v) {
+    v = String(v == null ? \"\" : v);
+    v = v.replace(\"R$\", \"\");
+    v = v.replace(/\\s+/g, \"\");
+    // se tiver vírgula, remove pontos de milhar
+    if (v.indexOf(\",\") >= 0) {
+      v = v.replace(/\\./g, \"\");
+    }
+    // troca ponto decimal por vírgula (caso venha 412.03)
+    v = v.replace(\".\", \",\");
+    if (v === \"\") v = \"0\";
+
+    // garante vírgula e 2 casas
+    if (v.indexOf(\",\") < 0) v = v + \",00\";
+    var parts = v.split(\",\");
+    var inteiro = parts[0] === \"\" ? \"0\" : parts[0];
+    var dec = parts[1] || \"\";
+    dec = (dec + \"00\").substring(0, 2);
+
+    return inteiro + \",\" + dec;
+  }
+
+  var valorTexto = normalizarBR2(valorBruto);
+
+  // 1) foco (igual ao F12)
+  try { el.focus(); } catch (e) {}
+  try {
+    if (window.gx && gx.evt && typeof gx.evt.onfocus === \"function\") {
+      gx.evt.onfocus(el, 100, \"W0283\", false, \"0001\", 0);
+    }
+  } catch (e) {}
+
+  // 2) set value (setter nativo quando possível)
+  try {
+    var desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, \"value\");
+    if (desc && typeof desc.set === \"function\") {
+      desc.set.call(el, valorTexto);
+    } else {
+      el.value = valorTexto;
+    }
+  } catch (e) {
+    el.value = valorTexto;
+  }
+
+  // 3) input/change
+  fireEvent(el, \"input\");
+  fireEvent(el, \"change\");
+
+  // 4) validação decimal do GX (2 casas) + onchange
+  try {
+    if (window.gx && gx.num && typeof gx.num.valid_decimal === \"function\") {
+      gx.num.valid_decimal(el, \".\", \",\", \"2\");
+    }
+  } catch (e) {}
+
+  try {
+    if (window.gx && gx.evt && typeof gx.evt.onchange === \"function\") {
+      gx.evt.onchange(el, null);
+    }
+  } catch (e) {}
+
+  // 5) blur + onblur(100) com delay
+  setTimeout(function () {
+    try { el.blur(); } catch (e) {}
+    fireEvent(el, \"blur\");
+
+    try {
+      if (window.gx && gx.evt && typeof gx.evt.onblur === \"function\") {
+        gx.evt.onblur(el, 100);
+      }
+    } catch (e) {}
+  }, 150);
+
+  return \"OK: Empenho Valor preenchido + blur | value=\" + el.value;
+}'''
+    WAIT 4
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//clicar em adicionar
+
+function ExecuteScript() {
+  var btnId = \"W0283BTNADICIONAR\";
+  var btn = document.getElementById(btnId);
+  if (!btn) return \"ERRO: botão \" + btnId + \" não encontrado\";
+
+  // helper: disparar evento (compatível)
+  function fireEvent(element, type) {
+    var ev;
+    try {
+      if (typeof Event === \"function\") {
+        ev = new Event(type, { bubbles: true });
+      } else {
+        ev = document.createEvent(\"Event\");
+        ev.initEvent(type, true, true);
+      }
+      element.dispatchEvent(ev);
+    } catch (e) {}
+  }
+
+  // 1) Foco (como no onfocus do F12)
+  try { btn.focus(); } catch (e) {}
+  try {
+    if (window.gx && gx.evt && typeof gx.evt.onfocus === \"function\") {
+      gx.evt.onfocus(btn, 106, \"W0283\", false, \"\", 0);
+    }
+  } catch (e) {}
+
+  // 2) Dispara o evento GeneXus exato (setGridEvt + execEvt)
+  var acionouGX = false;
+  try {
+    if (window.gx && gx.evt && typeof gx.evt.execEvt === \"function\") {
+      if (!gx.evt.jsEvent || gx.evt.jsEvent(btn)) {
+        if (typeof gx.evt.setGridEvt === \"function\") {
+          gx.evt.setGridEvt(114, null);
+        }
+        gx.evt.execEvt(\"W0283\", false, \"W0283E\'DOADICIONAR\'.\", btn);
+        acionouGX = true;
+      }
+    }
+  } catch (e) {}
+
+  // 3) Fallback: click “forte” (caso o GX não dispare)
+  try {
+    btn.dispatchEvent(new MouseEvent(\"mousedown\", { bubbles: true }));
+    btn.dispatchEvent(new MouseEvent(\"mouseup\",   { bubbles: true }));
+    btn.dispatchEvent(new MouseEvent(\"click\",     { bubbles: true }));
+  } catch (e) {}
+  try { btn.click(); } catch (e) {}
+
+  // 4) BLUR (ajuda algumas telas GeneXus a concluir a ação)
+  setTimeout(function () {
+    try { btn.blur(); } catch (e) {}
+    fireEvent(btn, \"blur\");
+  }, 150);
+
+  return acionouGX
+    ? \"OK: Adicionar acionado via GeneXus (setGridEvt+execEvt) + blur\"
+    : \"OK: tentei Adicionar via click + blur (GX não confirmou)\";
+}
+'''
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''Empenho adicionado com sucesso.''')
+    Excel.ReadFromExcel.ReadCell Instance: planilha_base StartColumn: $'''m''' StartRow: LinhaExcelAtual_M - 1 GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> oeecheklist
+    IF oeecheklist = $'''\"\"''' THEN
+        Logging.LogMessage Message: $'''ausente dado numero OEE''' LogLevel: Logging.LogLevel.InfoLevel
+    END
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//clicar em voltar
+
+function ExecuteScript() {
+voltar = document.getElementById(\'BTNBTNVOLTAR\')
+voltar.click()
+}
+'''
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''Contratado''')
+    **ENDREGION
+    **REGION buscar OEE
+    WAIT 4
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}%oee_numero%{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''Em Elaboração''')
+    WAIT 1
+    **ENDREGION
+    **REGION Tramitar OEE concluída
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//tramitar
+
+function ExecuteScript() {
+
+  // ====== CONFIGURAÇÃO (opcional) ======
+  // Se você quiser clicar no sanduíche da linha do OEE filtrado:
+  var OEE_NUM = \"%oee_numero%\"; // ex: 564  (pode deixar vazio \"\")
+  var OPCAO = \"Tramitar\";
+  var TIMEOUT_MS = 4000;
+  // ====================================
+
+  function trim(s){ return (s || \"\").replace(/^\\s+|\\s+$/g, \"\"); }
+
+  function closest(el, selector){
+    // compatível ES5
+    while (el) {
+      if (el.matches && el.matches(selector)) return el;
+      el = el.parentElement;
+    }
+    return null;
+  }
+
+  function clickForte(el){
+    if (!el) return false;
+    try { el.scrollIntoView({block:\"center\", inline:\"center\"}); } catch(e) {}
+    try { el.focus(); } catch(e) {}
+
+    try {
+      el.dispatchEvent(new MouseEvent(\"mousedown\", {bubbles:true, cancelable:true}));
+      el.dispatchEvent(new MouseEvent(\"mouseup\",   {bubbles:true, cancelable:true}));
+      el.dispatchEvent(new MouseEvent(\"click\",     {bubbles:true, cancelable:true}));
+      return true;
+    } catch(e2) {
+      try { el.click(); return true; } catch(e3) { return false; }
+    }
+  }
+
+  function getMenuAberto(){
+    // no seu F12 o container é <div class=\"dropdown-menu open\"> ... <ul class=\"dropdown-menu inner\">
+    var divOpen = document.querySelector(\"div.dropdown-menu.open\");
+    if (divOpen && divOpen.offsetParent !== null) return divOpen;
+
+    // fallback: ul inner visível
+    var uls = document.querySelectorAll(\"ul.dropdown-menu.inner[role=\'listbox\']\");
+    for (var i=0; i<uls.length; i++){
+      if (uls[i] && uls[i].offsetParent !== null) return uls[i];
+    }
+    return null;
+  }
+
+  function clicarTramitarNoMenu(menu){
+    if (!menu) return false;
+
+    // 1) por data-original-index=4 (mais direto)
+    var a1 = menu.querySelector(\"li[data-original-index=\'4\'] a\");
+    if (a1) return clickForte(a1);
+
+    // 2) por texto \"Tramitar\"
+    var spans = menu.querySelectorAll(\"span.text\");
+    for (var j=0; j<spans.length; j++){
+      if (trim(spans[j].textContent) === OPCAO){
+        var a = closest(spans[j], \"a\");
+        if (a) return clickForte(a);
+      }
+    }
+    return false;
+  }
+
+  function acharBotaoSanduiche(){
+    // Se OEE_NUM estiver preenchido, tenta achar o <tr> que contém esse número
+    if (OEE_NUM && trim(OEE_NUM) !== \"\") {
+      var trs = document.getElementsByTagName(\"tr\");
+      for (var i=0; i<trs.length; i++){
+        var t = trim(trs[i].innerText || trs[i].textContent);
+        if (t && t.indexOf(OEE_NUM) >= 0) {
+          var btn = trs[i].querySelector(\"button.dropdown-toggle[data-id^=\'vGRIDACTIONS_\']\");
+          if (btn) return btn;
+        }
+      }
+    }
+
+    // fallback: primeiro sanduíche visível
+    var btn2 = document.querySelector(\"button.dropdown-toggle[data-id^=\'vGRIDACTIONS_\']\");
+    return btn2;
+  }
+
+  // ====== EXECUÇÃO ======
+  // Se o menu já estiver aberto, tente clicar direto
+  var menu0 = getMenuAberto();
+  if (menu0 && clicarTramitarNoMenu(menu0)) {
+    // blur leve para “assentar”
+    setTimeout(function(){
+      try { document.activeElement && document.activeElement.blur(); } catch(e){}
+    }, 150);
+    return \"OK: Tramitar (menu já aberto)\";
+  }
+
+  // 1) Achar botão sanduíche correto
+  var btn = acharBotaoSanduiche();
+  if (!btn) return \"ERRO: não encontrei botão sanduíche (vGRIDACTIONS_****)\";
+
+  // 2) Abrir menu
+  clickForte(btn);
+
+  // 3) Esperar menu abrir (pequeno loop)
+  var start = new Date().getTime();
+  var menu = null;
+  while ((new Date().getTime() - start) < TIMEOUT_MS) {
+    menu = getMenuAberto();
+    if (menu) break;
+  }
+  if (!menu) return \"ERRO: cliquei no sanduíche mas o menu não abriu\";
+
+  // 4) Clicar Tramitar
+  var ok = clicarTramitarNoMenu(menu);
+  if (!ok) return \"ERRO: menu abriu, mas não consegui clicar em Tramitar\";
+
+  // 5) BLUR (como você pediu)
+  setTimeout(function(){
+    try { btn.blur(); } catch(e){}
+  }, 150);
+
+  return \"OK: Tramitar clicado\";
+}'''
+    WAIT 1
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''Data da Ordem de Execução de Empenho''')
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''Concluída''')
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//tramitar 2
+function ExecuteScript() {
+  var LABEL_OPCAO = \"Tramitar\";
+
+  function norm(s) { return (s || \"\").replace(/\\s+/g, \" \").trim(); }
+
+  function fire(el) {
+    if (!el) return false;
+    try { el.scrollIntoView({ block: \"center\", inline: \"center\" }); } catch (e) {}
+
+    // Pointer + Mouse (Edge/PAD)
+    try {
+      el.dispatchEvent(new PointerEvent(\"pointerdown\", { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new PointerEvent(\"pointerup\",   { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new MouseEvent(\"mousedown\", { bubbles: true, cancelable: true, view: window }));
+      el.dispatchEvent(new MouseEvent(\"mouseup\",   { bubbles: true, cancelable: true, view: window }));
+      el.dispatchEvent(new MouseEvent(\"click\",     { bubbles: true, cancelable: true, view: window }));
+      return true;
+    } catch (e2) {
+      try { el.click(); return true; } catch (e3) { return false; }
+    }
+  }
+
+  function findSandwichButton() {
+    // pega o primeiro vGRIDACTIONS_* visível
+    var btns = Array.from(document.querySelectorAll(\"button.dropdown-toggle[data-id^=\'vGRIDACTIONS_\']\"));
+    for (var i = 0; i < btns.length; i++) {
+      if (btns[i] && btns[i].offsetParent !== null) return btns[i];
+    }
+    return null;
+  }
+
+  function findOpenMenuRoot() {
+    // bootstrap-select aberto
+    var m1 = document.querySelector(\".bootstrap-select.open .dropdown-menu.open\");
+    if (m1) return m1;
+
+    // fallback: qualquer dropdown aberto
+    var m2 = document.querySelector(\".dropdown-menu.open\");
+    if (m2) return m2;
+
+    return null;
+  }
+
+  function clickOptionInOpenMenu(label) {
+    var menu = findOpenMenuRoot();
+    if (!menu) return { ok: false, step: \"findMenu\", error: \"Nenhum dropdown aberto detectado.\" };
+
+    // Procura por texto \"Tramitar\"
+    var spans = Array.from(menu.querySelectorAll(\"span.text\"));
+    for (var j = 0; j < spans.length; j++) {
+      if (norm(spans[j].textContent) === label) {
+        var a = spans[j].closest(\"a\");
+        if (!a) return { ok: false, step: \"findOption\", error: \"Span encontrado, mas <a> não localizado.\" };
+        fire(a);
+        return { ok: true, step: \"clickedOption\", option: label };
+      }
+    }
+
+    return { ok: false, step: \"findOption\", error: \"Opção não encontrada no menu aberto.\", option: label };
+  }
+
+  // 0) (Opcional) se estiver carregando via GeneXus/AJAX, melhor o PAD aguardar antes.
+  // Aqui só deixo diagnóstico, não travo com while.
+  var ajax = document.querySelector(\"#gx_ajax_notification\");
+  var ajaxVisible = ajax && ajax.style && ajax.style.display !== \"none\";
+
+  // 1) achar botão sandwich
+  var btn = findSandwichButton();
+  if (!btn) {
+    return JSON.stringify({ ok: false, step: \"findButton\", error: \"Não encontrei button vGRIDACTIONS_* visível.\", ajaxVisible: ajaxVisible });
+  }
+
+  // 2) abrir menu (clicar wrapper + botão)
+  var wrapper = btn.closest(\".bootstrap-select\") || btn.parentElement;
+  if (wrapper) fire(wrapper);
+  fire(btn);
+
+  // 3) clicar Tramitar dentro do menu aberto
+  var result = clickOptionInOpenMenu(LABEL_OPCAO);
+
+  // 4) se falhar, tenta uma segunda abertura + clique (sem loop pesado)
+  if (!result.ok) {
+    fire(btn);
+    result = clickOptionInOpenMenu(LABEL_OPCAO);
+  }
+
+  return JSON.stringify({
+    ok: result.ok,
+    step: result.step,
+    option: result.option || LABEL_OPCAO,
+    error: result.error || \"\",
+    dataId: btn.getAttribute(\"data-id\") || \"\",
+    ajaxVisible: ajaxVisible
+  });
+}'''
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''Enviada ao Fornecedor''')
+    WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//tramitar 3
+function ExecuteScript() {
+  // === CONFIG ===
+  var DATA_ID = \"vGRIDACTIONS_0001\";   // ajuste se mudar por linha
+  var LABEL_OPCAO = \"Tramitar\";
+
+  // === HELPERS ===
+  function norm(s) { return (s || \"\").replace(/\\s+/g, \" \").trim(); }
+
+  function firePointerMouse(el) {
+    try {
+      el.scrollIntoView({ block: \"center\", inline: \"center\" });
+    } catch (e) {}
+
+    // Pointer events (melhor para Edge/PAD)
+    try {
+      el.dispatchEvent(new PointerEvent(\"pointerdown\", { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new PointerEvent(\"pointerup\",   { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new MouseEvent(\"mousedown\", { bubbles: true, cancelable: true, view: window }));
+      el.dispatchEvent(new MouseEvent(\"mouseup\",   { bubbles: true, cancelable: true, view: window }));
+      el.dispatchEvent(new MouseEvent(\"click\",     { bubbles: true, cancelable: true, view: window }));
+      return true;
+    } catch (e2) {
+      try { el.click(); return true; } catch (e3) { return false; }
+    }
+  }
+
+  function findOpenMenuContainer() {
+    // Bootstrap-select aberto costuma marcar \".bootstrap-select.open\"
+    var c1 = document.querySelector(\".bootstrap-select.open .dropdown-menu.open\");
+    if (c1) return c1;
+
+    // Fallback: qualquer dropdown-menu aberto
+    var c2 = document.querySelector(\".dropdown-menu.open\");
+    if (c2) return c2;
+
+    // Fallback 2: container do bootstrap-select com UL \"inner\" visível
+    var uls = Array.from(document.querySelectorAll(\"ul.dropdown-menu.inner[role=\'listbox\']\"));
+    for (var i = 0; i < uls.length; i++) {
+      if (uls[i] && uls[i].offsetParent !== null) return uls[i].closest(\".dropdown-menu\") || uls[i];
+    }
+    return null;
+  }
+
+  // === 1) ACHAR O BOTÃO CERTO (EVITA CLICAR NO DROPDOWN ERRADO) ===
+  var btn = document.querySelector(\"button.dropdown-toggle[data-id=\'\" + DATA_ID + \"\']\");
+  if (!btn) {
+    // fallback: qualquer dropdown-toggle cujo data-id comece com vGRIDACTIONS_
+    btn = document.querySelector(\"button.dropdown-toggle[data-id^=\'vGRIDACTIONS_\']\");
+  }
+
+  if (!btn) {
+    return JSON.stringify({ ok: false, step: \"findButton\", error: \"Botão dropdown não encontrado (data-id).\", dataId: DATA_ID });
+  }
+
+  // === 2) ABRIR MENU (preferir clicar no wrapper também) ===
+  var wrapper = btn.closest(\".bootstrap-select\") || btn.parentElement;
+  // clique no wrapper primeiro (muitos bootstrap-select abrem assim)
+  if (wrapper) firePointerMouse(wrapper);
+  // depois no botão
+  firePointerMouse(btn);
+
+  // === 3) LOCALIZAR MENU ABERTO ===
+  var menu = findOpenMenuContainer();
+  if (!menu) {
+    // segunda tentativa: clicar de novo no botão
+    firePointerMouse(btn);
+    menu = findOpenMenuContainer();
+  }
+
+  if (!menu) {
+    return JSON.stringify({
+      ok: false, step: \"openMenu\",
+      error: \"Não detectei dropdown aberto após o clique.\",
+      hint: \"Pode estar em iframe/linha diferente ou data-id mudou.\",
+      dataId: DATA_ID
+    });
+  }
+
+  // === 4) CLICAR NA OPÇÃO \"Tramitar\" DENTRO DO MENU ABERTO ===
+  // Primeiro tenta por texto (mais estável)
+  var spans = Array.from(menu.querySelectorAll(\"span.text\"));
+  var targetA = null;
+
+  for (var j = 0; j < spans.length; j++) {
+    if (norm(spans[j].textContent) === LABEL_OPCAO) {
+      targetA = spans[j].closest(\"a\");
+      break;
+    }
+  }
+
+  // Fallback: por data-original-index=4 (se existir)
+  if (!targetA) {
+    var li = menu.querySelector(\"li[data-original-index=\'4\'] a\");
+    if (li) targetA = li;
+  }
+
+  if (!targetA) {
+    return JSON.stringify({
+      ok: false, step: \"findOption\",
+      error: \"Menu abriu, mas não encontrei a opção.\",
+      option: LABEL_OPCAO
+    });
+  }
+
+  firePointerMouse(targetA);
+
+  return JSON.stringify({
+    ok: true,
+    step: \"done\",
+    clicked: LABEL_OPCAO,
+    dataId: (btn.getAttribute(\"data-id\") || DATA_ID)
+  });
+}
+``'''
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    **ENDREGION
+END
+WebAutomation.CloseWebBrowser BrowserInstance: grp_login_OEE

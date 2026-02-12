@@ -1,0 +1,31 @@
+CALL Iniciar_excel
+**REGION login
+WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://grp-hm.pbh.gov.br/bh_hml_quartzo/servlet/app.wlogin''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> grp_login_OEE
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp_login_OEE Text: $'''Esqueci minha senha''')
+WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//login
+
+function ExecuteScript() { 
+nome = document.getElementById(\'vUSERNAME\') 
+nome.value = \"%Matricula_usuario%\"
+}'''
+WAIT 1
+WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//senha para login
+function ExecuteScript() {
+senha= document.getElementById(\'vUSERPASSWORD\')
+senha.value=\'%senha%\'
+senha_id=document.getElementById(\'vUSERPASSWORD\')
+senha_id.type=\'password\'
+senha_id.value=\'%senha%\'
+}'''
+WAIT 1
+WebAutomation.ExecuteJavascript BrowserInstance: grp_login_OEE Javascript: $'''//entrar (ok )
+function ExecuteScript() { 
+regiao = document.getElementsByClassName(\'col-xs-12 TableActionsCellLogin\')
+regiao[0].children[0].click()
+}'''
+WAIT 1
+**ENDREGION
+CALL 'criação OEE'
+CALL Lancamento_NF
+Display.ShowMessageDialog.ShowMessage Title: $'''Statatus do lançamento dos dados''' Message: $'''Caro usuário, os dados foram lançados com sucesso.''' Icon: Display.Icon.Information Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False
+EXIT Code: 0

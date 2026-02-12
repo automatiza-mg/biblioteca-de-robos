@@ -1,0 +1,944 @@
+**REGION login_para teste remover depois e trocar referencias
+WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://grp-hm.pbh.gov.br/bh_hml_quartzo/servlet/app.wlogin''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 PiPUserDataFolderMode: WebAutomation.PiPUserDataFolderModeEnum.AutomaticProfile TargetDesktop: $'''{\"DisplayName\":\"Computador local\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> grp2_login_NF
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp2_login_NF Text: $'''Esqueci minha senha''')
+WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//login
+
+function ExecuteScript() { 
+nome = document.getElementById(\'vUSERNAME\') 
+nome.value = \"%Matricula_usuario%\"
+}'''
+WAIT 1
+WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//senha para login
+function ExecuteScript() {
+senha= document.getElementById(\'vUSERPASSWORD\')
+senha.value=\'%senha%\'
+senha_id=document.getElementById(\'vUSERPASSWORD\')
+senha_id.type=\'password\'
+senha_id.value=\'%senha%\'
+}'''
+WAIT 1
+WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//entrar (ok )
+function ExecuteScript() { 
+regiao = document.getElementsByClassName(\'col-xs-12 TableActionsCellLogin\')
+regiao[0].children[0].click()
+}'''
+WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp2_login_NF Text: $'''TABELAS BÁSICAS''')
+**ENDREGION
+**REGION caminho alancamento NF
+WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''// workspace_modulo_contrato
+function ExecuteScript() { 
+botao= document.getElementById(\'span_HOMEMODULESSDT__OPTIONTITLE_0004\') 
+botao.click()
+}'''
+WAIT 5
+WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''// abre \"Gestão de Serviços\" e clica \"Entrada Material Serviço\"
+function ExecuteScript() {
+  const HREF_ENTRADA = \"app.materiais.wmentradamaterialnfservico\";
+  const TEXTO_MENU   = \"Gestão de Serviços\";
+
+  // 1) garante que o menu lateral existe
+  const sidebar = document.querySelector(\"#sidebar_ul\");
+  if (!sidebar) return \"ERRO: sidebar_ul ainda não carregou\";
+
+  // helper: normaliza texto
+  const norm = (s) => (s || \"\").replace(/\\s+/g, \" \").trim();
+
+  // helper: clique forte (PAD/Edge)
+  function strongClick(el) {
+    if (!el) return false;
+    try { el.scrollIntoView({ block: \"center\", inline: \"center\" }); } catch (e) {}
+
+    try {
+      el.dispatchEvent(new PointerEvent(\"pointerdown\", { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new PointerEvent(\"pointerup\",   { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new MouseEvent(\"mousedown\", { bubbles: true, cancelable: true, view: window }));
+      el.dispatchEvent(new MouseEvent(\"mouseup\",   { bubbles: true, cancelable: true, view: window }));
+      el.dispatchEvent(new MouseEvent(\"click\",     { bubbles: true, cancelable: true, view: window }));
+      return true;
+    } catch (e2) {
+      try { el.click(); return true; } catch (e3) { return false; }
+    }
+  }
+
+  function isHiddenSubmenu(ul) {
+    if (!ul) return true;
+    // Pelo seu HTML: style=\"display:none\" quando fechado
+    const disp = (ul.style && ul.style.display) ? ul.style.display : \"\";
+    if (disp === \"none\") return true;
+
+    // fallback: se não ocupa layout, considera oculto
+    return ul.offsetParent === null;
+  }
+
+  // 2) acha o menu \"Gestão de Serviços\" pelo texto
+  const menuGestao = Array.from(sidebar.querySelectorAll(\"a.menu-dropdown\"))
+    .find(a => {
+      const sp = a.querySelector(\"span.menu-text\");
+      return sp && norm(sp.textContent).startsWith(TEXTO_MENU);
+    });
+
+  if (!menuGestao) return \"ERRO: menu \'Gestão de Serviços\' não encontrado\";
+
+  // 3) se submenu estiver fechado, abre
+  const liGestao = menuGestao.closest(\"li\");
+  const submenu  = liGestao ? liGestao.querySelector(\"ul.submenu\") : null;
+
+  if (submenu && isHiddenSubmenu(submenu)) {
+    strongClick(menuGestao);
+  }
+
+  // 4) encontra o link \"Entrada Material Serviço\" pelo href (mais confiável)
+  let linkEntrada = sidebar.querySelector(`a[href=\'${HREF_ENTRADA}\']`);
+
+  // fallback: caso venha com prefixo (ex.: /servlet/...)
+  if (!linkEntrada) {
+    linkEntrada = Array.from(sidebar.querySelectorAll(\"a[href]\"))
+      .find(a => (a.getAttribute(\"href\") || \"\").includes(HREF_ENTRADA));
+  }
+
+  if (!linkEntrada) return `ERRO: link \'${HREF_ENTRADA}\' não encontrado`;
+
+  // 5) rola e clica
+  linkEntrada.scrollIntoView({ block: \"center\" });
+  strongClick(linkEntrada);
+
+  // 6) fallback: se framework bloquear click, navega via URL
+  if (!location.href.includes(\"wmentradamaterialnfservico\")) {
+    const href = linkEntrada.getAttribute(\"href\");
+    if (href && href !== \"#\") location.assign(href);
+  }
+
+  return \"OK: Gestão de Serviços > Entrada Material Serviço\";
+}
+``'''
+WAIT 6
+**ENDREGION
+LOOP FOREACH loop_NF IN ler_excel_base
+    **REGION informações do documento_dados NF
+    Excel.ReadFromExcel.ReadCell Instance: planilha_base StartColumn: $'''M''' StartRow: LinhaExcelAtual_NF GetCellContentsMode: Excel.GetCellContentsMode.TypedValues CellValue=> oee_m_coluna
+    Text.SplitText.SplitWithDelimiter Text: oee_m_coluna CustomDelimiter: $'''/''' IsRegEx: False Result=> PartesOeeNF
+    SET oee_numero_atual TO PartesOeeNF[0]
+    SET ValorExcel_D TO loop_NF['Valor']
+    SET ValorExcel_N TO loop_NF['N° NF']
+    SET ValorExcel_Data TO loop_NF['Data emissao']
+    WAIT 2
+    **REGION inf.doc
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//clica no botão inserir
+
+function ExecuteScript() {
+  var btns = document.getElementsByName(\'W0006BTNBTINSERIR\');
+  if (!btns || !btns.length) return \"ERRO: botão Inserir não encontrado por name\";
+
+  btns[0].scrollIntoView({ block: \'center\' });
+  btns[0].click();
+
+  return \"OK: clique no Inserir\";
+}
+``'''
+    WAIT 1
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//clica OF com oEE
+function ExecuteScript() {
+  const CARD_ID = \"TBCOMOFSERVICO\"; // Serviço (Com OEE)
+
+  function strongClick(win, el) {
+    if (!el) return false;
+    try { el.scrollIntoView({ block: \"center\", inline: \"center\" }); } catch (e) {}
+
+    try {
+      el.dispatchEvent(new win.PointerEvent(\"pointerdown\", { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new win.PointerEvent(\"pointerup\",   { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new win.MouseEvent(\"mousedown\", { bubbles: true, cancelable: true, view: win }));
+      el.dispatchEvent(new win.MouseEvent(\"mouseup\",   { bubbles: true, cancelable: true, view: win }));
+      el.dispatchEvent(new win.MouseEvent(\"click\",     { bubbles: true, cancelable: true, view: win }));
+      return true;
+    } catch (e2) {
+      try { el.click(); return true; } catch (e3) { return false; }
+    }
+  }
+
+  function findVisiblePopupIframe() {
+    // pega o popup visível (GeneXus: gx-responsive-popup) e o iframe dentro
+    const popup = Array.from(document.querySelectorAll(\".gx-responsive-popup\"))
+      .find(p => p && p.style && p.style.visibility !== \"hidden\" && p.offsetParent !== null);
+
+    if (popup) {
+      const ifrm = popup.querySelector(\"iframe[id$=\'_ifrm\']\");
+      if (ifrm) return ifrm;
+    }
+
+    // fallback: primeiro iframe de popup
+    return document.querySelector(\"iframe[id^=\'gxp\'][id$=\'_ifrm\']\");
+  }
+
+  const ifrm = findVisiblePopupIframe();
+  if (!ifrm) return JSON.stringify({ ok: false, step: \"findIframe\", error: \"Iframe do popup não encontrado (gxp*_ifrm).\" });
+
+  let doc, win;
+  try {
+    win = ifrm.contentWindow;
+    doc = ifrm.contentDocument || (win && win.document);
+  } catch (e) {
+    return JSON.stringify({ ok: false, step: \"accessIframe\", error: \"Sem acesso ao iframe (cross-origin ou bloqueio).\" });
+  }
+
+  if (!doc) return JSON.stringify({ ok: false, step: \"docNull\", error: \"Documento do iframe não disponível ainda.\" });
+
+  const card = doc.getElementById(CARD_ID);
+  if (!card) {
+    return JSON.stringify({
+      ok: false,
+      step: \"findCard\",
+      error: \"Card não encontrado dentro do iframe.\",
+      target: CARD_ID
+    });
+  }
+
+  const clicked = strongClick(win, card);
+  if (!clicked) return JSON.stringify({ ok: false, step: \"click\", error: \"Falha ao clicar no card.\", target: CARD_ID });
+
+  return JSON.stringify({ ok: true, step: \"done\", clicked: CARD_ID });
+}'''
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp2_login_NF Text: $'''Entrada de Materiais''')
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//insere o prestador
+function ExecuteScript() {
+  const ID = \"W0023SDTENTRADAMATERIALNF_ENTMATNFFORNECEDORCOD\";
+  const VALOR = \"%prestador%\";   // ex.: \"18440\"
+  const GX_FORM = \"W0023\";
+  const GX_CTRL = 69;            // do seu F12
+
+  const el = document.getElementById(ID);
+  if (!el) return JSON.stringify({ ok: false, step: \"find\", error: \"Campo não encontrado\", id: ID });
+
+  // Setter nativo (mais compatível com frameworks)
+  const desc = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, \"value\");
+  const setter = desc && desc.set;
+
+  // 1) Foco + onfocus GeneXus
+  try { el.focus(); } catch (e) {}
+  try {
+    if (window.gx && gx.evt && gx.evt.onfocus) {
+      gx.evt.onfocus(el, GX_CTRL, GX_FORM, false, \"\", 0);
+    }
+  } catch (e) {}
+
+  // 2) Setar valor
+  try { setter ? setter.call(el, String(VALOR).trim()) : (el.value = String(VALOR).trim()); } catch (e) {}
+
+  // 3) input/change + onchange GeneXus
+  try { el.dispatchEvent(new Event(\"input\", { bubbles: true, cancelable: true })); } catch (e) {}
+  try { el.dispatchEvent(new Event(\"change\", { bubbles: true, cancelable: true })); } catch (e) {}
+
+  try {
+    if (window.gx && gx.evt && gx.evt.onchange) {
+      gx.evt.onchange(el, window.event || null);
+    }
+  } catch (e) {}
+
+  // 4) Simular TAB completo (keydown/keypress/keyup)
+  function sendKey(type) {
+    try {
+      el.dispatchEvent(new KeyboardEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        key: \"Tab\",
+        code: \"Tab\",
+        keyCode: 9,
+        which: 9
+      }));
+    } catch (e) {}
+  }
+
+  sendKey(\"keydown\");
+  sendKey(\"keypress\");
+  sendKey(\"keyup\");
+
+  // 5) Garantir blur/focusout + onblur GeneXus
+  try { el.dispatchEvent(new Event(\"focusout\", { bubbles: true, cancelable: true })); } catch (e) {}
+  try { el.blur(); } catch (e) {}
+  try { el.dispatchEvent(new Event(\"blur\", { bubbles: true, cancelable: true })); } catch (e) {}
+
+  try {
+    if (window.gx && gx.evt && gx.evt.onblur) {
+      gx.evt.onblur(el, GX_CTRL);
+    }
+  } catch (e) {}
+
+  return JSON.stringify({ ok: true, step: \"done\", id: ID, value: el.value });
+}'''
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp2_login_NF Text: prestador)
+    WAIT 4
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Tab}{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp2_login_NF Text: $'''CEMIG DISTRIBUICAO S.A''')
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//insere o unidade adm 0013
+
+function ExecuteScript() {
+  bt=document.getElementById(\'W0023SDTENTRADAMATERIALNF_ENTMATNFORGNCODIGO\')
+  bt.value=\"0013\"
+  
+}'''
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 3
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//insere o unidade orçamentária
+
+function ExecuteScript() {
+  var SELECT_ID = \"W0023SDTENTRADAMATERIALNF_ENTMATNFUOID\";
+  var TARGET_VALUE = \"2039\";
+  var TARGET_TEXT = \"2700 - SECRETARIA MUNICIPAL DE OBRAS E INFRAESTRUTURA\";
+  var TIMEOUT_MS = 6000;
+
+  function norm(s) { return (s || \"\").replace(/\\s+/g, \" \").trim(); }
+
+  function isReady(sel) {
+    return sel && !sel.disabled && sel.offsetParent !== null;
+  }
+
+  function getCtrlIdFromOnblur(sel) {
+    var onb = sel.getAttribute(\"onblur\") || \"\";
+    var m = onb.match(/onblur\\s*\\(\\s*this\\s*,\\s*(\\d+)/i);
+    return m ? parseInt(m[1], 10) : null;
+  }
+
+  function setValueNative(win, sel, value) {
+    var desc = Object.getOwnPropertyDescriptor(win.HTMLSelectElement.prototype, \"value\");
+    var setter = desc && desc.set;
+    if (setter) setter.call(sel, value);
+    else sel.value = value;
+  }
+
+  function waitOption(sel, value, text) {
+    var t0 = Date.now();
+    while (Date.now() - t0 < TIMEOUT_MS) {
+      var opt = sel.querySelector(\"option[value=\'\" + value + \"\']\");
+      if (opt) return { ok: true, value: value };
+      // fallback por texto
+      var opts = Array.from(sel.querySelectorAll(\"option\"));
+      var byText = opts.find(o => norm(o.textContent) === text);
+      if (byText) return { ok: true, value: byText.value };
+    }
+    return { ok: false };
+  }
+
+  function apply(win, doc, where) {
+    var sel = doc.getElementById(SELECT_ID);
+    if (!sel) return null;
+
+    // espera ficar pronto/visível
+    var t0 = Date.now();
+    while (Date.now() - t0 < TIMEOUT_MS) {
+      if (isReady(sel)) break;
+    }
+    if (!isReady(sel)) {
+      return { ok: false, where: where, step: \"notReady\", error: \"Select encontrado, mas está disabled/invisível.\" };
+    }
+
+    // espera a opção existir (para não perder para o refresh AJAX)
+    var found = waitOption(sel, TARGET_VALUE, TARGET_TEXT);
+    if (!found.ok) {
+      return {
+        ok: false,
+        where: where,
+        step: \"optionNotLoaded\",
+        error: \"Opção 2039/2700 não apareceu no tempo. Provável AJAX ainda recarregando.\",
+        optionsCount: sel.options ? sel.options.length : 0
+      };
+    }
+
+    var realValue = found.value;
+
+    // seta valor
+    setValueNative(win, sel, realValue);
+
+    // eventos nativos
+    try { sel.dispatchEvent(new win.Event(\"change\", { bubbles: true, cancelable: true })); } catch (e) {}
+    try { if (typeof sel.onchange === \"function\") sel.onchange(); } catch (e) {}
+
+    // GeneXus onchange + blur
+    var ctrlId = getCtrlIdFromOnblur(sel);
+    try { if (win.gx && win.gx.evt && win.gx.evt.onchange) win.gx.evt.onchange(sel, win.event || null); } catch (e) {}
+    try { sel.blur(); } catch (e) {}
+    try { if (ctrlId !== null && win.gx && win.gx.evt && win.gx.evt.onblur) win.gx.evt.onblur(sel, ctrlId); } catch (e) {}
+
+    var txt = sel.options && sel.selectedIndex >= 0 ? norm(sel.options[sel.selectedIndex].text) : \"\";
+    return { ok: true, where: where, step: \"done\", value: sel.value, text: txt, ctrlId: ctrlId };
+  }
+
+  // 1) documento atual
+  var r0 = apply(window, document, \"document\");
+  if (r0) return JSON.stringify(r0);
+
+  // 2) iframes
+  var iframes = Array.from(document.querySelectorAll(\"iframe\"));
+  for (var i = 0; i < iframes.length; i++) {
+    try {
+      var win = iframes[i].contentWindow;
+      var doc = iframes[i].contentDocument || (win && win.document);
+      if (!doc) continue;
+
+      var r = apply(win, doc, \"iframe[\" + i + \"]\");
+      if (r) return JSON.stringify(r);
+    } catch (e) {}
+  }
+
+  return JSON.stringify({ ok: false, step: \"findSelect\", error: \"Select não encontrado no document nem em iframes.\", id: SELECT_ID });
+}'''
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//insere data do recebimento
+
+function ExecuteScript() {
+  const bt = document.getElementById(\'W0023SDTENTRADAMATERIALNF_ENTMATNFDTARECEBIMENTO\');
+  if (!bt) return \"ERRO: campo de data não encontrado\";
+
+  const hoje = new Date();
+  const dd = String(hoje.getDate()).padStart(2, \'0\');
+  const mm = String(hoje.getMonth() + 1).padStart(2, \'0\'); // mês começa em 0
+  const yyyy = hoje.getFullYear();
+
+  bt.value = `${dd}/${mm}/${yyyy}`;
+
+  return `OK: data preenchida = ${bt.value}`;
+}'''
+    WAIT 3
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Down}{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//insere n° do boleto
+function ExecuteScript() {
+  bt=document.getElementById(\'W0023SDTENTRADAMATERIALNF_ENTMATNFNMRNOTAFISCAL\')
+  bt.value=\"%ValorExcel_N%\"
+  
+}'''
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//insere data emissão boleto
+
+function ExecuteScript() {
+  bt=document.getElementById(\'W0023SDTENTRADAMATERIALNF_ENTMATNFDATANOTAFISCAL\')
+  bt.value=\"%ValorExcel_Data%\"
+  
+}'''
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//insere valor boleto
+function ExecuteScript() {
+  const ID = \"W0023SDTENTRADAMATERIALNF_ENTMATNFVALOR\";
+  const bruto = \"%ValorExcel_D%\"; // vem do Excel (ex.: \"R$ 402,25\" ou \"402.25\")
+
+  const el = document.getElementById(ID);
+  if (!el) return JSON.stringify({ ok:false, step:\"find\", error:\"Campo não encontrado\", id: ID });
+
+  // Extrai automaticamente o ctrlId do GeneXus a partir do onblur=\"...onblur(this,XXX)...\"
+  function extrairCtrlId(input) {
+    const onb = input.getAttribute(\"onblur\") || \"\";
+    const m = onb.match(/onblur\\s*\\(\\s*this\\s*,\\s*(\\d+)/i);
+    return m ? parseInt(m[1], 10) : null;
+  }
+  const gxCtrlId = extrairCtrlId(el);
+
+  // Normaliza para padrão brasileiro com 2 casas decimais (ex.: \"402,25\")
+  function normalizarBR2(v) {
+    v = String(v ?? \"\").trim();
+
+    // remove R$, espaços e caracteres não numéricos (mantém dígitos, , . e -)
+    v = v.replace(/\\s+/g, \"\").replace(/^R\\$/i, \"\");
+    v = v.replace(/[^\\d,.\\-]/g, \"\");
+
+    if (v === \"\" || v === \"-\" || v === \",\" || v === \".\") return \"0,00\";
+
+    // Se tem vírgula, assumimos vírgula como decimal e removemos pontos de milhar
+    if (v.includes(\",\")) {
+      v = v.replace(/\\./g, \"\"); // remove milhar
+      // garante só uma vírgula (caso raro)
+      const parts = v.split(\",\");
+      v = parts[0] + \",\" + parts.slice(1).join(\"\");
+    } else {
+      // Se não tem vírgula, mas tem ponto, assume ponto como decimal e troca por vírgula
+      // e remove possíveis milhares (ex.: 1,234.56 já foi limpo acima, mas por segurança)
+      const lastDot = v.lastIndexOf(\".\");
+      if (lastDot >= 0) {
+        const intPart = v.slice(0, lastDot).replace(/\\./g, \"\");
+        const decPart = v.slice(lastDot + 1);
+        v = intPart + \",\" + decPart;
+      } else {
+        // só inteiro
+        v = v + \",00\";
+      }
+    }
+
+    // Ajusta decimais para 2 casas
+    let [inteiro, dec] = v.split(\",\");
+    inteiro = inteiro === \"\" ? \"0\" : inteiro;
+    dec = (dec || \"\");
+    dec = (dec + \"00\").slice(0, 2);
+
+    // remove zeros à esquerda do inteiro (mantém \"0\")
+    inteiro = inteiro.replace(/^(-?)0+(?=\\d)/, \"$1\");
+
+    return inteiro + \",\" + dec;
+  }
+
+  const valorTexto = normalizarBR2(bruto);
+
+  // setter nativo (mais compatível com frameworks)
+  const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, \"value\")?.set;
+
+  // 1) foco
+  try { el.scrollIntoView({ block:\"center\", inline:\"center\" }); } catch(e) {}
+  try { el.focus(); } catch(e) {}
+
+  // 2) set value
+  try { setter ? setter.call(el, valorTexto) : (el.value = valorTexto); } catch(e) { el.value = valorTexto; }
+
+  // 3) eventos + validação GeneXus
+  try { el.dispatchEvent(new Event(\"input\",  { bubbles:true, cancelable:true })); } catch(e) {}
+  try { el.dispatchEvent(new Event(\"change\", { bubbles:true, cancelable:true })); } catch(e) {}
+
+  // valid_decimal(thousandSep=\".\", decimalSep=\",\", decimals=\"2\")
+  try {
+    if (window.gx && gx.num && typeof gx.num.valid_decimal === \"function\") {
+      gx.num.valid_decimal(el, \".\", \",\", \"2\");
+    }
+  } catch(e) {}
+
+  try {
+    if (window.gx && gx.evt && typeof gx.evt.onchange === \"function\") {
+      gx.evt.onchange(el, window.event || null);
+    }
+  } catch(e) {}
+
+  // 4) como você usa TAB para \"commit\", simula TAB e faz blur/onblur
+  try {
+    el.dispatchEvent(new KeyboardEvent(\"keydown\", { bubbles:true, cancelable:true, key:\"Tab\", code:\"Tab\", keyCode:9, which:9 }));
+    el.dispatchEvent(new KeyboardEvent(\"keyup\",   { bubbles:true, cancelable:true, key:\"Tab\", code:\"Tab\", keyCode:9, which:9 }));
+  } catch(e) {}
+
+  try { el.blur(); } catch(e) {}
+  try { el.dispatchEvent(new Event(\"blur\", { bubbles:true, cancelable:true })); } catch(e) {}
+
+  try {
+    if (gxCtrlId !== null && window.gx && gx.evt && typeof gx.evt.onblur === \"function\") {
+      gx.evt.onblur(el, gxCtrlId);
+    }
+  } catch(e) {}
+
+  return JSON.stringify({ ok:true, step:\"done\", id:ID, bruto:String(bruto), normalizado:valorTexto, valueFinal: el.value, gxCtrlId: gxCtrlId });
+}'''
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Enter}''' DelayBetweenKeystrokes: 2000 SendTextAsHardwareKeys: False
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp2_login_NF Text: $'''Registro salvo com sucesso.''')
+    **ENDREGION
+    **REGION salva num lançame
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//captar numero OEE
+function ExecuteScript() {
+  // 1) tenta pegar do span visível (preferencial)
+  var sp = document.getElementById(\"span_W0023SDTENTRADAMATERIALNF_ENTMATRECEBIMENTO\");
+  if (sp) {
+    var t = sp.innerText || sp.textContent || \"\";
+    t = t.replace(/^\\s+|\\s+$/g, \"\"); // trim
+    if (t) return t;
+  }
+
+  // 2) fallback: pega do input escondido (tem espaços)
+  var inp = document.getElementById(\"span_W0023SDTENTRADAMATERIALNF_ENTMATRECEBIMENTO\");
+  if (inp) {
+    var v = inp.value || \"\";
+    v = v.replace(/^\\s+|\\s+$/g, \"\");
+    return v;
+  }
+
+  return \"\";
+} ''' Result=> NF_nu_gerado
+    WAIT 2
+    Excel.WriteToExcel.WriteCell Instance: planilha_base Value: NF_nu_gerado Column: $'''N''' Row: LinhaExcelAtual_NF
+    Variables.IncreaseVariable Value: LinhaExcelAtual_NF IncrementValue: 1
+    Text.SplitText.SplitWithDelimiter Text: NF_nu_gerado CustomDelimiter: $'''/''' IsRegEx: False Result=> PartesNFnume
+    SET NF_numero TO PartesNFnume[0]
+    **ENDREGION
+    **REGION OEE lançamento NF
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//seleção aba OEE
+function ExecuteScript() { 
+aba_item = document.getElementById(\'Tab_GXUITABSPANEL_ABASContainerpanel3\') 
+aba_item.click()
+}'''
+    WAIT 1
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//clique inserir
+
+function ExecuteScript() {
+  const FORM = \"W0039\";
+  const EVENT = \"W0039E\'DOINSERT\'.\";
+  const GRID_EVT = 69;   // do onclick: setGridEvt(69,null)
+  const CTRL_FOCUS = 25; // do onfocus: onfocus(this, 25,\'W0039\'...)
+
+  // 1) localizar botão (não tem id, tem name)
+  let btn =
+    document.querySelector(\"input[name=\'W0039BTNINSERT\']\") ||
+    document.querySelector(\"input[title=\'Inserir\'][value=\'Inserir\']\") ||
+    Array.from(document.querySelectorAll(\"input[type=\'button\'][onclick]\"))
+      .find(b => (b.getAttribute(\"onclick\") || \"\").includes(EVENT));
+
+  if (!btn) {
+    return JSON.stringify({ ok: false, step: \"find\", error: \"Botão Inserir (W0039BTNINSERT) não encontrado.\" });
+  }
+
+  // 2) foco (como o GeneXus espera)
+  try { btn.scrollIntoView({ block: \"center\", inline: \"center\" }); } catch (e) {}
+  try { btn.focus(); } catch (e) {}
+
+  // 3) acionar pelo GeneXus (mais confiável do que click puro)
+  let acionouGX = false;
+  try {
+    if (window.gx && gx.evt && typeof gx.evt.execEvt === \"function\") {
+      // replica o onfocus do HTML
+      try { if (gx.evt.onfocus) gx.evt.onfocus(btn, CTRL_FOCUS, FORM, false, \"\", 0); } catch (e1) {}
+
+      // replica o onclick do HTML
+      if (!gx.evt.jsEvent || gx.evt.jsEvent(btn)) {
+        if (gx.evt.setGridEvt) gx.evt.setGridEvt(GRID_EVT, null);
+        gx.evt.execEvt(FORM, false, EVENT, btn);
+        acionouGX = true;
+      }
+    }
+  } catch (e2) {}
+
+  // 4) fallback (clique forte) caso o GX não pegue
+  if (!acionouGX) {
+    try {
+      btn.dispatchEvent(new PointerEvent(\"pointerdown\", { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      btn.dispatchEvent(new PointerEvent(\"pointerup\",   { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      btn.dispatchEvent(new MouseEvent(\"mousedown\", { bubbles: true, cancelable: true, view: window }));
+      btn.dispatchEvent(new MouseEvent(\"mouseup\",   { bubbles: true, cancelable: true, view: window }));
+      btn.dispatchEvent(new MouseEvent(\"click\",     { bubbles: true, cancelable: true, view: window }));
+    } catch (e3) {
+      try { btn.click(); } catch (e4) {}
+    }
+  }
+
+  return JSON.stringify({
+    ok: true,
+    step: \"done\",
+    acionouGX: acionouGX,
+    name: btn.getAttribute(\"name\") || \"\",
+    title: btn.getAttribute(\"title\") || \"\",
+    value: btn.getAttribute(\"value\") || \"\"
+  });
+}
+'''
+    WAIT 1
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//clicar lupa OEE
+
+function ExecuteScript() {
+  const TARGET_ID = \"PROMPTORDEMFATURA\";
+
+  function strongClick(win, el) {
+    if (!el) return false;
+    try { el.scrollIntoView({ block: \"center\", inline: \"center\" }); } catch (e) {}
+
+    try {
+      el.dispatchEvent(new win.PointerEvent(\"pointerdown\", { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new win.PointerEvent(\"pointerup\",   { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new win.MouseEvent(\"mousedown\", { bubbles: true, cancelable: true, view: win }));
+      el.dispatchEvent(new win.MouseEvent(\"mouseup\",   { bubbles: true, cancelable: true, view: win }));
+      el.dispatchEvent(new win.MouseEvent(\"click\",     { bubbles: true, cancelable: true, view: win }));
+      return true;
+    } catch (e2) {
+      try { el.click(); return true; } catch (e3) { return false; }
+    }
+  }
+
+  function tryClickIn(win, doc, where) {
+    const el = doc.getElementById(TARGET_ID);
+    if (!el) return null;
+
+    // Foco (às vezes GeneXus precisa do foco antes do click)
+    try { el.focus(); } catch (e) {}
+
+    const ok = strongClick(win, el);
+    return { ok, where, found: true, id: TARGET_ID };
+  }
+
+  // 1) tenta no documento atual
+  let r = tryClickIn(window, document, \"document\");
+  if (r) return JSON.stringify(r);
+
+  // 2) tenta no popup GeneXus visível (.gx-responsive-popup) => iframe id$=\"_ifrm\"
+  const popup = Array.from(document.querySelectorAll(\".gx-responsive-popup\"))
+    .find(p => p && p.style && p.style.visibility !== \"hidden\" && p.offsetParent !== null);
+
+  if (popup) {
+    const ifrm = popup.querySelector(\"iframe[id$=\'_ifrm\']\");
+    if (ifrm) {
+      try {
+        const win = ifrm.contentWindow;
+        const doc = ifrm.contentDocument || (win && win.document);
+        if (doc) {
+          r = tryClickIn(win, doc, \"gx-popup-iframe\");
+          if (r) return JSON.stringify(r);
+        }
+      } catch (e) {}
+    }
+  }
+
+  // 3) fallback: varre qualquer iframe (caso popup não tenha class padrão)
+  const iframes = Array.from(document.querySelectorAll(\"iframe\"));
+  for (let i = 0; i < iframes.length; i++) {
+    try {
+      const win = iframes[i].contentWindow;
+      const doc = iframes[i].contentDocument || (win && win.document);
+      if (!doc) continue;
+
+      r = tryClickIn(win, doc, \"iframe[\" + i + \"]\");
+      if (r) return JSON.stringify(r);
+    } catch (e) {
+      // sem acesso (cross-origin)
+      continue;
+    }
+  }
+
+  return JSON.stringify({ ok: false, found: false, id: TARGET_ID, error: \"Lupa não encontrada no documento nem em iframes.\" });
+}'''
+    WAIT 1
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}%oee_numero_atual%{Tab}{Tab}{Enter}''' DelayBetweenKeystrokes: 400 SendTextAsHardwareKeys: False
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp2_login_NF Text: $'''Gravar OEE''')
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Down}{Tab}{Enter}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp2_login_NF Text: $'''Registro salvo com sucesso.''')
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Escape}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+    WAIT 1
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//botao voltar
+
+function ExecuteScript() {
+  const FORM = \"W0039\";
+  const EVENT = \"W0039E\'DOBTVOLTAR\'.\";
+  const GRID_EVT = 69;   // do onclick: setGridEvt(69,null)
+  const CTRL_FOCUS = 93; // do onfocus: onfocus(this, 93,\'W0039\'...)
+
+  // 1) localizar (não tem id, tem name)
+  let btn =
+    document.querySelector(\"input[name=\'W0039BTNBTVOLTAR\']\") ||
+    document.querySelector(\"input[title=\'Voltar\'][value=\'Voltar\']\") ||
+    Array.from(document.querySelectorAll(\"input[type=\'button\'][onclick]\"))
+      .find(b => (b.getAttribute(\"onclick\") || \"\").includes(EVENT));
+
+  if (!btn) {
+    return JSON.stringify({ ok: false, step: \"find\", error: \"Botão Voltar (W0039BTNBTVOLTAR) não encontrado.\" });
+  }
+
+  // 2) foco
+  try { btn.scrollIntoView({ block: \"center\", inline: \"center\" }); } catch (e) {}
+  try { btn.focus(); } catch (e) {}
+
+  // 3) tenta acionar pelo GeneXus (mais confiável)
+  let acionouGX = false;
+  try {
+    if (window.gx && gx.evt && typeof gx.evt.execEvt === \"function\") {
+      // replica o onfocus
+      try { if (gx.evt.onfocus) gx.evt.onfocus(btn, CTRL_FOCUS, FORM, false, \"\", 0); } catch (e1) {}
+
+      // replica o onclick
+      if (!gx.evt.jsEvent || gx.evt.jsEvent(btn)) {
+        if (gx.evt.setGridEvt) gx.evt.setGridEvt(GRID_EVT, null);
+        gx.evt.execEvt(FORM, false, EVENT, btn);
+        acionouGX = true;
+      }
+    }
+  } catch (e2) {}
+
+  // 4) fallback: clique forte (PAD/Edge)
+  if (!acionouGX) {
+    try {
+      btn.dispatchEvent(new PointerEvent(\"pointerdown\", { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      btn.dispatchEvent(new PointerEvent(\"pointerup\",   { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      btn.dispatchEvent(new MouseEvent(\"mousedown\", { bubbles: true, cancelable: true, view: window }));
+      btn.dispatchEvent(new MouseEvent(\"mouseup\",   { bubbles: true, cancelable: true, view: window }));
+      btn.dispatchEvent(new MouseEvent(\"click\",     { bubbles: true, cancelable: true, view: window }));
+    } catch (e3) {
+      try { btn.click(); } catch (e4) {}
+    }
+  }
+
+  return JSON.stringify({
+    ok: true,
+    step: \"done\",
+    acionouGX: acionouGX,
+    name: btn.getAttribute(\"name\") || \"\",
+    value: btn.getAttribute(\"value\") || \"\"
+  });
+}'''
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp2_login_NF Text: $'''SECRETARIA MUNICIPAL DE OBRAS E INFRAESTRUTURA''')
+    WAIT 2
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//buscar NF lançada
+
+function ExecuteScript() {
+  const ID = \"W0006vENTMATNFNUMERO1\";
+  const VALOR = \"%NF_numero%\";  // <-- variável do PAD (ex.: \"3340333321\")
+  const GX_FORM = \"W0006\";
+  const GX_CTRL = 62; // do F12: onfocus(...62,\'W0006\'...) e onblur(...,62)
+
+  const el = document.getElementById(ID);
+  if (!el) return JSON.stringify({ ok: false, step: \"find\", error: \"Campo não encontrado\", id: ID });
+
+  // limpa e mantém somente dígitos (type=number)
+  let num = String(VALOR ?? \"\").trim();
+  // se vier \"123/2026\", pega só antes da barra
+  num = num.split(\"/\")[0].replace(/[^\\d\\-]/g, \"\");
+  if (num === \"\" || num === \"-\") num = \"0\";
+
+  // setter nativo
+  const desc = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, \"value\");
+  const setter = desc && desc.set;
+
+  // 1) foco + GeneXus onfocus
+  try { el.scrollIntoView({ block: \"center\", inline: \"center\" }); } catch (e) {}
+  try { el.focus(); } catch (e) {}
+
+  try {
+    if (window.gx && gx.evt && typeof gx.evt.onfocus === \"function\") {
+      gx.evt.onfocus(el, GX_CTRL, GX_FORM, false, \"0001\", 0);
+    }
+  } catch (e) {}
+
+  // 2) setar valor (para number, valueAsNumber ajuda)
+  try { el.valueAsNumber = parseInt(num, 10); } catch (e) {}
+  try { setter ? setter.call(el, num) : (el.value = num); } catch (e) { el.value = num; }
+
+  // 3) eventos + validação integer + onchange GX
+  try { el.dispatchEvent(new Event(\"input\",  { bubbles: true, cancelable: true })); } catch (e) {}
+  try { el.dispatchEvent(new Event(\"change\", { bubbles: true, cancelable: true })); } catch (e) {}
+
+  try {
+    if (window.gx && gx.num && typeof gx.num.valid_integer === \"function\") {
+      gx.num.valid_integer(el, \".\");
+    }
+  } catch (e) {}
+
+  try {
+    if (window.gx && gx.evt && typeof gx.evt.onchange === \"function\") {
+      gx.evt.onchange(el, window.event || null);
+    }
+  } catch (e) {}
+
+  // 4) commit (blur + onblur GX) — geralmente substitui TAB
+  try { el.blur(); } catch (e) {}
+  try { el.dispatchEvent(new Event(\"blur\", { bubbles: true, cancelable: true })); } catch (e) {}
+
+  try {
+    if (window.gx && gx.evt && typeof gx.evt.onblur === \"function\") {
+      gx.evt.onblur(el, GX_CTRL);
+    }
+  } catch (e) {}
+
+  return JSON.stringify({ ok: true, step: \"done\", id: ID, setTo: num, valueNow: el.value });
+}'''
+    WAIT 3
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//botao finalizar lançamento
+
+function ExecuteScript() {
+  var DATA_ID_PREFERIDO = \"vGRIDACTIONS_0001\"; // se existir, ele usa este
+  var OPCAO = \"Finalizar\";
+
+  function norm(s) { return (s || \"\").replace(/\\s+/g, \" \").trim(); }
+
+  function clickForte(el) {
+    if (!el) return false;
+    try { el.scrollIntoView({ block: \"center\", inline: \"center\" }); } catch (e) {}
+
+    try {
+      el.dispatchEvent(new PointerEvent(\"pointerdown\", { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new PointerEvent(\"pointerup\",   { bubbles: true, cancelable: true, pointerType: \"mouse\" }));
+      el.dispatchEvent(new MouseEvent(\"mousedown\", { bubbles: true, cancelable: true, view: window }));
+      el.dispatchEvent(new MouseEvent(\"mouseup\",   { bubbles: true, cancelable: true, view: window }));
+      el.dispatchEvent(new MouseEvent(\"click\",     { bubbles: true, cancelable: true, view: window }));
+      return true;
+    } catch (e2) {
+      try { el.click(); return true; } catch (e3) { return false; }
+    }
+  }
+
+  function acharBotaoSandwich() {
+    // 1) tenta o data-id preferido
+    var btn = document.querySelector(\"button.dropdown-toggle[data-id=\'\" + DATA_ID_PREFERIDO + \"\']\");
+    if (btn && btn.offsetParent !== null) return btn;
+
+    // 2) tenta qualquer vGRIDACTIONS_* visível (mais confiável quando muda de 0001)
+    var btns = Array.from(document.querySelectorAll(\"button.dropdown-toggle[data-id^=\'vGRIDACTIONS_\']\"));
+    btn = btns.find(b => b && b.offsetParent !== null) || null;
+    if (btn) return btn;
+
+    // 3) fallback: primeiro dropdown-toggle visível
+    btns = Array.from(document.querySelectorAll(\"button.dropdown-toggle\"));
+    return btns.find(b => b && b.offsetParent !== null) || null;
+  }
+
+  function acharMenuAberto() {
+    // bootstrap-select aberto
+    var m1 = document.querySelector(\".bootstrap-select.open .dropdown-menu.open\");
+    if (m1) return m1;
+
+    // qualquer dropdown-menu aberto
+    var m2 = document.querySelector(\".dropdown-menu.open\");
+    if (m2) return m2;
+
+    // fallback: UL inner visível
+    var uls = Array.from(document.querySelectorAll(\"ul.dropdown-menu.inner[role=\'listbox\']\"));
+    for (var i = 0; i < uls.length; i++) {
+      if (uls[i] && uls[i].offsetParent !== null) return uls[i].closest(\".dropdown-menu\") || uls[i];
+    }
+    return null;
+  }
+
+  function clicarOpcao(menu, texto) {
+    // procura span.text === \"Finalizar\"
+    var spans = Array.from(menu.querySelectorAll(\"span.text\"));
+    var span = spans.find(s => norm(s.textContent) === texto) || null;
+    if (!span) return false;
+
+    var a = span.closest(\"a\");
+    if (!a) return false;
+
+    return clickForte(a);
+  }
+
+  // 1) acha botão sandwich
+  var btn = acharBotaoSandwich();
+  if (!btn) return JSON.stringify({ ok: false, step: \"findButton\", error: \"Botão sandwich (dropdown-toggle) não encontrado.\" });
+
+  // 2) abre menu (wrapper + botão)
+  var wrapper = btn.closest(\".bootstrap-select\") || btn.parentElement;
+  if (wrapper) clickForte(wrapper);
+  clickForte(btn);
+
+  // 3) acha menu aberto
+  var menu = acharMenuAberto();
+  if (!menu) {
+    // tenta abrir novamente
+    clickForte(btn);
+    menu = acharMenuAberto();
+  }
+  if (!menu) return JSON.stringify({ ok: false, step: \"openMenu\", error: \"Não detectei dropdown aberto.\" });
+
+  // 4) clica Finalizar
+  var ok = clicarOpcao(menu, OPCAO);
+  if (!ok) {
+    return JSON.stringify({
+      ok: false,
+      step: \"clickOption\",
+      error: \"Menu abriu, mas não encontrei/click na opção.\",
+      option: OPCAO
+    });
+  }
+
+  return JSON.stringify({
+    ok: true,
+    step: \"done\",
+    clicked: OPCAO,
+    dataId: btn.getAttribute(\"data-id\") || \"\"
+  });
+}'''
+    WAIT 3
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Tab}{Tab}{Enter}''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
+    WebAutomation.ExecuteJavascript BrowserInstance: grp2_login_NF Javascript: $'''//botao SIM
+
+function ExecuteScript() {
+btm=document.getElementById(\'W0006DVELOP_CONFIRMPANEL_UAFINALIZARContainer_SaveButton\')
+btm.click()
+}'''
+    WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainText BrowserInstance: grp2_login_NF Text: $'''Finalização realizada com sucesso.''')
+    **ENDREGION
+    **ENDREGION
+END
+WebAutomation.CloseWebBrowser BrowserInstance: grp2_login_NF
