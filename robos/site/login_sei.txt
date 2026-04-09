@@ -57,7 +57,7 @@ for (var i = 0; i < x.length; i++) {
 }
 }'''
 WebAutomation.ExecuteJavascript BrowserInstance: sei Javascript: $'''function ExecuteScript() { 
-acessar=document.getElementById(\"Acessar\")
+acessar=document.getElementById(\"sbmAcessar\")
 acessar.click()
 }''' Result=> Result
 # Aguarda página inicial de SEI ser carregada. Somente quando textos "Controle de Processos" aparecer é que próximas ações serão realizadas.
