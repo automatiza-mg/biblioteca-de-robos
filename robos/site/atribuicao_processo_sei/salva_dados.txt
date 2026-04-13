@@ -3,8 +3,8 @@ DateTime.GetCurrentDateTime.Windows DateTimeFormat: DateTime.DateTimeFormat.Date
 Text.SplitText.Split Text: DataHoraFinalizacao StandardDelimiter: Text.StandardDelimiter.Space DelimiterTimes: 1 Result=> ListaDataHora
 SET DataFinalizacao TO ListaDataHora[0]
 SET HoraFinalizacao TO ListaDataHora[1]
-Text.Replace Text: DataFinalizacao TextToFind: $'''/''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''_''' ActivateEscapeSequences: False Result=> DataFormatada
-Text.Replace Text: HoraFinalizacao TextToFind: $''':''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''-''' ActivateEscapeSequences: False Result=> HoraFormatada
+Text.Replace.ReplaceText Text: DataFinalizacao TextToFind: $'''/''' IgnoreCase: False ReplaceWith: $'''_''' ActivateEscapeSequences: False ComparisonType: Text.TextComparisonType.CultureSensitive Result=> DataFormatada
+Text.Replace.ReplaceText Text: HoraFinalizacao TextToFind: $''':''' IgnoreCase: False ReplaceWith: $'''-''' ActivateEscapeSequences: False ComparisonType: Text.TextComparisonType.CultureSensitive Result=> HoraFormatada
 Folder.Create FolderPath: pastaDeTrabalho FolderName: $'''auditoriadoFluxo''' Folder=> pastaDeAuditoria
 Folder.GetFiles Folder: pastaDeTrabalho FileFilter: $'''*.xlsx''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> arquivosDaPastaDeTrabalho
 Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: arquivosDaPastaDeTrabalho[0] Visible: True ReadOnly: False UseMachineLocale: False Instance=> ExcelInstance
