@@ -74,7 +74,7 @@ document.getElementById(\"placa\").focus();
                 UIAutomation.FocusWindow.FocusByInstanceOrHandle WindowInstance: Planilha_veiculos
                 Excel.WriteToExcel.WriteCell Instance: Planilha_veiculos Value: PowershellOutput Column: $'''g''' Row: linha_cidadao + 1
                 Excel.WriteToExcel.WriteCell Instance: Planilha_veiculos Value: situacao_do_veiculo Column: $'''d''' Row: linha_cidadao + 1
-                Scripting.RunPowershellScript.RunPowershellScript Script: $'''Get-Date -Format \"dd/MM/yyyy hh:mm tt\"''' ScriptOutput=> PowershellOutput
+                Scripting.RunPowershellScript.RunScript Script: $'''Get-Date -Format \\\"dd/MM/yyyy hh:mm tt\\\"''' ScriptOutput=> PowershellOutput
             END
         END
         IF situacao_do_veiculo <> $'''Este Veículo não tem Autuação e não tem Multa.''' THEN
